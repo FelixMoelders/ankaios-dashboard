@@ -1,0 +1,17 @@
+apiVersion: v0.1
+workloads:
+  ank_dashboard:
+    runtime: podman
+    agent: agent_A
+    restart: true
+    updateStrategy: AT_MOST_ONCE
+    accessRights:
+      allow: []
+      deny: []
+    restartPolicy: NEVER
+    tags:
+      - key: owner
+        value: Ankaios team
+    runtimeConfig: |
+      image: dashboard:0.0
+      commandOptions: ["-p", "5001:5001"]

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>JSON Tabelle</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='Ankaios__logo_for_light_bgrd_clipped.png') }}" width="30" height="30" class="d-inline-block align-top" alt="">
+                Ankaios
+            </a>
+        </nav>
+    </header>
+
+    <div class="container mt-5">
+        <table class="table table-striped" id="dataTable">
+            <thead>
+                <tr>
+                    <th>Workload Name</th>
+                    <th>Agent</th>
+                    <th>Status</th>
+                    <!-- Fügen Sie hier weitere Ths für Kopfzeilen hinzu -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Hier füllt jQuery die Daten ein -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        $(document).ready(function () {
+            fetch('/completeState')
+                .then(response => {
+                    response.json().then(function(jsonData) {
+                        var html = '';
+                        html += '<tr>';
+                        html += '<td>' + jsonData.response.completeState.workloadStates[0].instanceName.workloadName + '</td>';
+                        html += '<td>' + jsonData.response.completeState.workloadStates[0].instanceName.agentName + '</td>';
+                        html += '<td>' + jsonData.response.completeState.workloadStates[0].executionState.running + '</td>';
+                        html += '</tr>';
+                        $('#dataTable tbody').append(html);
+                    });
+                }).catch(error => console.error('Ein Fehler ist aufgetreten: ', error));
+        });
+    </script>
+
+</body>
+
+</html>

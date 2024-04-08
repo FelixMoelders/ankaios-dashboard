@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="icon" href="img/favicon.png" type="image/png">
+	<link href="{{url_for('static', filename='css/surface_styles.css')}}" rel="stylesheet">
+	<link href="{{url_for('static', filename='css/monokai_sublime.css')}}" rel="stylesheet">
+	<script src="js/highlight.pack.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<title>Ankaios Dashboard</title>
+	<meta name="description" content="Ankaios Dashboard">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+	<input type="checkbox" id="nav--super-vertical-responsive">
+	<label for="nav--super-vertical-responsive">MENU</label>
+	<aside class="nav--super-vertical g--2 g-m--3 g-s--6 g-t--12 no-margin-vertical" role="sidebar">
+		<div class="g--12 logo-area no-margin-vertical">
+			<h4 class="color--pink no-margin-vertical">Dashboard</h5>
+		</div>
+		<nav class="g--12 no-margin-vertical" role="navigation">
+			<a href="index.html">Home</a>
+			<a href="login.html">Login</a>
+			<a href="{{url_for('workloads')}}">Workloads</a>
+			<a href="about.html">About</a>
+		</nav>
+	</aside>
+	<main class="g--10 g-m--12 m--2 m-m--0 no-margin-vertical" role="main">
+		<header class="container--wrap">
+			<img src="{{url_for('static', filename='ankaios_logo.png')}}" style="width:10%">
+		</header>
+		<div class="g--10 m--1">
+			<table class="g--8 card" id="workloadTable">
+			  <thead>
+				  <tr>
+					<th>Workload</th>
+					<th>Agent</th>
+					<th>State</th>
+				  </tr>
+			  </thead>
+			  <tbody>
+			  </tbody>
+			</table>
+			<button onclick="load_state()" class="btn--raised btn--blue" id="loadBtn">Refresh</button>
+			<button onclick="delete_rows()" class="btn--raised btn--blue" id="clearBtn">Clear</button>
+			<script>
+				function json_to_html(json_data) {
+					states = json_data.response.completeState.workloadStates;
+					var n_states = Object.keys(states).length;
+					var html = '';
+					for (let i = 0; i <= n_states - 1; i++) {
+						html += '<tr>';
+						html += '<td>' + states[i].instanceName.workloadName + '</td>';
+						html += '<td>' + states[i].instanceName.agentName + '</td>';
+						html += '<td>' + states[i].executionState.running + '</td>';
+					};
+					return html;
+				}
+			</script>
+			<script>
+				function append_to_table(rows) {
+					delete_rows();
+					$('#workloadTable tbody').append(rows);
+				}
+			</script>
+			<script>
+				function load_state() {
+					fetch('/states')
+							.then(response => response.json())
+							.then(json_to_html)
+							.then(append_to_table);
+				}
+			</script>
+			<script>
+				function delete_rows() {
+					$('#workloadTable tbody tr').remove();
+				}
+			</script>
+		</div>
+	</main>
+</body>
+</hmtl>

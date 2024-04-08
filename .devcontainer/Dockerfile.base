@@ -21,6 +21,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install \
     # java for plantuml
     default-jre \
+    git \
     graphviz \
     # MkDocs Material and social card
     python3 \
@@ -70,7 +71,7 @@ RUN curl -sL https://github.com/plantuml/plantuml/releases/download/v1.2024.0/pl
 COPY plantuml /usr/local/bin
 
 # MkDocs Material
-RUN PIP_BREAK_SYSTEM_PACKAGES=1 pip install mkdocs-material pillow cairosvg mike robotframework
+RUN PIP_BREAK_SYSTEM_PACKAGES=1 pip install mkdocs-material pillow cairosvg mike robotframework flask
 
 # protoc-gen-doc
 RUN curl -sL https://github.com/pseudomuto/protoc-gen-doc/releases/download/v1.5.1/protoc-gen-doc_1.5.1_linux_${TARGETARCH}.tar.gz | tar xz --directory=/usr/local/bin protoc-gen-doc
@@ -91,5 +92,13 @@ RUN cargo install cargo-llvm-cov --locked; \
 # Install required cargo targets and toolchains
 RUN rustup target add x86_64-unknown-linux-musl \
     && rustup target add aarch64-unknown-linux-musl
+
+# Retrieve latest verion of ankaios from github and build it
+WORKDIR "/tmp"
+RUN sudo git clone --depth 1 --branch v0.3.0-rc1 https://github.com/eclipse-ankaios/ankaios.git
+WORKDIR "/tmp/ankaios"
+RUN sudo chmod a+w /tmp/ankaios
+RUN cargo build
+RUN sudo cp ./target/x86_64-unknown-linux-musl/debug/ank ./target/x86_64-unknown-linux-musl/debug/ank-server ./target/x86_64-unknown-linux-musl/debug/ank-agent /usr/bin
 
 USER root

@@ -1,9 +1,9 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/rust
 {
-    "name": "Ankaios dev",
+    "name": "Ankaios-dashboard dev",
     "build": {
-        "dockerfile": "Dockerfile"
+        "dockerfile": "Dockerfile.base"
     },
    "mounts": [
    ],
@@ -45,7 +45,7 @@
            ]
        }
    },
-   "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/ankaios/,type=bind",
-   "workspaceFolder": "/workspaces/ankaios/",
+   "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/ankaios-dashboard/,type=bind",
+   "workspaceFolder": "/workspaces/ankaios-dashboard/",
    "remoteUser": "vscode"
 }

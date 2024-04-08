@@ -23,7 +23,7 @@ RUN echo 'if [ -f ~/.git-completion.bash ]; then\n\
 fi\n' >> /home/$USERNAME/.bashrc
 
 # add an alias for the test coverage generation
-RUN echo 'alias cov="/workspaces/ankaios/tools/generate_test_coverage_report.sh"' | tee -a /home/${USERNAME}/.bashrc /home/${USERNAME}/.zshrc
+RUN echo 'alias cov="/workspaces/ankaios-dashboard/tools/generate_test_coverage_report.sh"' | tee -a /home/${USERNAME}/.bashrc /home/${USERNAME}/.zshrc
 
 USER ${USERNAME}
 

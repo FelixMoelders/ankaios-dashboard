@@ -12,13 +12,13 @@ RUN apk update && apk add --update-cache \
     protoc \
     && rm -rf /var/cache/apk/*
 
-COPY api/proto/ankaios.proto /usr/local/lib/ankaios/ankaios.proto
+COPY /tmp/ankaios/api/proto/ankaios.proto /usr/local/lib/ankaios/ankaios.proto
 RUN protoc --python_out=/usr/local/lib/ankaios/ --proto_path=/usr/local/lib/ankaios/ ankaios.proto && touch /usr/local/lib/ankaios/__init__.py
 
 # prod stage
 FROM base
 ENV PYTHONPATH="${PYTHONPATH}:/usr/local/lib/ankaios"
 COPY --from=dev /usr/local/lib/ankaios /usr/local/lib/ankaios
-COPY examples/dashboard/app /ankaios
+COPY /workspaces/ankaios-dashboard/app /ankaios-dashboard
 
-ENTRYPOINT ["python3", "-u", "/ankaios/main.py"]
+ENTRYPOINT ["python3", "-u", "/ankaios-dashboard/main.py"]

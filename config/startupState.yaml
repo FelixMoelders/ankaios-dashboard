@@ -4,7 +4,7 @@ workloads:
     runtime: podman
     agent: agent_A
     restart: true
-    updateStrategy: AT_MOST_ONCE
+    updateStrategy: AT_LEAST_ONCE
     accessRights:
       allow: []
       deny: []
@@ -16,11 +16,11 @@ workloads:
       image: dashboard:0.0
       commandOptions: ["-p", "5001:5001"]
 
-ank_dashboard_B:
+  ank_dashboard_B:
     runtime: podman
     agent: agent_B
     restart: true
-    updateStrategy: AT_MOST_ONCE
+    updateStrategy: AT_LEAST_ONCE
     accessRights:
       allow: []
       deny: []
@@ -30,13 +30,13 @@ ank_dashboard_B:
         value: Ankaios team
     runtimeConfig: |
       image: dashboard:0.0
-      commandOptions: ["-p", "5001:5001"]
+      commandOptions: ["-p", "5002:5001"]
 
-ank_dashboard_C:
+  ank_dashboard_C:
     runtime: podman
     agent: agent_C
     restart: true
-    updateStrategy: AT_MOST_ONCE
+    updateStrategy: AT_LEAST_ONCE
     accessRights:
       allow: []
       deny: []
@@ -46,4 +46,4 @@ ank_dashboard_C:
         value: Ankaios team
     runtimeConfig: |
       image: dashboard:0.0
-      commandOptions: ["-p", "5001:5001"]
+      commandOptions: ["-p", "5003:5001"]

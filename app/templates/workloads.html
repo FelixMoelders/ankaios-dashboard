@@ -11,6 +11,25 @@
 	<title>Ankaios Dashboard</title>
 	<meta name="description" content="Ankaios Dashboard">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<style>
+		.btn--red {
+			color: #fff;
+			background-color: red; /* Adjust color as needed */
+		}
+		.btn-to-right {
+			margin-left: 50px; /* Adjust spacing as needed */
+		}
+	</style>
+
+	<script>
+		window.onload = function() { /* Workloads load as soon as the page is opened */
+		load_state();
+		}; 
+	</script> 
+
+
+
 </head>
 <body>
 	<input type="checkbox" id="nav--super-vertical-responsive">
@@ -25,7 +44,7 @@
 			<a href="{{url_for('workloads')}}">Workloads</a>
 			<a href="about.html">About</a>
 		</nav>
-	</aside>
+	</aside> 
 	<main class="g--10 g-m--12 m--2 m-m--0 no-margin-vertical" role="main">
 		<header class="container--wrap">
 			<img src="{{url_for('static', filename='ankaios_logo.png')}}" style="width:10%">
@@ -34,6 +53,7 @@
 			<table class="g--8 card" id="workloadTable">
 			  <thead>
 				  <tr>
+					<th>Select</th> <!--Introduce checkbox for workloads--> 
 					<th>Workload</th>
 					<th>Agent</th>
 					<th>State</th>
@@ -44,6 +64,7 @@
 			</table>
 			<button onclick="load_state()" class="btn--raised btn--blue" id="loadBtn">Refresh</button>
 			<button onclick="delete_rows()" class="btn--raised btn--blue" id="clearBtn">Clear</button>
+			<button onclick="delete_checked_rows()" class="btn--raised btn--red btn-to-right" id="deleteBtn">Delete</button> <!-- Option to delete checked workloads with extra button -->
 			<script>
 				function json_to_html(json_data) {
 					states = json_data.response.completeState.workloadStates;
@@ -77,6 +98,29 @@
 					$('#workloadTable tbody tr').remove();
 				}
 			</script>
+
+			<script>
+				function json_to_html(json_data) {
+				states = json_data.response.completeState.workloadStates;
+				var n_states = Object.keys(states).length;
+				var html = '';
+				for (let i = 0; i <= n_states - 1; i++) {
+					html += '<tr>';
+					html += '<td>' + '<input type="checkbox" class="delete-checkbox" />'; + '</td>';
+					html += '<td>' + states[i].instanceName.workloadName + '</td>';
+					html += '<td>' + states[i].instanceName.agentName + '</td>';
+					html += '<td>' + states[i].executionState.running + '</td>';
+					html += '</tr>';
+				};
+				return html;
+	}
+
+	function delete_checked_rows() {
+		$('.delete-checkbox:checked').each(function () { /* Delete the market buttons */
+			$(this).closest('tr').remove();
+		});
+	}
+</script>
 		</div>
 	</main>
 </body>

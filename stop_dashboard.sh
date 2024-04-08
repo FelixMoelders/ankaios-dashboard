@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 # Cleanup Ankaios ....
 echo "Cleaning up Ankaios..."

@@ -28,12 +28,13 @@ logger = create_logger()
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
 def home():
-    """
-    Returns the complete state of the ankaios system
-    as a Json string.
-    """
     return render_template('index.html')
+
+@app.route('/workloads')
+def workloads():
+    return render_template('workloads.html')
 
 @app.route('/completeState', methods=['GET'])
 def get_complete_state():

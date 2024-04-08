@@ -66,7 +66,7 @@
 			</script>
 			<script>
 				function load_state() {
-					fetch('/states')
+					fetch('/completeState')
 							.then(response => response.json())
 							.then(json_to_html)
 							.then(append_to_table);

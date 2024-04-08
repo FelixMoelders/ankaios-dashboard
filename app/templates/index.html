@@ -1,54 +1,36 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>JSON Tabelle</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<link rel="icon" href="img/favicon.png" type="image/png">
+	<link href="{{url_for('static', filename='css/surface_styles.css')}}" rel="stylesheet">
+	<link href="{{url_for('static', filename='css/monokai_sublime.css')}}" rel="stylesheet">
+	<script src="js/highlight.pack.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+	<title>Ankaios Dashboard</title>
+	<meta name="description" content="Ankaios Dashboard">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-
 <body>
-    <header>
-        <nav class="navbar navbar-dark bg-dark">
-            <a class="navbar-brand" href="#">
-                <img src="{{ url_for('static', filename='Ankaios__logo_for_light_bgrd_clipped.png') }}" width="30" height="30" class="d-inline-block align-top" alt="">
-                Ankaios
-            </a>
-        </nav>
-    </header>
-
-    <div class="container mt-5">
-        <table class="table table-striped" id="dataTable">
-            <thead>
-                <tr>
-                    <th>Workload Name</th>
-                    <th>Agent</th>
-                    <th>Status</th>
-                    <!-- Fügen Sie hier weitere Ths für Kopfzeilen hinzu -->
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Hier füllt jQuery die Daten ein -->
-            </tbody>
-        </table>
-    </div>
-    <script>
-        $(document).ready(function () {
-            fetch('/completeState')
-                .then(response => {
-                    response.json().then(function(jsonData) {
-                        var html = '';
-                        html += '<tr>';
-                        html += '<td>' + jsonData.response.completeState.workloadStates[0].instanceName.workloadName + '</td>';
-                        html += '<td>' + jsonData.response.completeState.workloadStates[0].instanceName.agentName + '</td>';
-                        html += '<td>' + jsonData.response.completeState.workloadStates[0].executionState.running + '</td>';
-                        html += '</tr>';
-                        $('#dataTable tbody').append(html);
-                    });
-                }).catch(error => console.error('Ein Fehler ist aufgetreten: ', error));
-        });
-    </script>
-
+	<input type="checkbox" id="nav--super-vertical-responsive">
+	<label for="nav--super-vertical-responsive">MENU</label>
+	<aside class="nav--super-vertical g--2 g-m--3 g-s--6 g-t--12 no-margin-vertical" role="sidebar">
+		<div class="g--12 logo-area no-margin-vertical">
+			<h4 class="color--pink no-margin-vertical">Dashboard</h5>
+		</div>
+		<nav class="g--12 no-margin-vertical" role="navigation">
+			<a href="index.html">Home</a>
+			<a href="login.html">Login</a>
+			<a href="{{url_for('workloads')}}">Workloads</a>
+			<a href="about.html">About</a>
+		</nav>
+	</aside>
+	<main class="g--10 g-m--12 m--2 m-m--0 no-margin-vertical" role="main">
+		<header class="container--wrap">
+			<img src="{{url_for('static', filename='ankaios_logo.png')}}" style="width:10%">
+		</header>
+		<div class="g--10 m--1">
+			<h2 class="fade-in-from-top color--pink">Welcome to the Ankaios Dashboard</h2>
+		</div>
+	</main>
 </body>
-
-</html>
+</hmtl>

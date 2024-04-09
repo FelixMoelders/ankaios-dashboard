@@ -2,7 +2,7 @@
 
 Future web interface to control the ankaios system.
 
-## How to run the examples?
+## How to run the dashboard?
 
 1. Open the project in VS Code Dev Container, with the provided configuration.
 2. Build and run the dashboard:
@@ -11,7 +11,7 @@ Future web interface to control the ankaios system.
    ./run_dashboard.sh
    ```
 
-   If the Ankaios executables are not inside the default path mentioned in the [Installation instructions](https://eclipse-ankaios.github.io/ankaios/main/usage/installation/), you can specify an alternative Ankaios executable path like the following:
+   The Ankaios executables are provided by the dev container under the default path [Installation instructions](https://eclipse-ankaios.github.io/ankaios/main/usage/installation/). If you want to use another version, you can specify an alternative Ankaios executable path like the following:
 
    ```shell
    ANK_BIN_DIR=/absolute/path/to/ankaios/executables ./run_dashboard.sh
@@ -29,6 +29,15 @@ Future web interface to control the ankaios system.
    ```shell
    podman logs -f $(podman ps -a | grep ank_dashboard | awk '{print $1}')
    ```
+
+## Use the protobuf definition in python
+
+Execute the following command in the dev container:
+
+   ```shell
+   protoc --python_out=/workspaces/ankaios-dashboard/app/ --proto_path=/tmp/ankaios/api/proto/ ankaios.proto && touch /workspaces/ankaios-dashboard/app/__init__.py
+   ```
+
 
 ## Ankaios logs
 

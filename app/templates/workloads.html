@@ -45,6 +45,8 @@
 			<button onclick="load_state()" class="btn--raised btn--blue" id="loadBtn">Refresh</button>
 			<button onclick="delete_rows()" class="btn--raised btn--blue" id="clearBtn">Clear</button>
 			<script>
+				let prev_state = null;
+
 				function json_to_html(json_data) {
 					states = json_data.response.completeState.workloadStates;
 					var n_states = Object.keys(states).length;
@@ -54,25 +56,30 @@
 						html += '<td>' + states[i].instanceName.workloadName + '</td>';
 						html += '<td>' + states[i].instanceName.agentName + '</td>';
 						html += '<td>' + states[i].executionState.running + '</td>';
+						html += '</tr>';
 					};
 					return html;
 				}
-			</script>
-			<script>
-				function append_to_table(rows) {
+
+				function write_to_table(rows) {
 					delete_rows();
 					$('#workloadTable tbody').append(rows);
 				}
-			</script>
-			<script>
+
+				function update_table(json_data) {
+					if (!_.isEqual(prev_state, json_data)) {
+						prev_state = json_data;
+						var html = json_to_html(json_data);
+						write_to_table(html);
+					}
+				}
+
 				function load_state() {
 					fetch('/completeState')
 							.then(response => response.json())
-							.then(json_to_html)
-							.then(append_to_table);
+							.then(update_table);
 				}
-			</script>
-			<script>
+
 				function delete_rows() {
 					$('#workloadTable tbody tr').remove();
 				}

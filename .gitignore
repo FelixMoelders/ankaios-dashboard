@@ -1,1 +1,3 @@
 __pycache__/
+app/ankaios_pb2.py
+app/__init__.py

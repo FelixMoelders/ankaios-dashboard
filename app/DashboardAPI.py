@@ -24,6 +24,14 @@ def get_complete_state():
     """
     return ank_comm_service.get_complete_state()
 
+@dashboard.route('/deleteWorkload')
+def send_delete_workload():
+    """
+    Returns request to delete a workload as a Json string
+    """
+    print("Delete button has been pressed!")
+    return 'Success'
+
 def run(ip="0.0.0.0", p="5001"):
     logger.info(f"Starting the dashboard api ...")
     dashboard.run(host=ip, port=p)

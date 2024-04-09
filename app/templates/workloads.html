@@ -28,6 +28,12 @@
 		}; 
 	</script> 
 
+<style> /* Allow table entries to go over multiple lines */
+	.break-word {
+		word-wrap: break-word;
+		word-break: break-all;
+	}
+	</style>
 
 
 </head>
@@ -55,6 +61,7 @@
 				  <tr>
 					<th>Select</th> <!--Introduce checkbox for workloads--> 
 					<th>Workload</th>
+					<th>ID</th>
 					<th>Agent</th>
 					<th>State</th>
 					<th>Active Time</th>
@@ -105,30 +112,75 @@
 					$('#workloadTable tbody tr').remove();
 				}
 			</script>
+			<script>
+			// This function will be triggered when a checkbox is clicked
+								function checkboxClicked(event) {
+									// Get the clicked element
+									const checkbox = event.target;
+									// Log the ID of the checkbox to the console
+									console.log('Checkbox clicked:', checkbox.id);
+								}
+
+								
+				function showIdInPopup(id) { //let the ID of the workload popup when the button in the table is clicked
+   				alert(id); 
+				}
+
+
+			</script>
 
 			<script>
 				function json_to_html(json_data) {
+				console.log(json_data);
 				states = json_data.response.completeState.workloadStates;
 				var n_states = Object.keys(states).length;
 				var html = '';
 				for (let i = 0; i <= n_states - 1; i++) {
 					html += '<tr>';
-					html += '<td>' + '<input type="checkbox" class="delete-checkbox" />'; + '</td>';
+					html += '<td><input type="checkbox" class="delete-checkbox" id="' + (i+1) + '. checkbox" onclick="checkboxClicked(event)" /></td>';
 					html += '<td>' + states[i].instanceName.workloadName + '</td>';
+					html += '<td><button class="id-button" onclick="showIdInPopup(\'' + states[i].instanceName.id + '\')">Show ID</button></td>';
 					html += '<td>' + states[i].instanceName.agentName + '</td>';
 					html += '<td>' + states[i].executionState.running + '</td>';
 					html += '<td class="active-time">' + '0' + '</td>'; // Active time of the workload
 					html += '</tr>';
 				};
+				
 				return html;
 				}
 
 					function delete_checked_rows() {
-					$('.delete-checkbox:checked').each(function () { /* Delete the market buttons */
+					$('.delete-checkbox:checked').each(function () { /* Delete the marked buttons */
 					$(this).closest('tr').remove();
-				});
-				}
+						});
+					}
+
+
+
+
 </script>
+
+
+<script> // Script to delete selected workload in the backend
+    function callWriteRequest() {
+        var myData = { 
+            deleteRequest: 'ank delete workload ank_dashboard_A'
+        };
+
+        $.ajax({
+            url: '/deleteWorkload', // endpoint where 'deleteWorkload' exists
+            type: 'post', // or 'get', it depends on what 'deleteWorkload' requires
+            dataType: 'json', // the type of data 'deleteWorkload' should expect
+            contentType: 'application/json', // this line sends the request as JSON
+            success: function (data) {
+                console.log('Data sent successfully');
+            },
+            data: JSON.stringify(myData) // converting the 'myData' object to a JSON string
+        });
+    }
+</script>
+
+
 		</div>
 	</main>
 </body>

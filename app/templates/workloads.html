@@ -57,6 +57,7 @@
 					<th>Workload</th>
 					<th>Agent</th>
 					<th>State</th>
+					<th>Active Time</th>
 				  </tr>
 			  </thead>
 			  <tbody>
@@ -65,20 +66,7 @@
 			<button onclick="load_state()" class="btn--raised btn--blue" id="loadBtn">Refresh</button>
 			<button onclick="delete_rows()" class="btn--raised btn--blue" id="clearBtn">Clear</button>
 			<button onclick="delete_checked_rows()" class="btn--raised btn--red btn-to-right" id="deleteBtn">Delete</button> <!-- Option to delete checked workloads with extra button -->
-			<script>
-				function json_to_html(json_data) {
-					states = json_data.response.completeState.workloadStates;
-					var n_states = Object.keys(states).length;
-					var html = '';
-					for (let i = 0; i <= n_states - 1; i++) {
-						html += '<tr>';
-						html += '<td>' + states[i].instanceName.workloadName + '</td>';
-						html += '<td>' + states[i].instanceName.agentName + '</td>';
-						html += '<td>' + states[i].executionState.running + '</td>';
-					};
-					return html;
-				}
-			</script>
+		
 			<script>
 				function append_to_table(rows) {
 					delete_rows();
@@ -86,11 +74,30 @@
 				}
 			</script>
 			<script>
+
+				function startTimer(activeTimeCell) { // Introduce a timer for active workload time
+					var seconds =0;
+					setInterval(function() {
+						seconds++;
+						activeTimeCell.text(seconds + " seconds");
+					
+					}, 1000);
+				}
+
+
+
+
 				function load_state() {
 					fetch('/completeState')
 							.then(response => response.json())
 							.then(json_to_html)
-							.then(append_to_table);
+							.then(append_to_table)
+							.then(() => {
+								// Start timer for workload
+								$('.active-time').each(function() {
+									startTimer($(this));
+								});
+							});
 				}
 			</script>
 			<script>
@@ -110,16 +117,17 @@
 					html += '<td>' + states[i].instanceName.workloadName + '</td>';
 					html += '<td>' + states[i].instanceName.agentName + '</td>';
 					html += '<td>' + states[i].executionState.running + '</td>';
+					html += '<td class="active-time">' + '0' + '</td>'; // Active time of the workload
 					html += '</tr>';
 				};
 				return html;
-	}
+				}
 
-	function delete_checked_rows() {
-		$('.delete-checkbox:checked').each(function () { /* Delete the market buttons */
-			$(this).closest('tr').remove();
-		});
-	}
+					function delete_checked_rows() {
+					$('.delete-checkbox:checked').each(function () { /* Delete the market buttons */
+					$(this).closest('tr').remove();
+				});
+				}
 </script>
 		</div>
 	</main>

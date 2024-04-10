@@ -26,6 +26,12 @@ const app = Vue.createApp({
             console.log('runtime:', this.runtime);
             console.log('restartPolicy:', this.restartPolicy);
             console.log('runtimeConfig:', this.runtimeConfig);
+
+            if (!this.workloadName) { // Added alert message if WorkloadName is empty in New Workload form. Bug: Unnamed Workloads result in EXECUTION STATE error and cannot be stopped.
+                alert('Workload name cannot be empty.')
+                return
+            }
+
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

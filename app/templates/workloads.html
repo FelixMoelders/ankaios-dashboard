@@ -6,7 +6,13 @@
 	<link href="{{url_for('static', filename='css/monokai_sublime.css')}}" rel="stylesheet">
 	<script src="js/highlight.pack.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<script>hljs.initHighlightingOnLoad();</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', (event) => {
+			hljs.initHighlightingOnLoad();
+		});
+		</script>
+	
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<title>Ankaios Dashboard</title>
 	<meta name="description" content="Ankaios Dashboard">
@@ -150,18 +156,45 @@
 				}
 
 					function delete_checked_rows() {
-					$('.delete-checkbox:checked').each(function () { /* Delete the marked buttons */
+					$('.delete-checkbox:checked').each(function () { /* Delete the marked workloads */
 					$(this).closest('tr').remove();
 						});
 					}
 
+					
+   			 document.getElementById('deleteBtn').onclick = () => {
+       			let checkedBoxes = document.querySelectorAll('input.delete-checkbox:checked');
+        		let checkedNames = Array.from(checkedBoxes).map((box) => box.parentElement.parentElement.children[1].textContent);
+       			console.log(checkedNames);
+
+				   fetch('http://localhost:5001/deleteWorkload', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({workload_names: checkedNames}),
+					})
+					.then(response => {
+						if (!response.ok) {
+						throw new Error("HTTP error " + response.status);
+						}
+						return response.json();
+					})
+					.then(json => {
+						console.log(json);
+					})
+					.catch(function(err) {
+						console.log("Fetch error: -S", err);
+					});
+   			 }
+				
 
 
 
 </script>
 
 
-<script> // Script to delete selected workload in the backend
+<script>/* // Script to delete selected workload in the backend -- did not work
     function callWriteRequest() {
         var myData = { 
             deleteRequest: 'ank delete workload ank_dashboard_A'
@@ -177,11 +210,13 @@
             },
             data: JSON.stringify(myData) // converting the 'myData' object to a JSON string
         });
-    }
+    }*/
+
+
 </script>
 
 
 		</div>
 	</main>
 </body>
-</hmtl>
+</html>

@@ -42,7 +42,8 @@
            "bianxianyang.htmlplay",
            "DavidAnson.vscode-markdownlint",
            "EditorConfig.EditorConfig",
-           "Vue.volar"
+           "Vue.volar",
+           "ms-azuretools.vscode-docker"
            ]
        }
    },

@@ -15,7 +15,7 @@ logger = Logger.get_custom_logger()
 ank_comm_service = AnkCommunicationService()
 
 @dashboard.route('/', methods=['GET'])
-@dashboard.route('/index', methods=['GET'])
+@dashboard.route('/index.html', methods=['GET'])
 def home():
     return render_template('index.html')
 

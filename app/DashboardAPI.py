@@ -1,15 +1,21 @@
 from Logger import Logger
-from flask import Flask, render_template, jsonify, request
-#from flask_restful import API, Resource, reqparse
+from flask import Flask, render_template, Response, request
 from AnkCommunicationService import AnkCommunicationService
 
-dashboard = Flask(__name__)
+class CustomFlask(Flask):
+    jinja_options = Flask.jinja_options.copy()
+    jinja_options.update(dict(
+        variable_start_string='%%',  # Default is '{{', I'm changing this because Vue.js uses '{{' / '}}'
+        variable_end_string='%%',
+    ))
+
+dashboard = CustomFlask(__name__)
 
 logger = Logger.get_custom_logger()
 ank_comm_service = AnkCommunicationService()
 
 @dashboard.route('/', methods=['GET'])
-@dashboard.route('/index', methods=['GET'])
+@dashboard.route('/index.html', methods=['GET'])
 def home():
     return render_template('index.html')
 
@@ -25,29 +31,15 @@ def get_complete_state():
     """
     return ank_comm_service.get_complete_state()
 
-@dashboard.route('/deleteWorkload', methods=['GET', 'POST'])
-def deleteWorkload():
-    """
-    Returns request to delete a workload as a Json string
-    """
-   # print(workload_names)
-    if request.method == 'POST':
-        if request.json:  # Check for JSON data in request
-            
-            workload_names = request.json.get('workload_names') 
+@dashboard.route('/addNewWorkload', methods=['POST'])
+def add_new_workload():
+    print(ank_comm_service.add_new_workload(request.json))
+    return Response("Workload added.", status=200, mimetype='application/json')
 
-            if workload_names: # Algorithm to check for errors, can be deleted or modified later.
-                print("Delete button has been pressed!")
-                print(workload_names)
-                return jsonify(message= 'OK'), 200
-            else:
-                return jsonify(error="Request is missing 'workload_names'"), 400  
-        else:
-                return jsonify(error="Request did not contain valid JSON data"), 400 
-
-#    print("Delete button has been pressed!")
-#    print(workload_names)
-#    return 'OK', 200
+@dashboard.route('/deleteWorkloads', methods=['POST'])
+def delete_workloads():
+    print(ank_comm_service.deleteWorkloads(request.json))
+    return Response("Workloads deleted.", status=200, mimetype='application/json')
 
 def run(ip="0.0.0.0", p="5001"):
     logger.info(f"Starting the dashboard api ...")

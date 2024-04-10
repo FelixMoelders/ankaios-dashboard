@@ -41,7 +41,9 @@
            "d-biehl.robotcode",
            "bianxianyang.htmlplay",
            "DavidAnson.vscode-markdownlint",
-           "EditorConfig.EditorConfig"
+           "EditorConfig.EditorConfig",
+           "Vue.volar",
+           "ms-azuretools.vscode-docker"
            ]
        }
    },

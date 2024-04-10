@@ -1,8 +1,15 @@
 from Logger import Logger
-from flask import Flask, render_template
+from flask import Flask, render_template, Response, request
 from AnkCommunicationService import AnkCommunicationService
 
-dashboard = Flask(__name__)
+class CustomFlask(Flask):
+    jinja_options = Flask.jinja_options.copy()
+    jinja_options.update(dict(
+        variable_start_string='%%',  # Default is '{{', I'm changing this because Vue.js uses '{{' / '}}'
+        variable_end_string='%%',
+    ))
+
+dashboard = CustomFlask(__name__)
 
 logger = Logger.get_custom_logger()
 ank_comm_service = AnkCommunicationService()
@@ -23,6 +30,16 @@ def get_complete_state():
     as a Json string.
     """
     return ank_comm_service.get_complete_state()
+
+@dashboard.route('/addNewWorkload', methods=['POST'])
+def add_new_workload():
+    print(ank_comm_service.add_new_workload(request.json))
+    return Response("Workload added.", status=200, mimetype='application/json')
+
+@dashboard.route('/deleteWorkloads', methods=['POST'])
+def delete_workloads():
+    print(ank_comm_service.deleteWorkloads(request.json))
+    return Response("Workloads deleted.", status=200, mimetype='application/json')
 
 def run(ip="0.0.0.0", p="5001"):
     logger.info(f"Starting the dashboard api ...")

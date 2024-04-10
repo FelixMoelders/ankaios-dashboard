@@ -63,7 +63,7 @@ class ControlInterface:
                 response_request_id = from_server.response.requestId
                 if response_request_id == request_id:
                     msg_json = MessageToJson(from_server)
-                    self.logger.info(f"JSON-Response: {msg_json}")
+                    self.logger.debug(f"JSON-Response: {msg_json}")
                     return msg_json
                 else:
                     self.logger.debug(f"RequestId does not match. Skipping messages from requestId: {response_request_id}")

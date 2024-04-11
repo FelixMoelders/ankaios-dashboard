@@ -10,8 +10,8 @@ workloads:
       deny: []
     restartPolicy: NEVER
     tags:
-      - key: owner
-        value: Ankaios team
+      - key: Started by
+        value: Felix
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5001:5001"]
@@ -26,8 +26,8 @@ workloads:
       deny: []
     restartPolicy: NEVER
     tags:
-      - key: owner
-        value: Ankaios team
+      - key: Started by
+        value: Hendrik
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5002:5001"]
@@ -42,8 +42,8 @@ workloads:
       deny: []
     restartPolicy: NEVER
     tags:
-      - key: owner
-        value: Ankaios team
+      - key: Started by
+        value: Ömür
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5003:5001"]

@@ -11,7 +11,9 @@ const app = Vue.createApp({
             agent: "agent_A",
             runtime: "podman",
             restartPolicy: "Never",
-            runtimeConfig: "image: docker.io/library/nginx\ncommandOptions: [\"-p\", \"8080:80\"]"
+            runtimeConfig: "image: docker.io/library/nginx\ncommandOptions: [\"-p\", \"8080:80\"]",
+            key: [],
+            value: []
         }
     },
     methods: {
@@ -68,12 +70,44 @@ const app = Vue.createApp({
         },
         loadState() {
             fetch('/completeState')
-                    .then(response => response.json())
-                    .then(json => json.response.completeState.workloadStates)
-                    .then((states) => {
-                        this.workloadStates = states;
-                    });
-        }
+                .then(response => response.json())
+                .then(json => {
+                    const workloads = json.response.completeState.desiredState.workloads;
+                    const workloadStates = json.response.completeState.workloadStates;
+                    for (const state of workloadStates) {
+                        const workload = workloads[state.instanceName.workloadName];
+                        state.tags = workload ? workload.tags : [];
+                    }
+                    this.workloadStates = workloadStates;
+                });
+        },
+
+        getColor(value) {
+            let hash = 0;
+            for(let i = 0; i < value.length; i++) {
+              hash = value.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            let color = ((hash & 0x00FFFFFF) | 0x1000000).toString(16).substring(1);
+            return `#${color}`;
+          },
+        
+
+        /*loadTags() {
+            fetch('/tags')
+                .then(response => response.json())
+                .then(json => {
+                    // transform each sub-array into an object with 'key' and 'value' properties
+                    const tags = json.map(item => ({ key: item[0], value: item[1] }));
+                    
+                    // then we assign these tags to the 'state' that they belong to
+                    for(let state of this.workloadStates) {
+                        state.tags = tags.filter(tag => tagIsAssociatedToState(tag, state)); // assuming you have a way to determine if a tag belongs to a state
+                    }
+                });
+          }*/
+
+
+
     },
     mounted() {
         this.timer = setInterval(() => {

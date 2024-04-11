@@ -12,6 +12,8 @@ workloads:
     tags:
       - key: Started by
         value: Felix
+      - key: Run in
+        value: AC Unit
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5001:5001"]
@@ -28,6 +30,8 @@ workloads:
     tags:
       - key: Started by
         value: Hendrik
+      - key: Run in
+        value: Infotainment
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5002:5001"]
@@ -44,6 +48,8 @@ workloads:
     tags:
       - key: Started by
         value: Ömür
+      - key: Run in
+        value: Drivetrain
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5003:5001"]

@@ -68,35 +68,7 @@ class AnkCommunicationService:
                             updateMask=[f"desiredState.workloads.{workload_name}"]
                         )
                 )
-            )
-
-    def get_tags(self):
-        request_complete_state = self.create_request_for_complete_state(REQUEST_ID)
-        self.control_interface.write_request_to_control_interface(request_complete_state)
-        response = self.control_interface.read_from_control_interface(REQUEST_ID)
-
-        all_tags = [] # List of tags for ALL workloads
-        try:
-            # Convert JSON response into a dictionary
-            response_dict = json.loads(response)
-        except json.JSONDecodeError as json_err:
-            print("JSON Decode Error: ", json_err)
-            return
-
-        try:
-            # Iterate and print the tags
-            workloads = response_dict['response']['completeState']['desiredState']['workloads']
-            for workload in workloads:
-                workload_tags = workloads[workload]['tags']
-                for tag in workload_tags:
-                    print('Key: ', tag['key'])
-                    print('Value: ', tag['value'])
-                    all_tags.append((tag['key'], tag['value']))
-        except KeyError as key_err:
-            print("Key Error: ", key_err)
-
-        return all_tags
-              
+            )      
 
     def get_complete_state(self):
         request_complete_state = self.create_request_for_complete_state(REQUEST_ID)

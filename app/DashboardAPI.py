@@ -31,16 +31,6 @@ def get_complete_state():
     """
     return ank_comm_service.get_complete_state()
 
-
-@dashboard.route('/tags', methods=['GET'])
-def get_tags():
-    """
-    Returns the tags of the workloads
-    as a Json string.
-    """
-    return ank_comm_service.get_tags()
-   # return ank_comm_service.get_complete_state()
-
 @dashboard.route('/addNewWorkload', methods=['POST'])
 def add_new_workload():
     print(ank_comm_service.add_new_workload(request.json))

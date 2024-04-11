@@ -12,8 +12,6 @@ const app = Vue.createApp({
             runtime: "podman",
             restartPolicy: "Never",
             runtimeConfig: "image: docker.io/library/nginx\ncommandOptions: [\"-p\", \"8080:80\"]",
-            key: [],
-            value: []
         }
     },
     methods: {
@@ -90,23 +88,6 @@ const app = Vue.createApp({
             let color = ((hash & 0x00FFFFFF) | 0x1000000).toString(16).substring(1);
             return `#${color}`;
           },
-        
-
-        /*loadTags() {
-            fetch('/tags')
-                .then(response => response.json())
-                .then(json => {
-                    // transform each sub-array into an object with 'key' and 'value' properties
-                    const tags = json.map(item => ({ key: item[0], value: item[1] }));
-                    
-                    // then we assign these tags to the 'state' that they belong to
-                    for(let state of this.workloadStates) {
-                        state.tags = tags.filter(tag => tagIsAssociatedToState(tag, state)); // assuming you have a way to determine if a tag belongs to a state
-                    }
-                });
-          }*/
-
-
 
     },
     mounted() {

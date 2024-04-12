@@ -11,8 +11,8 @@ workloads:
     restartPolicy: NEVER
     tags:
       - key: Started by
-        value: Felix
-      - key: Run in
+        value: Driver
+      - key: Running in
         value: AC Unit
     runtimeConfig: |
       image: dashboard:0.0
@@ -29,8 +29,8 @@ workloads:
     restartPolicy: NEVER
     tags:
       - key: Started by
-        value: Hendrik
-      - key: Run in
+        value: Front Passenger
+      - key: Running in
         value: Infotainment
     runtimeConfig: |
       image: dashboard:0.0
@@ -47,8 +47,8 @@ workloads:
     restartPolicy: NEVER
     tags:
       - key: Started by
-        value: Ömür
-      - key: Run in
+        value: Cloud Service
+      - key: Running in
         value: Drivetrain
     runtimeConfig: |
       image: dashboard:0.0

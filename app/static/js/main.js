@@ -12,7 +12,8 @@ const app = Vue.createApp({
             runtime: "podman",
             restartPolicy: "Never",
             runtimeConfig: "image: docker.io/library/nginx\ncommandOptions: [\"-p\", \"8080:80\"]",
-        }
+            filterTag: 'Infotainment', // Filter Tag for dashboard gets written/updated here
+        };
     },
     methods: {
         openForm() {
@@ -89,7 +90,18 @@ const app = Vue.createApp({
             return `#${color}`;
           },
 
+
     },
+
+    computed: { // Filter functionality is implemented here. If either key or value of the filterTag are existing in a workload, it gets displayed, otherwise hidden in the dashboard.
+        filteredWorkloads() {
+            return this.workloadStates.filter(workload =>
+              workload.tags.some(tag => tag.key === this.filterTag || tag.value === this.filterTag),
+            );
+        },
+
+    },
+
     mounted() {
         this.timer = setInterval(() => {
             this.loadState();

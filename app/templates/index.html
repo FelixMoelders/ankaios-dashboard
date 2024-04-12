@@ -39,6 +39,7 @@
 			<a >About</a>
 		</nav>
 	</aside>
+
 	<main class="g--10 g-m--12 m--2 m-m--0 no-margin-vertical" role="main">
 		<header class="container--wrap">
 			<img src="%% url_for('static', filename='ankaios_logo.png') %%" style="width:10%">
@@ -48,10 +49,16 @@
 			<h2 class="fade-in-from-top color--pink">Welcome to the Ankaios Dashboard</h2>
 		</div>
 		<!-- Workloads -->
+	  
 		<div class="g--10 m--1" v-if="showWorkloads">
 			<button v-on:click="deleteCheckedWorkloads()" class="btn--raised btn--red btn-to-right" id="deleteBtn">Delete</button>
 			<button v-on:click="openForm()" class="btn--raised btn--blue" id="newWorkloadBtn">New Workload</button>
 			
+			<label> <!--Filter label for workload tags-->
+				Filter by tag: <input type="text" v-model="filterTag">
+			  </label>
+
+
 			<div v-if="isFormOpen">
 				<label>
 					WorkloadName: <input type="text" v-model="workloadName">
@@ -83,7 +90,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="state in workloadStates">
+					<tr v-for="state in filteredWorkloads">
 					  <td><input type="checkbox" class="delete-checkbox" :id="state.instanceName.workloadName" :value="state.instanceName.workloadName" v-model="checkedWorkloads"/></td>
 					  <td>{{state.instanceName.workloadName}}</td>
 					  <td>{{state.instanceName.agentName}}</td>

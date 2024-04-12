@@ -41,6 +41,11 @@ def delete_workloads():
     print(ank_comm_service.deleteWorkloads(request.json))
     return Response("Workloads deleted.", status=200, mimetype='application/json')
 
+@dashboard.route('/updateConfig', methods=['POST'])
+def update_config():
+    print(ank_comm_service.update_config(request.json))
+    return Response("Workloads deleted.", status=200, mimetype='application/json')
+
 def run(ip="0.0.0.0", p="5001"):
     logger.info(f"Starting the dashboard api ...")
     dashboard.run(host=ip, port=p)

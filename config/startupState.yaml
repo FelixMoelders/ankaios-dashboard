@@ -27,23 +27,23 @@ workloads:
     restartPolicy: NEVER
     tags:
       - key: owner
-        value: Ankaios team
+        value: Felix
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5002:5001"]
 
-  ank_dashboard_C:
-    runtime: podman
-    agent: agent_C
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: owner
-        value: Ankaios team
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5003:5001"]
+  # ank_dashboard_C:
+  #   runtime: podman
+  #   agent: agent_C
+  #   restart: true
+  #   updateStrategy: AT_LEAST_ONCE
+  #   accessRights:
+  #     allow: []
+  #     deny: []
+  #   restartPolicy: NEVER
+  #   tags:
+  #     - key: owner
+  #       value: Ankaios team
+  #   runtimeConfig: |
+  #     image: dashboard:0.0
+  #     commandOptions: ["-p", "5003:5001"]

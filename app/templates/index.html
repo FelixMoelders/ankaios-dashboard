@@ -54,9 +54,11 @@
 			<button v-on:click="deleteCheckedWorkloads()" class="btn--raised btn--red btn-to-right" id="deleteBtn">Delete</button>
 			<button v-on:click="openForm()" class="btn--raised btn--blue" id="newWorkloadBtn">New Workload</button>
 			
+
+
 			<label> <!--Filter label for workload tags-->
-				Filter by tag: <input type="text" v-model="filterTag">
-			  </label>
+				<input type="text" v-model="filterTag" placeholder="Filter by tag" />
+			</label>
 
 
 			<div v-if="isFormOpen">
@@ -98,7 +100,8 @@
 					  <td>
 						  <ul>
 							  <li v-for="tag in state.tags">
-								  <span :style="{background: getColor(tag.key)}" class="tag-item">{{ tag.key }}</span>: 
+								  <!--Remove colored Key tags <span :style="{background: getColor(tag.key)}" class="tag-item">{{ tag.key }}</span>: -->
+								  <span :class="tag-item">{{ tag.key }}</span>:
 								  <span :style="{background: getColor(tag.value)}" class="tag-item">{{ tag.value }}</span>
 							  </li>
 						  </ul>

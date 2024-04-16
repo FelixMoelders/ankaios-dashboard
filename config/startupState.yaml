@@ -10,8 +10,10 @@ workloads:
       deny: []
     restartPolicy: NEVER
     tags:
-      - key: owner
-        value: Ankaios team
+      - key: Started by
+        value: Driver
+      - key: Running in
+        value: AC Unit
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5001:5001"]
@@ -26,24 +28,30 @@ workloads:
       deny: []
     restartPolicy: NEVER
     tags:
-      - key: owner
-        value: Felix
+      - key: Started by
+        value: Front Passenger
+      - key: Running in
+        value: Infotainment
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5002:5001"]
 
-  # ank_dashboard_C:
-  #   runtime: podman
-  #   agent: agent_C
-  #   restart: true
-  #   updateStrategy: AT_LEAST_ONCE
-  #   accessRights:
-  #     allow: []
-  #     deny: []
-  #   restartPolicy: NEVER
-  #   tags:
-  #     - key: owner
-  #       value: Ankaios team
-  #   runtimeConfig: |
-  #     image: dashboard:0.0
-  #     commandOptions: ["-p", "5003:5001"]
+
+  ank_dashboard_C:
+    runtime: podman
+    agent: agent_C
+    restart: true
+    updateStrategy: AT_LEAST_ONCE
+    accessRights:
+      allow: []
+      deny: []
+    restartPolicy: NEVER
+    tags:
+      - key: Started by
+        value: Cloud Service
+      - key: Running in
+        value: Drivetrain
+    runtimeConfig: |
+      image: dashboard:0.0
+      commandOptions: ["-p", "5003:5001"]
+

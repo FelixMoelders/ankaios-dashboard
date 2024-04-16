@@ -11,6 +11,19 @@
 	<title>Ankaios Dashboard</title>
 	<meta name="description" content="Ankaios Dashboard">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style> /*Adding colored background to 'Tags' */
+    .tag-item {
+        border: 1px solid;
+        padding: 2px;
+		line-height: 1.2;
+        margin-right: 3px;
+        border-radius: 4px;
+        display: inline-block;
+        color: #000; /* Text color */
+    }
+    </style>
+
 </head>
 <body id="app">
 	<input type="checkbox" id="nav--super-vertical-responsive">
@@ -26,6 +39,7 @@
 			<a >About</a>
 		</nav>
 	</aside>
+
 	<main class="g--10 g-m--12 m--2 m-m--0 no-margin-vertical" role="main">
 		<header class="container--wrap">
 			<img src="%% url_for('static', filename='ankaios_logo.png') %%" style="width:10%">
@@ -49,10 +63,15 @@
 			</div>
 		</div>
 		<!-- Workloads -->
+	  
 		<div class="g--10 m--1" v-if="showWorkloads">
 			<button v-on:click="deleteCheckedWorkloads()" class="btn--raised btn--red btn-to-right" id="deleteBtn">Delete</button>
 			<button v-on:click="switchForm()" class="btn--raised btn--blue" id="newWorkloadBtn">New Workload</button>
 			
+                      
+      <label> <!--Filter label for workload tags-->
+				<input type="text" v-model="filterTag" placeholder="Filter by tag" />
+			</label>
 			<div v-if="isFormOpen" class="g--8 card">
 				<div class="g--12">
 					<label>
@@ -102,18 +121,29 @@
 						<th>Workload</th>
 						<th>Agent</th>
 						<th>State</th>
+
 						<th>Info</th>
+            <th>Tags</th> <!--Introduce column for workload tags-->
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="(state, index) in workloadStates">
-						<td><input type="checkbox" class="delete-checkbox" :id="state.instanceName.workloadName" :value="state.instanceName.workloadName" v-model="checkedWorkloads"/></td>
-						<td>{{state.instanceName.workloadName}}</td>
-						<td>{{state.instanceName.agentName}}</td>
-						<td>{{state.executionState.running}}</td>
-						<td><button class="btn--float" v-on:click="openConfig(state.instanceName.workloadName)">+</button></td>
+					<tr v-for="state in filteredWorkloads">
+					  <td><input type="checkbox" class="delete-checkbox" :id="state.instanceName.workloadName" :value="state.instanceName.workloadName" v-model="checkedWorkloads"/></td>
+					  <td>{{state.instanceName.workloadName}}</td>
+					  <td>{{state.instanceName.agentName}}</td>
+					  <td>{{state.executionState.running}}</td>
+            <td><button class="btn--float" v-on:click="openConfig(state.instanceName.workloadName)">+</button></td>
+					  <td>
+						  <ul>
+							  <li v-for="tag in state.tags">
+								  <!--Remove colored Key tags <span :style="{background: getColor(tag.key)}" class="tag-item">{{ tag.key }}</span>: -->
+								  <span :class="tag-item">{{ tag.key }}</span>:
+								  <span :style="{background: getColor(tag.value)}" class="tag-item">{{ tag.value }}</span>
+							  </li>
+						  </ul>
+					  </td>
 					</tr>
-			  	</tbody>
+				  </tbody>
 			</table>
 		</div>
 	</main>

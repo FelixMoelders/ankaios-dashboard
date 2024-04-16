@@ -48,35 +48,68 @@
 		<div class="g--10 m--1" v-if="showHome">
 			<h2 class="fade-in-from-top color--pink">Welcome to the Ankaios Dashboard</h2>
 		</div>
+		<!-- Config -->
+		<div class="g--10 m--1" v-if="showConfig">
+			<div class="g--8 card">
+				<div class="g--12">
+					<label>
+						Runtime Config for {{config.workloadName}} on {{config.agent}}: <br>
+						<textarea v-model="config.runtimeConfig" :disabled="!config.edit"></textarea>
+					</label>
+				</div>
+				<button v-on:click="switchEdit()" class="btn--raised btn--blue" id="addBtn">Edit</button>
+				<button v-on:click="applyConfig()" class="btn--raised btn--blue" id="addBtn">Save</button>
+				<button v-on:click="closeConfig()" class="btn--raised btn--blue" id="addBtn">Close</button>
+			</div>
+		</div>
 		<!-- Workloads -->
 	  
 		<div class="g--10 m--1" v-if="showWorkloads">
 			<button v-on:click="deleteCheckedWorkloads()" class="btn--raised btn--red btn-to-right" id="deleteBtn">Delete</button>
-			<button v-on:click="openForm()" class="btn--raised btn--blue" id="newWorkloadBtn">New Workload</button>
+			<button v-on:click="switchForm()" class="btn--raised btn--blue" id="newWorkloadBtn">New Workload</button>
 			
-
-
-			<label> <!--Filter label for workload tags-->
+                      
+      <label> <!--Filter label for workload tags-->
 				<input type="text" v-model="filterTag" placeholder="Filter by tag" />
 			</label>
-
-
-			<div v-if="isFormOpen">
-				<label>
-					WorkloadName: <input type="text" v-model="workloadName">
-			  	</label>
-				<label>
-				  	Agent: <input type="text" v-model="agent">
-				</label>
-				<label>
-					Runtime: <input type="text" v-model="runtime">
-				</label>
-				<label>
-					Restart Policy: <input type="text" v-model="restartPolicy">
-				</label>
-				<label>
-					Runtime Config: <input type="text" v-model="runtimeConfig">
-				</label>
+			<div v-if="isFormOpen" class="g--8 card">
+				<div class="g--12">
+					<label>
+						WorkloadName: <input type="text" v-model="workloadName">
+					</label>
+				</div>
+				<div class="g--12">
+					<label>
+						Agent: <input type="text" v-model="agent">
+					</label>
+				</div>
+				<div class="g--12">
+					<label>
+						Runtime: <input type="text" v-model="runtime">
+					</label>
+				</div>
+				<div class="g--12">
+					<label>
+						Restart Policy: 
+						<select name="restartPolicy" id="selectRestartPolicy" v-model="restartPolicy">
+							<option value="NEVER">NEVER</option>
+							<option value="ALWAYS">ALWAYS</option>
+							<option value="ON_FAILURE">ON_FAILURE</option>
+						</select>
+					</label>
+				</div>
+				<div class="g--12">
+					<label>
+						Tags (Json-Format: {"key1": "value1", "key2": "value2", ...}): <br>
+						<textarea v-model="tags"></textarea>
+					</label>
+				</div>
+				<div class="g--12">
+					<label>
+						Runtime Config: <br>
+						<textarea v-model="runtimeConfig"></textarea>
+					</label>
+				</div>
 				<button v-on:click="addWorkload()" class="btn--raised btn--gray" id="addBtn">Add</button>
 				<button v-on:click="closeForm()" class="btn--raised btn--blue" id="addBtn">Close</button>
 			</div>
@@ -88,7 +121,9 @@
 						<th>Workload</th>
 						<th>Agent</th>
 						<th>State</th>
-						<th>Tags</th> <!--Introduce column for workload tags-->
+
+						<th>Info</th>
+            <th>Tags</th> <!--Introduce column for workload tags-->
 					</tr>
 				</thead>
 				<tbody>
@@ -97,6 +132,7 @@
 					  <td>{{state.instanceName.workloadName}}</td>
 					  <td>{{state.instanceName.agentName}}</td>
 					  <td>{{state.executionState.running}}</td>
+            <td><button class="btn--float" v-on:click="openConfig(state.instanceName.workloadName)">+</button></td>
 					  <td>
 						  <ul>
 							  <li v-for="tag in state.tags">
@@ -114,6 +150,7 @@
 </body>
 
 <!-- Import Vue App -->
+<script src="%% url_for('static', filename='js/components/dialog.js') %%"></script>
 <script src="%% url_for('static', filename='js/main.js') %%"></script>
 
 <!-- Mount Vue App -->

@@ -1,6 +1,7 @@
 import ankaios_pb2 as ank
 from Logger import Logger
 from ControlInterface import ControlInterface
+import json
 
 REQUEST_ID = "ank_dashboard"
 logger = Logger.get_custom_logger()
@@ -67,7 +68,7 @@ class AnkCommunicationService:
                             updateMask=[f"desiredState.workloads.{workload_name}"]
                         )
                 )
-            )
+            )      
 
     def get_complete_state(self):
         request_complete_state = self.create_request_for_complete_state(REQUEST_ID)

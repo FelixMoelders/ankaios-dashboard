@@ -11,8 +11,9 @@ const app = Vue.createApp({
             agent: "agent_A",
             runtime: "podman",
             restartPolicy: "Never",
-            runtimeConfig: "image: docker.io/library/nginx\ncommandOptions: [\"-p\", \"8080:80\"]"
-        }
+            runtimeConfig: "image: docker.io/library/nginx\ncommandOptions: [\"-p\", \"8080:80\"]",
+            filterTag: '', // Filter Tag for dashboard gets written/updated here
+        };
     },
     methods: {
         openForm() {
@@ -68,13 +69,48 @@ const app = Vue.createApp({
         },
         loadState() {
             fetch('/completeState')
-                    .then(response => response.json())
-                    .then(json => json.response.completeState.workloadStates)
-                    .then((states) => {
-                        this.workloadStates = states;
-                    });
-        }
+                .then(response => response.json())
+                .then(json => {
+                    const workloads = json.response.completeState.desiredState.workloads;
+                    const workloadStates = json.response.completeState.workloadStates;
+                    for (const state of workloadStates) {
+                        const workload = workloads[state.instanceName.workloadName];
+                        state.tags = workload ? workload.tags : [];
+                    }
+                    this.workloadStates = workloadStates;
+                });
+        },
+
+        getColor(value) {
+            let hash = 0;
+            for(let i = 0; i < value.length; i++) {
+              hash = value.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            let color = ((hash & 0x00FFFFFF) | 0x1000000).toString(16).substring(1);
+            return `#${color}`;
+          },
+
+
     },
+
+    computed: { // Filter functionality is implemented here. If either key or value of the filterTag are existing in a workload, it gets displayed, otherwise hidden in the dashboard.
+        filteredWorkloads() {
+            const filterTagLower = this.filterTag.toLowerCase();
+            return this.workloadStates.filter(workload => {
+                if(filterTagLower === '') { // Is filterTagLower an empty string?
+                    // if yes, return all workloads
+                    return true;
+                } else if(workload.tags) {  // if no, filter workloads by the tag, considering only workloads with tags
+                    return workload.tags.some(tag => tag.key.toLowerCase().includes(filterTagLower) || tag.value.toLowerCase().includes(filterTagLower));
+                } else {
+                    // if the workload has no tags, and there's some filter, it should not be visible
+                    return false;
+                }
+            });
+        }
+
+    },
+
     mounted() {
         this.timer = setInterval(() => {
             this.loadState();

@@ -23,6 +23,10 @@ def home():
 def workloads():
     return render_template('workloads.html')
 
+@dashboard.route('/debug')
+def debug():
+    return render_template('debug.html')
+
 @dashboard.route('/completeState', methods=['GET'])
 def get_complete_state():
     """

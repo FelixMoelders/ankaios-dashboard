@@ -24,6 +24,15 @@
     }
     </style>
 
+	<style>
+		.color-box {
+			background-color: red;  /* Debug message*/
+			padding: 20px;
+			color: black; 
+			font-size: 30px;  
+		}
+	</style>
+
 </head>
 <body id="app">
 	<input type="checkbox" id="nav--super-vertical-responsive">
@@ -36,9 +45,16 @@
 			<a v-on:click="home()">Home</a>
 			<a >Login</a>
 			<a v-on:click="workloads()">Workloads</a>
+			<a v-on:click="debug()">Debug</a>
 			<a >About</a>
 		</nav>
 	</aside>
+
+	<!--<body>
+		<div class="color-box">
+			Debug Mode
+		</div>
+	</body>-->
 
 	<main class="g--10 g-m--12 m--2 m-m--0 no-margin-vertical" role="main">
 		<header class="container--wrap">
@@ -48,6 +64,11 @@
 		<div class="g--10 m--1" v-if="showHome">
 			<h2 class="fade-in-from-top color--pink">Welcome to the Ankaios Dashboard</h2>
 		</div>
+		<!--Debug-->
+		<div class="g--10 m--1" v-if="showDebug">
+			<h2 class="fade-in-from-top color--pink">Debug Mode</h2>
+		</div>
+                      
 		<!-- Config -->
 		<div class="g--10 m--1" v-if="showConfig">
 			<div class="g--8 card">
@@ -62,15 +83,15 @@
 				<button v-on:click="closeConfig()" class="btn--raised btn--blue" id="addBtn">Close</button>
 			</div>
 		</div>
+
 		<!-- Workloads -->
-	  
 		<div class="g--10 m--1" v-if="showWorkloads">
+			<h2 class="fade-in-from-top color--pink">Workloads</h2>
 			<button v-on:click="deleteCheckedWorkloads()" class="btn--raised btn--red btn-to-right" id="deleteBtn">Delete</button>
-			<button v-on:click="switchForm()" class="btn--raised btn--blue" id="newWorkloadBtn">New Workload</button>
-			
-                      
-      <label> <!--Filter label for workload tags-->
-				<input type="text" v-model="filterTag" placeholder="Filter by tag" />
+			<button v-on:click="switchForm()" class="btn--raised btn--blue" id="newWorkloadBtn">New Workload</button>               
+      		
+			<label> <!--Filter label for workload tags-->
+			<input type="text" v-model="filterTag" placeholder="Filter by tag" />
 			</label>
 			<div v-if="isFormOpen" class="g--8 card">
 				<div class="g--12">
@@ -121,9 +142,8 @@
 						<th>Workload</th>
 						<th>Agent</th>
 						<th>State</th>
-
 						<th>Info</th>
-            <th>Tags</th> <!--Introduce column for workload tags-->
+            			<th>Tags</th> <!--Introduce column for workload tags-->
 					</tr>
 				</thead>
 				<tbody>
@@ -132,7 +152,7 @@
 					  <td>{{state.instanceName.workloadName}}</td>
 					  <td>{{state.instanceName.agentName}}</td>
 					  <td>{{state.executionState.running}}</td>
-            <td><button class="btn--float" v-on:click="openConfig(state.instanceName.workloadName)">+</button></td>
+            		  <td><button class="btn--float" v-on:click="openConfig(state.instanceName.workloadName)">+</button></td>
 					  <td>
 						  <ul>
 							  <li v-for="tag in state.tags">

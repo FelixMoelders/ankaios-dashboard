@@ -3,6 +3,7 @@ const app = Vue.createApp({
         return {
             showHome: true,
             showWorkloads: false,
+            showDebug: false,
             desiredState: {},
             workloadStates: [],
             timer: null,
@@ -99,12 +100,25 @@ const app = Vue.createApp({
             this.isFormOpen = false;
         },
         workloads() {
-            this.showWorkloads = true;
+            console.log('workloads method triggered');
             this.showHome = false;
+            this.showDebug = false;
+            this.showWorkloads = true;
+            
         },
         home() {
             this.showWorkloads = false;
             this.showHome = true;
+            this.showDebug = false;
+
+        },
+        debug() {
+            //fetch('/debug')
+            this.showWorkloads = false;
+            this.showHome = false;
+            this.showDebug = true;
+            this.showConfig = false;
+
         },
         loadState() {
             fetch('/completeState')

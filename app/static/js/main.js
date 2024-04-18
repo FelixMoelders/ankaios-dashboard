@@ -4,6 +4,7 @@ const app = Vue.createApp({
             showHome: true,
             showWorkloads: false,
             showDebug: false,
+            debugWindow: false,
             desiredState: {},
             workloadStates: [],
             timer: null,
@@ -18,6 +19,7 @@ const app = Vue.createApp({
             restartPolicy: "NEVER",
             runtimeConfig: "image: docker.io/library/nginx\ncommandOptions: [\"-p\", \"8080:80\"]",
             filterTag: '', // Filter Tag for dashboard gets written/updated here
+            showID: false,
         };
     },
     methods: {
@@ -44,6 +46,7 @@ const app = Vue.createApp({
         openConfig(workloadName) {
             this.showConfig = true;
             this.showWorkloads = false;
+            this.showDebug = false;
             this.config.edit = false;
             this.config.workloadName = workloadName;
             this.config.agent = this.desiredState.workloads[workloadName].agent;
@@ -56,8 +59,22 @@ const app = Vue.createApp({
         closeConfig() {
             this.config.edit = false;
             this.showConfig = false;
-            this.showWorkloads = true;
+            if (this.debugWindow == true) {
+                this.showDebug = true;
+                this.showWorkloads = false;
+            } else if (this.debugWindow == false) {
+                this.showDebug = false;
+                this.showWorkloads = true;
+            };
         },
+
+        toggleID: function(name) {
+
+            this.openConfig(name);
+            this.showID = !this.showId;
+
+        },
+
         switchForm() {
             this.isFormOpen = !this.isFormOpen;
         },
@@ -104,6 +121,7 @@ const app = Vue.createApp({
             this.showHome = false;
             this.showDebug = false;
             this.showWorkloads = true;
+            this.debugWindow = false;
             
         },
         home() {
@@ -117,7 +135,8 @@ const app = Vue.createApp({
             this.showWorkloads = false;
             this.showHome = false;
             this.showDebug = true;
-            this.showConfig = false;
+            //this.showConfig = false;
+            this.debugWindow = true;
 
         },
         loadState() {
@@ -130,9 +149,11 @@ const app = Vue.createApp({
                     for (const state of workloadStates) {
                         const workload = workloads[state.instanceName.workloadName];
                         state.tags = workload ? workload.tags : [];
+                        console.log(state);
                     }
                     this.workloadStates = workloadStates;
                     this.desiredState = completeState.desiredState;
+                    //console.log(state);
                 });
         },
 

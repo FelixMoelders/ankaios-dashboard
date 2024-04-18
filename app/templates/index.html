@@ -67,16 +67,105 @@
 		<!--Debug-->
 		<div class="g--10 m--1" v-if="showDebug">
 			<h2 class="fade-in-from-top color--pink">Debug Mode</h2>
+			<button v-on:click="deleteCheckedWorkloads()" class="btn--raised btn--red btn-to-right" id="deleteBtn">Delete</button>
+			<button v-on:click="switchForm()" class="btn--raised btn--blue" id="newWorkloadBtn">New Workload</button> 
+			<label> <!--Filter label for workload tags-->
+				<input type="text" v-model="filterTag" placeholder="Filter by tag" />
+				</label>
+				<div v-if="isFormOpen" class="g--8 card">
+					<div class="g--12">
+						<label>
+							WorkloadName: <input type="text" v-model="workloadName">
+						</label>
+					</div>
+					<div class="g--12">
+						<label>
+							Agent: <input type="text" v-model="agent">
+						</label>
+					</div>
+					<div class="g--12">
+						<label>
+							Runtime: <input type="text" v-model="runtime">
+						</label>
+					</div>
+					<div class="g--12">
+						<label>
+							Restart Policy: 
+							<select name="restartPolicy" id="selectRestartPolicy" v-model="restartPolicy">
+								<option value="NEVER">NEVER</option>
+								<option value="ALWAYS">ALWAYS</option>
+								<option value="ON_FAILURE">ON_FAILURE</option>
+							</select>
+						</label>
+					</div>
+					<div class="g--12">
+						<label>
+							Tags (Json-Format: {"key1": "value1", "key2": "value2", ...}): <br>
+							<textarea v-model="tags"></textarea>
+						</label>
+					</div>
+					<div class="g--12">
+						<label>
+							Runtime Config: <br>
+							<textarea v-model="runtimeConfig"></textarea>
+						</label>
+					</div>
+					<button v-on:click="addWorkload()" class="btn--raised btn--gray" id="addBtn">Add</button>
+					<button v-on:click="closeForm()" class="btn--raised btn--blue" id="addBtn">Close</button>
+				</div>
+	
+				<table class="g--8 card" id="workloadTable">
+					<thead>
+						<tr>
+							<th>Select</th> <!--Introduce checkbox for workloads--> 
+							<th>Workload</th>
+							<th>Agent</th>
+							<th>Desired State</th>
+							<th>Current State</th>
+							<th>Info</th>
+							<th>Tags</th> <!--Introduce column for workload tags-->
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="state in filteredWorkloads">
+						  <td><input type="checkbox" class="delete-checkbox" :id="state.instanceName.workloadName" :value="state.instanceName.workloadName" v-model="checkedWorkloads"/></td>
+						  <td>{{state.instanceName.workloadName}}</td>
+						  <td>{{state.instanceName.agentName}}</td>
+						  <td>{{state.executionState.running}}</td>
+						  <td>{{state.executionState.running}}</td>
+						  <td><button class="btn--float" v-on:click="openConfig(state.instanceName.workloadName)">+</button></td>
+						  <td>
+							  <ul>
+								  <li v-for="tag in state.tags">
+									  <!--Remove colored Key tags <span :style="{background: getColor(tag.key)}" class="tag-item">{{ tag.key }}</span>: -->
+									  <span :class="tag-item">{{ tag.key }}</span>:
+									  <span :style="{background: getColor(tag.value)}" class="tag-item">{{ tag.value }}</span>
+								  </li>
+							  </ul>
+						  </td>
+						</tr>
+					  </tbody>
+				</table>           
 		</div>
                       
 		<!-- Config -->
 		<div class="g--10 m--1" v-if="showConfig">
 			<div class="g--8 card">
 				<div class="g--12">
+					<div class="g--10 m--1" v-if="debugWindow == true">
+					<label>
+						ID for {{config.workloadName}} on {{config.agent}}: <br>  
+						<!--{{state.instanceName.id}} <br> -->
+						Runtime Config for {{config.workloadName}} on {{config.agent}}: <br>
+						<textarea v-model="config.runtimeConfig" :disabled="!config.edit"></textarea>
+					</label>
+					</div>
+					<div class="g--10 m--1" v-if="debugWindow == false">
 					<label>
 						Runtime Config for {{config.workloadName}} on {{config.agent}}: <br>
 						<textarea v-model="config.runtimeConfig" :disabled="!config.edit"></textarea>
 					</label>
+					</div>
 				</div>
 				<button v-on:click="switchEdit()" class="btn--raised btn--blue" id="addBtn">Edit</button>
 				<button v-on:click="applyConfig()" class="btn--raised btn--blue" id="addBtn">Save</button>

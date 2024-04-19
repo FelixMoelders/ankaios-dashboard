@@ -117,34 +117,22 @@
 				<table class="g--8 card" id="workloadTable">
 					<thead>
 						<tr>
-							<th>Select</th> <!--Introduce checkbox for workloads--> 
-							<th>Workload</th>
-							<th>Agent</th>
+							<th>Workload Name</th>
 							<th>Desired State</th>
-							<th>Current State</th>
-							<th>Info</th>
-							<th>Tags</th> <!--Introduce column for workload tags-->
+							<th>Complete State</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr v-for="state in filteredWorkloads">
-						  <td><input type="checkbox" class="delete-checkbox" :id="state.instanceName.workloadName" :value="state.instanceName.workloadName" v-model="checkedWorkloads"/></td>
-						  <td>{{state.instanceName.workloadName}}</td>
-						  <td>{{state.instanceName.agentName}}</td>
-						  <td>{{state.executionState.running}}</td>
-						  <td>{{state.executionState.running}}</td>
-						  <td><button class="btn--float" v-on:click="openConfig(state.instanceName.workloadName)">+</button></td>
-						  <td>
-							  <ul>
-								  <li v-for="tag in state.tags">
-									  <!--Remove colored Key tags <span :style="{background: getColor(tag.key)}" class="tag-item">{{ tag.key }}</span>: -->
-									  <span :class="tag-item">{{ tag.key }}</span>:
-									  <span :style="{background: getColor(tag.value)}" class="tag-item">{{ tag.value }}</span>
-								  </li>
-							  </ul>
-						  </td>
+						<tr v-for="(workloadState, index) in workloadStates" :key="index">
+							<td>{{ workloadState.instanceName.workloadName }}</td>
+							<td>
+								<pre>{{ desiredState.workloads[workloadState.instanceName.workloadName] }}</pre>
+							</td>
+							<td>
+								<pre>{{ workloadState }}</pre> 
+							</td>
 						</tr>
-					  </tbody>
+					</tbody>
 				</table>           
 		</div>
                       

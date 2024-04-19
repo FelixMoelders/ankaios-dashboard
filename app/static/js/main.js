@@ -59,7 +59,7 @@ const app = Vue.createApp({
         closeConfig() {
             this.config.edit = false;
             this.showConfig = false;
-            if (this.debugWindow == true) {
+            if (this.debugWindow == true) { // Depending on whether config window is opened from "Workloads" or "Debug Mode" tab, go back there upon closing.
                 this.showDebug = true;
                 this.showWorkloads = false;
             } else if (this.debugWindow == false) {
@@ -68,12 +68,29 @@ const app = Vue.createApp({
             };
         },
 
-        toggleID: function(name) {
+        toggleID(workloadName) {
 
-            this.openConfig(name);
-            this.showID = !this.showId;
+            this.completeState;
 
         },
+
+      /*  toReadableFormat(object) {
+            if (typeof object !== "object") {
+                return object;
+            }
+
+            let output = {}
+            for (let key in object) {
+                if (typeof object[key] === "object") {
+                    output[key] = this.toReadableFormat(object[key]);
+                } else {
+                    output[key] = object[key];
+                }
+            }
+
+            return output;
+        }, */
+  
 
         switchForm() {
             this.isFormOpen = !this.isFormOpen;
@@ -130,6 +147,24 @@ const app = Vue.createApp({
             this.showDebug = false;
 
         },
+        toReadableFormat(object) {
+            this.showDebug = true;
+            if (typeof object !== "object") {
+                return object;
+            }
+    
+            let output = {}
+            for (let key in object) {
+                if (typeof object[key] === "object") {
+                    output[key] = this.toReadableFormat(object[key]);
+                } else {
+                    output[key] = object[key];
+                }
+            }
+    
+            return output;
+        },
+    
         debug() {
             //fetch('/debug')
             this.showWorkloads = false;
@@ -137,8 +172,12 @@ const app = Vue.createApp({
             this.showDebug = true;
             //this.showConfig = false;
             this.debugWindow = true;
-
+            //console.log(workloadStates);
+            //console.log(desiredState);
+            //console.log(completeState);
+    
         },
+
         loadState() {
             fetch('/completeState')
                 .then(response => response.json())
@@ -153,7 +192,7 @@ const app = Vue.createApp({
                     }
                     this.workloadStates = workloadStates;
                     this.desiredState = completeState.desiredState;
-                    //console.log(state);
+                                        //console.log(state);
                 });
         },
 

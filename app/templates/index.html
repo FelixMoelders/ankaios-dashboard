@@ -33,6 +33,18 @@
 		}
 	</style>
 
+	<style> /* Style code for displaying matching table entries in Debug Mode in green*/
+		.match {
+			color: green;
+		}
+	</style>
+
+	<style> /* Style code for displaying mismatching table entries in Debug Mode in red*/
+		.mismatch {
+			color: red;
+		}
+	</style>
+
 </head>
 <body id="app">
 	<input type="checkbox" id="nav--super-vertical-responsive">
@@ -126,14 +138,37 @@
 						<tr v-for="(workloadState, index) in workloadStates" :key="index">
 							<td>{{ workloadState.instanceName.workloadName }}</td>
 							<td>
-								<pre>{{ desiredState.workloads[workloadState.instanceName.workloadName] }}</pre>
+								<pre :class="desiredState.workloads[workloadState.instanceName.workloadName].agent == workloadState.instanceName.agentName ? 'match' : ''">
+									Agent: {{ desiredState.workloads[workloadState.instanceName.workloadName].agent }} 
+								</pre>
+								<pre :class="desiredState.workloads[workloadState.instanceName.workloadName].tags[0].value == workloadState.tags[0].value ? 'match' : ''">
+									Started by: {{ desiredState.workloads[workloadState.instanceName.workloadName].tags[0].value }}
+								</pre>
+								<pre :class="desiredState.workloads[workloadState.instanceName.workloadName].tags[1].value == workloadState.tags[1].value ? 'match' : ''">
+									Running in: {{ desiredState.workloads[workloadState.instanceName.workloadName].tags[1].value }}
+								</pre>
+								<pre>
+									Runtime: {{ desiredState.workloads[workloadState.instanceName.workloadName].runtime }}
+							 	</pre>
 							</td>
 							<td>
-								<pre>{{ workloadState }}</pre> 
+								<pre :class="desiredState.workloads[workloadState.instanceName.workloadName].agent == workloadState.instanceName.agentName ? 'match' : ''">
+									Agent: {{ workloadState.instanceName.agentName }}
+								</pre>
+								<pre :class="desiredState.workloads[workloadState.instanceName.workloadName].tags[0].value == workloadState.tags[0].value ? 'match' : ''">
+									Started by: {{ workloadState.tags[0].value }}
+								</pre>
+								<pre :class="desiredState.workloads[workloadState.instanceName.workloadName].tags[1].value == workloadState.tags[1].value ? 'match' : ''">
+									Running in: {{ workloadState.tags[1].value }}
+								</pre>
+								<pre>
+									ID: {{ workloadState.instanceName.id }}
+									Running: {{ workloadState.executionState.running }}
+								</pre>
 							</td>
-						</tr>
+					  </tr>
 					</tbody>
-				</table>           
+				  </table>          
 		</div>
                       
 		<!-- Config -->

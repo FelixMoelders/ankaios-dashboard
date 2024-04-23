@@ -33,9 +33,9 @@
 			<h4 class="color--pink no-margin-vertical">Dashboard</h5>
 		</div>
 		<nav class="g--12 no-margin-vertical" role="navigation">
-			<a v-on:click="home()">Home</a>
-			<a >Login</a>
-			<a v-on:click="workloads()">Workloads</a>
+			<a v-on:click="viewHome()">Home</a>
+			<a v-on:click="viewLogin()">Login</a>
+			<a v-on:click="viewWorkloads()">Workloads</a>
 			<a >About</a>
 		</nav>
 	</aside>
@@ -48,6 +48,14 @@
 		<div class="g--10 m--1" v-if="showHome">
 			<h2 class="fade-in-from-top color--pink">Welcome to the Ankaios Dashboard</h2>
 		</div>
+		<!-- login -->
+		<div class="g--10 m--1" v-if="showLogin">
+			<div class="g--8 card">
+				<label for="pwd">Enter the password:</label>
+				<input type="password" id="pwd" name="pwd" v-model="password" @keyup.enter="login()" placeholder="password">
+				<button v-on:click="login()" class="btn--raised btn--blue" id="loginBttn">Login</button>
+			</div>
+		</div>
 		<!-- Config -->
 		<div class="g--10 m--1" v-if="showConfig">
 			<div class="g--8 card">
@@ -57,9 +65,9 @@
 						<textarea v-model="config.runtimeConfig" :disabled="!config.edit"></textarea>
 					</label>
 				</div>
-				<button v-on:click="switchEdit()" class="btn--raised btn--blue" id="addBtn">Edit</button>
-				<button v-on:click="applyConfig()" class="btn--raised btn--blue" id="addBtn">Save</button>
-				<button v-on:click="closeConfig()" class="btn--raised btn--blue" id="addBtn">Close</button>
+				<button v-on:click="switchEdit()" class="btn--raised btn--blue" id="editBttn">Edit</button>
+				<button v-on:click="applyConfig()" class="btn--raised btn--blue" id="saveBttn">Save</button>
+				<button v-on:click="closeConfig()" class="btn--raised btn--blue" id="closeBttn">Close</button>
 			</div>
 		</div>
 		<!-- Workloads -->

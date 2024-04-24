@@ -183,23 +183,46 @@ const app = Vue.createApp({
     
         },
 
-        loadState() {
+        loadState() { //changes to the loadState() method in order to catch errors such as empty/undefined/null data (e.g. when a workload is deleted)
             fetch('/completeState')
-                .then(response => response.json())
-                .then(json => {
-                    const completeState = json.response.completeState;
-                    const workloads = json.response.completeState.desiredState.workloads;
-                    const workloadStates = json.response.completeState.workloadStates;
-                    for (const state of workloadStates) {
-                        const workload = workloads[state.instanceName.workloadName];
-                        state.tags = workload ? workload.tags : [];
-                        console.log(state);
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Network response was not ok');
                     }
-                    this.workloadStates = workloadStates;
-                    this.desiredState = completeState.desiredState;
-                                        //console.log(state);
+                }).then(json => {
+                    console.log(json); 
+                    
+                    let completeState = null, workloads = null, workloadStates = null;
+          
+                    if (json && json.response && json.response.completeState) {
+                        completeState = json.response.completeState;
+                        
+                        if (json.response.completeState.desiredState) {
+                            workloads = json.response.completeState.desiredState.workloads;
+                        }
+          
+                        workloadStates = json.response.completeState.workloadStates;
+                    }
+                    
+                    if (workloadStates && workloads) {
+                        for (const state of workloadStates) {
+                            const workload = workloads[state.instanceName.workloadName];
+                            state.tags = workload ? workload.tags : [];
+                            console.log(state);
+                        }
+                        this.workloadStates = workloadStates;
+                    }
+                    
+                    if (completeState && completeState.desiredState) {
+                        this.desiredState = completeState.desiredState;
+                    }
+                    
+                }).catch((error) => {
+                    console.log('There has been a problem with your fetch operation: ', error.message);
                 });
-        },
+          },
 
         getColor(value) {
             let hash = 0;
@@ -232,40 +255,81 @@ const app = Vue.createApp({
 
         checkDependency() {
             return (workloadState) => {
-              let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
-              if (dependencies && Object.keys(dependencies).length > 0) {
-                  if (this.workloadStates.some(workload => Object.keys(dependencies).includes(workload.instanceName.workloadName))) {
-                    return 'found';
+              const equivalentStates = {
+                "ADD_COND_RUNNING": "RUNNING_OK", // Not quite sure if this is intended, but it works for now. Problem is that conditions and states are named differently and there has to be some equivalency check.
+                "RUNNING_OK": "ADD_COND_RUNNING"
+                // more equivalencies can be added
+              };
+          
+              if (workloadState && this.desiredState && this.desiredState.workloads && workloadState.instanceName && 'workloadName' in workloadState.instanceName && workloadState.instanceName.workloadName in this.desiredState.workloads) {
+                let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
+                if (dependencies && Object.keys(dependencies).length > 0) {
+                  let allFound = true;
+                  for (let dependency in dependencies) {
+                    let workload = this.workloadStates.find(workload => workload.instanceName && 'workloadName' in workload.instanceName && 
+                    workload.instanceName.workloadName === dependency);
+                    if (workload && workload.executionState && Object.keys(workload.executionState).length > 0) {
+                      let desiredValue = dependencies[dependency];
+                      let actualValue = workload.executionState[Object.keys(workload.executionState)[0]];
+          
+                      if (equivalentStates[actualValue]) {
+                        actualValue = equivalentStates[actualValue];
+                      }
+          
+                      if (actualValue !== desiredValue) {
+                        allFound = false; // A dependency doesn't match required/equivalent state
+                        break;
+                      }
+          
+                    } else {
+                      allFound = false; // Dependency not found
+                      break;
+                    }
                   }
-                  // If we reach here, it means the dependent workload is not in workforceStates list
-                  return 'missing';
+          
+                  return allFound ? 'found' : 'missing';
+                }
               }
               return false;
             }
           },
           
-        getDependencyText() {
+          getDependencyText() {
             return (workloadState) => {
-              let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
-              if (dependencies && Object.keys(dependencies).length > 0) {
-                let dependencyText = '';
-                for (let dependency in dependencies) {
-                  if (this.workloadStates.some(workload => workload.instanceName.workloadName === dependency)) {
-                    // If the dependent workload exists in workloadStates list
-                    let value = dependencies[dependency];
-                    dependencyText += dependency + ' -> ' + value;
-                } else {
-                    // If the dependent workload is missing from workloadStates list
-                    let value = dependencies[dependency];
-                    dependencyText += dependency + ' -> ' + value + ' is missing';
+              const equivalentStates = {
+                "ADD_COND_RUNNING": "RUNNING_OK", // Not quite sure if this is intended, but it works for now. Problem is that conditions and states are named differently and there has to be some equivalency check.
+                "RUNNING_OK": "ADD_COND_RUNNING"
+                // more equivalencies can be added
+              };
+          
+              if (workloadState && this.desiredState && this.desiredState.workloads && workloadState.instanceName && workloadState.instanceName.workloadName in this.desiredState.workloads) {
+                let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
+                if (dependencies && Object.keys(dependencies).length > 0) {
+                  let dependencyText = '';
+                  for (let dependency in dependencies) {
+                    let workload = this.workloadStates.find(workload => workload.instanceName.workloadName === dependency);
+                    if (workload && workload.executionState) {
+                       // If the dependent workload exists in workloadStates list
+                      let desiredValue = dependencies[dependency];
+                      let actualValue = workload.executionState[Object.keys(workload.executionState)[0]];
+                      let actualMappedValue = equivalentStates[actualValue] || actualValue;
+                      if (actualMappedValue === desiredValue) {
+                        dependencyText += dependency + ' -> ' + desiredValue + ' is a match';
+                      } else {
+                        dependencyText += dependency + ' -> ' + desiredValue + ' does not match current state ' + actualMappedValue;
+                      }
+                    } else {
+                      // If the dependent workload is missing from workloadStates list
+                      let value = dependencies[dependency];
+                      dependencyText += dependency + ' -> ' + value + ' is missing';
+                    }
+                  }
+                  return dependencyText; // <-- It will return dependency text after checking and forming the text for all dependencies
                 }
-                }
-                return dependencyText;
               }
-              return 'No dependencies';
+              return "No dependencies";
             }
           }
-
     },
 
     mounted() {

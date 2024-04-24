@@ -27,6 +27,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     python3 \
     python3-pip \
     python3-flask \
+    python3-flask-login \
     python3-protobuf \
     libcairo2-dev \
     libfreetype6-dev \

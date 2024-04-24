@@ -16,42 +16,42 @@ workloads:
         value: AC Unit
     runtimeConfig: |
       image: dashboard:0.0
-      commandOptions: ["-p", "5001:5001"]
+      commandOptions: ["-p", "5001:5001", "-e", "PASSWORD=admin"]
 
-  ank_dashboard_B:
-    runtime: podman
-    agent: agent_B
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: Infotainment
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5002:5001"]
+  # ank_dashboard_B:
+  #   runtime: podman
+  #   agent: agent_B
+  #   restart: true
+  #   updateStrategy: AT_LEAST_ONCE
+  #   accessRights:
+  #     allow: []
+  #     deny: []
+  #   restartPolicy: NEVER
+  #   tags:
+  #     - key: Started by
+  #       value: Front Passenger
+  #     - key: Running in
+  #       value: Infotainment
+  #   runtimeConfig: |
+  #     image: dashboard:0.0
+  #     commandOptions: ["-p", "5002:5001"]
 
 
-  ank_dashboard_C:
-    runtime: podman
-    agent: agent_C
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Cloud Service
-      - key: Running in
-        value: Drivetrain
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5003:5001"]
+  # ank_dashboard_C:
+  #   runtime: podman
+  #   agent: agent_C
+  #   restart: true
+  #   updateStrategy: AT_LEAST_ONCE
+  #   accessRights:
+  #     allow: []
+  #     deny: []
+  #   restartPolicy: NEVER
+  #   tags:
+  #     - key: Started by
+  #       value: Cloud Service
+  #     - key: Running in
+  #       value: Drivetrain
+  #   runtimeConfig: |
+  #     image: dashboard:0.0
+  #     commandOptions: ["-p", "5003:5001"]
 

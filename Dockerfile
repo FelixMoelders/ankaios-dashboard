@@ -3,7 +3,7 @@ RUN apk update && apk add --update-cache \
     # Development tools
     python3 \
     && rm -rf /var/cache/apk/* \
-    && python3 -m ensurepip && pip3 install protobuf==3.20.2 && pip3 install Flask
+    && python3 -m ensurepip && pip3 install protobuf==3.20.2 && pip3 install Flask && pip3 install flask-login
 
 FROM base as dev
 

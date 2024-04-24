@@ -3,6 +3,7 @@ const app = Vue.createApp({
         return {
             showHome: true,
             showWorkloads: false,
+            showLogin: false,
             desiredState: {},
             workloadStates: [],
             timer: null,
@@ -17,6 +18,7 @@ const app = Vue.createApp({
             restartPolicy: "NEVER",
             runtimeConfig: "image: docker.io/library/nginx\ncommandOptions: [\"-p\", \"8080:80\"]",
             filterTag: '', // Filter Tag for dashboard gets written/updated here
+            password: "",
         };
     },
     methods: {
@@ -98,13 +100,43 @@ const app = Vue.createApp({
                 .then(response => console.log(response.status));
             this.isFormOpen = false;
         },
-        workloads() {
-            this.showWorkloads = true;
-            this.showHome = false;
+        login() {
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({password: this.password})
+            };
+            fetch('/login', requestOptions)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.changeView("workloads");
+                    }
+                });
         },
-        home() {
+        viewWorkloads() {
+            this.changeView("workloads");
+        },
+        viewHome() {
+            this.changeView("home");
+        },
+        viewLogin() {
+            this.changeView("login");
+        },
+        changeView(viewName) {
             this.showWorkloads = false;
-            this.showHome = true;
+            this.showHome = false;
+            this.showLogin = false;
+            switch (viewName) {
+                case "home":
+                    this.showHome = true;
+                    break;
+                case "login":
+                    this.showLogin = true;
+                    break;
+                case "workloads":
+                    this.showWorkloads = true;
+                    break;
+            }
         },
         loadState() {
             fetch('/completeState')
@@ -154,7 +186,9 @@ const app = Vue.createApp({
 
     mounted() {
         this.timer = setInterval(() => {
-            this.loadState();
+            if (this.showWorkloads) {
+                this.loadState();
+            }
         }, 2000)
     },
     beforeDestroy() {

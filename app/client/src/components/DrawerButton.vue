@@ -1,0 +1,10 @@
+<template>
+  <q-btn
+    flat
+    dense
+    round
+    @click="$emit('clickDrawerBtn')"
+    aria-label="Menu"
+    icon="menu"
+  />
+</template>

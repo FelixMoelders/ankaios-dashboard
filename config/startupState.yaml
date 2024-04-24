@@ -76,3 +76,24 @@ workloads:
       image: dashboard:0.0
       commandOptions: ["-p", "5004:5001"]
 
+
+  ank_startup_cond_D:
+    runtime: podman
+    agent: agent_D
+    restart: true
+    updateStrategy: AT_LEAST_ONCE
+    accessRights:
+      allow: []
+      deny: []
+    restartPolicy: NEVER
+    dependencies:
+    commandArgs: [ "-c", "sleep 10; exit 1" ]
+    tags:
+      - key: Started by
+        value: Driver
+      - key: Running in
+        value: Infotainment
+    runtimeConfig: |
+      image: dashboard:0.0
+      commandOptions: ["-p", "5005:5001"]
+

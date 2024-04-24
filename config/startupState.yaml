@@ -36,7 +36,6 @@ workloads:
       image: dashboard:0.0
       commandOptions: ["-p", "5002:5001"]
 
-
   ank_dashboard_C:
     runtime: podman
     agent: agent_C
@@ -46,6 +45,8 @@ workloads:
       allow: []
       deny: []
     restartPolicy: NEVER
+    dependencies:
+      ank_startup_cond_C: ADD_COND_RUNNING
     tags:
       - key: Started by
         value: Cloud Service
@@ -54,4 +55,24 @@ workloads:
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5003:5001"]
+
+  ank_dashboard_D:
+    runtime: podman
+    agent: agent_D
+    restart: true
+    updateStrategy: AT_LEAST_ONCE
+    accessRights:
+      allow: []
+      deny: []
+    restartPolicy: NEVER
+    dependencies:
+      ank_startup_cond_D: ADD_COND_FAILED
+    tags:
+      - key: Started by
+        value: Driver
+      - key: Running in
+        value: Infotainment
+    runtimeConfig: |
+      image: dashboard:0.0
+      commandOptions: ["-p", "5004:5001"]
 

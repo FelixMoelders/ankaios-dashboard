@@ -7,6 +7,7 @@ const app = Vue.createApp({
             debugWindow: false,
             desiredState: {},
             workloadStates: [],
+            workloadState: [],
             timer: null,
             checkedWorkloads: [],
             isFormOpen: false,
@@ -20,6 +21,7 @@ const app = Vue.createApp({
             runtimeConfig: "image: docker.io/library/nginx\ncommandOptions: [\"-p\", \"8080:80\"]",
             filterTag: '', // Filter Tag for dashboard gets written/updated here
             showID: false,
+            dependencies: "None",
         };
     },
     methods: {
@@ -73,6 +75,9 @@ const app = Vue.createApp({
             this.completeState;
 
         },
+
+
+
 
       /*  toReadableFormat(object) {
             if (typeof object !== "object") {
@@ -222,7 +227,44 @@ const app = Vue.createApp({
                     return false;
                 }
             });
-        }
+        },
+        /* Check dependencies between workloads for Debug Mode visualization */
+
+        checkDependency() {
+            return (workloadState) => {
+              let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
+              if (dependencies && Object.keys(dependencies).length > 0) {
+                  if (this.workloadStates.some(workload => Object.keys(dependencies).includes(workload.instanceName.workloadName))) {
+                    return 'found';
+                  }
+                  // If we reach here, it means the dependent workload is not in workforceStates list
+                  return 'missing';
+              }
+              return false;
+            }
+          },
+          
+        getDependencyText() {
+            return (workloadState) => {
+              let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
+              if (dependencies && Object.keys(dependencies).length > 0) {
+                let dependencyText = '';
+                for (let dependency in dependencies) {
+                  if (this.workloadStates.some(workload => workload.instanceName.workloadName === dependency)) {
+                    // If the dependent workload exists in workloadStates list
+                    let value = dependencies[dependency];
+                    dependencyText += dependency + ' -> ' + value;
+                } else {
+                    // If the dependent workload is missing from workloadStates list
+                    let value = dependencies[dependency];
+                    dependencyText += dependency + ' -> ' + value + ' is missing';
+                }
+                }
+                return dependencyText;
+              }
+              return 'No dependencies';
+            }
+          }
 
     },
 

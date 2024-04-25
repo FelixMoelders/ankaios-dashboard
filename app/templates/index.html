@@ -8,6 +8,7 @@
 	<script src="%% url_for('static', filename='js/highlight.min.js') %%"></script>
 	<script>hljs.highlightAll();</script>
 	<script src="%% url_for('static', filename='js/vue.global.js') %%"></script>
+	<script src="%% url_for('static', filename='js/d3.v7.min.js') %%"></script>
 	<title>Ankaios Dashboard</title>
 	<meta name="description" content="Ankaios Dashboard">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -36,7 +37,7 @@
 			<a v-on:click="viewHome()">Home</a>
 			<a v-on:click="viewLogin()">Login</a>
 			<a v-on:click="viewWorkloads()">Workloads</a>
-			<a >About</a>
+			<a v-on:click="viewDebug()">Debug</a>
 		</nav>
 	</aside>
 
@@ -77,7 +78,7 @@
 			<button v-on:click="switchForm()" class="btn--raised btn--blue" id="newWorkloadBtn">New Workload</button>
 			
                       
-      <label> <!--Filter label for workload tags-->
+      		<label> <!--Filter label for workload tags-->
 				<input type="text" v-model="filterTag" placeholder="Filter by tag" />
 			</label>
 			<div v-if="isFormOpen" class="g--8 card">
@@ -154,11 +155,21 @@
 				  </tbody>
 			</table>
 		</div>
+
+		<!-- Debug -->
+		<div class="g--10 m--1" v-if="showDebug">
+			<div class="g--8 card">
+				<!-- Hier soll der Graph hinnne -->
+				<button v-on:click="drawDependencyGraph()" class="btn--raised btn--gray" id="addBtn">Show/Refresh Dependency Graph</button>
+				<div id="dependencyGraph">
+					<svg></svg>
+				</div>
+			</div>
+		</div>
 	</main>
 </body>
 
 <!-- Import Vue App -->
-<script src="%% url_for('static', filename='js/components/dialog.js') %%"></script>
 <script src="%% url_for('static', filename='js/main.js') %%"></script>
 
 <!-- Mount Vue App -->

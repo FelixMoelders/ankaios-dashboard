@@ -1,11 +1,46 @@
+function linkArc(d) {
+    const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
+    return `
+      M${d.source.x},${d.source.y}
+      A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
+    `;
+}
+
+drag = simulation => {
+  
+    function dragstarted(event, d) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+    
+    function dragged(event, d) {
+      d.fx = event.x;
+      d.fy = event.y;
+    }
+    
+    function dragended(event, d) {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    }
+    
+    return d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended);
+}
+
 const app = Vue.createApp({
     data() {
         return {
             showHome: true,
             showWorkloads: false,
             showLogin: false,
+            showDebug: false,
             desiredState: {},
             workloadStates: [],
+            workloadDependencies: [],
             timer: null,
             checkedWorkloads: [],
             isFormOpen: false,
@@ -122,10 +157,15 @@ const app = Vue.createApp({
         viewLogin() {
             this.changeView("login");
         },
+        viewDebug() {
+            this.changeView("debug");
+        },
         changeView(viewName) {
             this.showWorkloads = false;
             this.showHome = false;
             this.showLogin = false;
+            this.showDebug = false;
+
             switch (viewName) {
                 case "home":
                     this.showHome = true;
@@ -136,12 +176,23 @@ const app = Vue.createApp({
                 case "workloads":
                     this.showWorkloads = true;
                     break;
+                case "debug":
+                    this.showDebug = true;
+                    break;
             }
         },
         loadState() {
-            fetch('/completeState')
-                .then(response => response.json())
-                .then(json => {
+            fetch('/completeState').then(response => {
+                    if (!response.ok) {
+                        if (response.status == 405) {
+                            console.log("User not logged in. Changing to Login Page.")
+                            this.changeView("login");
+                        }
+                        return Promise.reject(response);
+                    } else {
+                        return response.json();
+                    }
+                }).then(json => {
                     const completeState = json.response.completeState;
                     const workloads = json.response.completeState.desiredState.workloads;
                     const workloadStates = json.response.completeState.workloadStates;
@@ -151,9 +202,22 @@ const app = Vue.createApp({
                     }
                     this.workloadStates = workloadStates;
                     this.desiredState = completeState.desiredState;
+
+                    console.log(workloads);
+                    for (let [workloadName, workdloadDefinition] of Object.entries(workloads)) {
+                        if ("dependencies" in workdloadDefinition) {
+                            for (let [dependency, condition] of Object.entries(workdloadDefinition.dependencies)) {
+                                this.workloadDependencies.push({
+                                    source: workloadName, 
+                                    target: dependency, 
+                                    type: condition
+                                });
+                            }
+                        }
+                    }
+                    console.log(this.workloadDependencies);
                 });
         },
-
         getColor(value) {
             let hash = 0;
             for(let i = 0; i < value.length; i++) {
@@ -161,9 +225,107 @@ const app = Vue.createApp({
             }
             let color = ((hash & 0x00FFFFFF) | 0x1000000).toString(16).substring(1);
             return `#${color}`;
-          },
+        },
+        drawDependencyGraph() {
+            /*
+                Todos:
+                    - legende einfügen               
+            */
+            const width = 750;
+            const height = 400;
+            const types = Array.from(new Set(this.workloadDependencies.map(d => d.type)));
+            const nodes = Array.from(new Set(this.workloadDependencies.flatMap(l => [l.source, l.target])), id => ({id}));
+            const links = this.workloadDependencies.map(d => Object.create(d))
+            const color = d3.scaleOrdinal(types, d3.schemeCategory10);
 
+            d3.selectAll("g > *").remove(); // delete all g elements in order to clear the svg for refresh.
 
+            const simulation = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id))
+                .force("charge", d3.forceManyBody().strength(-400))
+                .force("x", d3.forceX())
+                .force("y", d3.forceY());
+
+            const svg = d3.select("svg")
+                .attr("viewBox", [-width / 2, -height / 2, width, height])
+                .attr("width", width)
+                .attr("height", height)
+                .attr("style", "max-width: 100%; height: auto; font: 12px sans-serif;");
+            
+            // Create legend
+            var legend = svg.selectAll(".legend")
+                .data(color.domain())
+                .enter().append("g")
+                .attr("class", "legend")
+                .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+            legend.append("rect")
+                .attr("x", -350)
+                .attr("width", 18)
+                .attr("height", 18)
+                .style("fill", color);
+
+            legend.append("text")
+                .attr("x", -325)
+                .attr("y", 9)
+                .attr("dy", ".35em")
+                .text(function(d) { return d; });
+
+            // Per-type markers, as they don't inherit styles.
+            svg.append("defs").selectAll("marker")
+                .data(types)
+                .join("marker")
+                .attr("id", d => `arrow-${d}`)
+                .attr("viewBox", "0 -5 10 10")
+                .attr("refX", 15)
+                .attr("refY", -0.5)
+                .attr("markerWidth", 6)
+                .attr("markerHeight", 6)
+                .attr("orient", "auto")
+                .append("path")
+                .attr("fill", color)
+                .attr("d", "M0,-5L10,0L0,5");
+
+            const link = svg.append("g")
+                .attr("fill", "none")
+                .attr("stroke-width", 1.5)
+                .selectAll("path")
+                .data(links)
+                .join("path")
+                .attr("stroke", d => color(d.type))
+                .attr("marker-end", d => `url(${new URL(`#arrow-${d.type}`, location)})`);
+
+            const node = svg.append("g")
+                .attr("fill", "currentColor")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-linejoin", "round")
+                .selectAll("g")
+                .data(nodes)
+                .join("g")
+                .call(drag(simulation));
+
+            node.append("circle")
+                .attr("stroke", "white")
+                .attr("stroke-width", 1.5)
+                .attr("r", 4);
+
+            node.append("text")
+                .attr("x", 8)
+                .attr("y", "0.31em")
+                .text(d => d.id)
+                .clone(true).lower()
+                .attr("fill", "none")
+                .attr("stroke", "white")
+                .attr("stroke-width", 3);
+
+            simulation.on("tick", () => {
+                link.attr("d", linkArc);
+                node.attr("transform", d => `translate(${d.x},${d.y})`);
+            });
+
+            // invalidation.then(() => simulation.stop());
+            // let chart = Object.assign(svg.node(), {scales: {color}});
+        },
     },
 
     computed: { // Filter functionality is implemented here. If either key or value of the filterTag are existing in a workload, it gets displayed, otherwise hidden in the dashboard.

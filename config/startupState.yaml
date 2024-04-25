@@ -1,6 +1,6 @@
 apiVersion: v0.1
 workloads:
-  ank_dashboard_A:
+  Automatic_Climate_Control:
     runtime: podman
     agent: agent_A
     restart: true
@@ -18,7 +18,7 @@ workloads:
       image: dashboard:0.0
       commandOptions: ["-p", "5001:5001"]
 
-  ank_dashboard_B:
+  Navigation:
     runtime: podman
     agent: agent_B
     restart: true
@@ -36,7 +36,7 @@ workloads:
       image: dashboard:0.0
       commandOptions: ["-p", "5002:5001"]
 
-  ank_dashboard_C:
+  Smartphone_Music_Streaming:
     runtime: podman
     agent: agent_C
     restart: true
@@ -46,17 +46,17 @@ workloads:
       deny: []
     restartPolicy: NEVER
     dependencies:
-      ank_startup_cond_C: ADD_COND_RUNNING
+      Smartphone_Bluetooth_Connection: ADD_COND_RUNNING
     tags:
       - key: Started by
-        value: Cloud Service
+        value: Rear Passenger
       - key: Running in
-        value: Drivetrain
+        value: Infotainment
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5003:5001"]
 
-  ank_dashboard_D:
+  EV_Charging_Error:
     runtime: podman
     agent: agent_D
     restart: true
@@ -66,10 +66,10 @@ workloads:
       deny: []
     restartPolicy: NEVER
     dependencies:
-      ank_startup_cond_D: ADD_COND_FAILED
+      EV_Charging_Session: ADD_COND_FAILED
     tags:
       - key: Started by
-        value: Driver
+        value: Charging Circuit
       - key: Running in
         value: Infotainment
     runtimeConfig: |
@@ -77,7 +77,7 @@ workloads:
       commandOptions: ["-p", "5004:5001"]
 
 
-  ank_startup_cond_D:
+  EV_Charging_Start:
     runtime: podman
     agent: agent_D
     restart: true
@@ -90,7 +90,7 @@ workloads:
     commandArgs: [ "-c", "sleep 10; exit 1" ]
     tags:
       - key: Started by
-        value: Driver
+        value: Charging Circuit
       - key: Running in
         value: Infotainment
     runtimeConfig: |

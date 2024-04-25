@@ -224,14 +224,29 @@ const app = Vue.createApp({
                 });
           },
 
-        getColor(value) {
+          getColor(value) { // Updated colored background for tags so that colors do not get too dark for legibility of black text
             let hash = 0;
-            for(let i = 0; i < value.length; i++) {
-              hash = value.charCodeAt(i) + ((hash << 5) - hash);
+            for (let i = 0; i < value.length; i++) {
+                hash = value.charCodeAt(i) + ((hash << 5) - hash);
             }
-            let color = ((hash & 0x00FFFFFF) | 0x1000000).toString(16).substring(1);
-            return `#${color}`;
-          },
+        
+            // Split hash into R, G, and B values
+            let r = (hash & 0xFF0000) >> 16;
+            let g = (hash & 0x00FF00) >> 8;
+            let b = hash & 0x0000FF;
+           
+            // Scale RGB values to avoid dark colors. Here 128 ensures colors are on the brighter half of the spectrum.
+            r = Math.floor((r + 256) / 2);
+            g = Math.floor((g + 256) / 2);
+            b = Math.floor((b + 256) / 2);
+        
+            // Convert R, G, B values to hexadecimal and pad with 0's if necessary
+            r = r.toString(16).padStart(2, '0');
+            g = g.toString(16).padStart(2, '0');
+            b = b.toString(16).padStart(2, '0');
+        
+            return '#' + r + g + b;
+        },
 
 
     },

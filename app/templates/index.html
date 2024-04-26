@@ -130,9 +130,8 @@
 						<th>Workload</th>
 						<th>Agent</th>
 						<th>State</th>
-
 						<th>Info</th>
-            <th>Tags</th> <!--Introduce column for workload tags-->
+            			<th>Tags</th> <!--Introduce column for workload tags-->
 					</tr>
 				</thead>
 				<tbody>
@@ -141,7 +140,7 @@
 					  <td>{{state.instanceName.workloadName}}</td>
 					  <td>{{state.instanceName.agentName}}</td>
 					  <td>{{state.executionState.running}}</td>
-            <td><button class="btn--float" v-on:click="openConfig(state.instanceName.workloadName)">+</button></td>
+					  <td><button class="btn--float" v-on:click="openConfig(state.instanceName.workloadName)">+</button></td>
 					  <td>
 						  <ul>
 							  <li v-for="tag in state.tags">

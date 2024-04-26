@@ -55,6 +55,10 @@ def logout():
     logout_user()
     return Response("Logged out.", status=200)
 
+@dashboard.route('/debug')
+def debug():
+    return render_template('debug.html')
+
 @dashboard.route('/completeState', methods=['GET'])
 @login_required
 def get_complete_state():

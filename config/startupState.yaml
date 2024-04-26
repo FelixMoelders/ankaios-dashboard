@@ -1,6 +1,6 @@
 apiVersion: v0.1
 workloads:
-  workload_a:
+  Automatic_Climate_Control:
     runtime: podman
     agent: agent_A
     restart: true
@@ -18,7 +18,7 @@ workloads:
       image: dashboard:0.0
       commandOptions: ["-p", "5001:5001", "-e", "PASSWORD=admin"]
 
-  workload_b:
+  Navigation:
     runtime: podman
     agent: agent_B
     restart: true
@@ -38,8 +38,7 @@ workloads:
       image: dashboard:0.0
       commandOptions: ["-p", "5002:5001"]
 
-
-  watch_dog:
+  Smartphone_Music_Streaming:
     runtime: podman
     agent: agent_C
     restart: true
@@ -48,14 +47,55 @@ workloads:
       allow: []
       deny: []
     restartPolicy: NEVER
+    dependencies:
+      Smartphone_Bluetooth_Connection: ADD_COND_RUNNING
     tags:
       - key: Started by
-        value: Cloud Service
+        value: Rear Passenger
       - key: Running in
-        value: Drivetrain
-    dependencies:
-      workload_b: ADD_COND_FAILED
+        value: Infotainment
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5003:5001"]
+
+  EV_Charging_Error:
+    runtime: podman
+    agent: agent_D
+    restart: true
+    updateStrategy: AT_LEAST_ONCE
+    accessRights:
+      allow: []
+      deny: []
+    restartPolicy: NEVER
+    dependencies:
+      EV_Charging_Start: ADD_COND_FAILED
+    tags:
+      - key: Started by
+        value: Charging Circuit
+      - key: Running in
+        value: Instrument Cluster
+    runtimeConfig: |
+      image: dashboard:0.0
+      commandOptions: ["-p", "5004:5001"]
+
+
+  EV_Charging_Start:
+    runtime: podman
+    agent: agent_D
+    restart: true
+    updateStrategy: AT_LEAST_ONCE
+    accessRights:
+      allow: []
+      deny: []
+    restartPolicy: NEVER
+    dependencies:
+    commandArgs: [ "-c", "sleep 10; exit 1" ]
+    tags:
+      - key: Started by
+        value: Charging Circuit
+      - key: Running in
+        value: Instrument Cluster
+    runtimeConfig: |
+      image: dashboard:0.0
+      commandOptions: ["-p", "5005:5001"]
 

@@ -36,10 +36,11 @@ const app = Vue.createApp({
         return {
             showHome: true,
             showWorkloads: false,
-            showLogin: false,
             showDebug: false,
+            debugWindow: false,
             desiredState: {},
             workloadStates: [],
+            workloadState: [],
             workloadDependencies: [],
             timer: null,
             checkedWorkloads: [],
@@ -53,6 +54,8 @@ const app = Vue.createApp({
             restartPolicy: "NEVER",
             runtimeConfig: "image: docker.io/library/nginx\ncommandOptions: [\"-p\", \"8080:80\"]",
             filterTag: '', // Filter Tag for dashboard gets written/updated here
+            showID: false,
+            dependencies: "None",
             password: "",
         };
     },
@@ -80,6 +83,7 @@ const app = Vue.createApp({
         openConfig(workloadName) {
             this.showConfig = true;
             this.showWorkloads = false;
+            this.showDebug = false;
             this.config.edit = false;
             this.config.workloadName = workloadName;
             this.config.agent = this.desiredState.workloads[workloadName].agent;
@@ -92,8 +96,42 @@ const app = Vue.createApp({
         closeConfig() {
             this.config.edit = false;
             this.showConfig = false;
-            this.showWorkloads = true;
+            if (this.debugWindow == true) { // Depending on whether config window is opened from "Workloads" or "Debug Mode" tab, go back there upon closing.
+                this.showDebug = true;
+                this.showWorkloads = false;
+            } else if (this.debugWindow == false) {
+                this.showDebug = false;
+                this.showWorkloads = true;
+            };
         },
+
+        toggleID(workloadName) {
+
+            this.completeState;
+
+        },
+
+
+
+
+      /*  toReadableFormat(object) {
+            if (typeof object !== "object") {
+                return object;
+            }
+
+            let output = {}
+            for (let key in object) {
+                if (typeof object[key] === "object") {
+                    output[key] = this.toReadableFormat(object[key]);
+                } else {
+                    output[key] = object[key];
+                }
+            }
+
+            return output;
+        }, */
+  
+
         switchForm() {
             this.isFormOpen = !this.isFormOpen;
         },
@@ -135,7 +173,20 @@ const app = Vue.createApp({
                 .then(response => console.log(response.status));
             this.isFormOpen = false;
         },
-        login() {
+        viewWorkloads() {
+            console.log('workloads method triggered');
+            this.showHome = false;
+            this.showDebug = false;
+            this.showWorkloads = true;
+            this.debugWindow = false;
+            this.changeView("workloads");
+            
+        },
+        changeView(viewName) {
+            this.showWorkloads = false;
+            this.showHome = true;
+        },
+        viewLogin() {
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -147,19 +198,28 @@ const app = Vue.createApp({
                         this.changeView("workloads");
                     }
                 });
+                this.changeView("login");
         },
-        viewWorkloads() {
-            this.changeView("workloads");
-        },
+
+       
         viewHome() {
             this.changeView("home");
         },
-        viewLogin() {
-            this.changeView("login");
-        },
+
+
         viewDebug() {
+            //fetch('/debug')
+            this.showWorkloads = false;
+            this.showHome = false;
+            this.showDebug = true;
+            //this.showConfig = false;
+            this.debugWindow = true;
+            //console.log(workloadStates);
+            //console.log(desiredState);
+            //console.log(completeState);
             this.changeView("debug");
         },
+
         changeView(viewName) {
             this.showWorkloads = false;
             this.showHome = false;
@@ -181,18 +241,11 @@ const app = Vue.createApp({
                     break;
             }
         },
+
         loadState() {
-            fetch('/completeState').then(response => {
-                    if (!response.ok) {
-                        if (response.status == 405) {
-                            console.log("User not logged in. Changing to Login Page.")
-                            this.changeView("login");
-                        }
-                        return Promise.reject(response);
-                    } else {
-                        return response.json();
-                    }
-                }).then(json => {
+            fetch('/completeState')
+                .then(response => response.json())
+                .then(json => {
                     const completeState = json.response.completeState;
                     const workloads = json.response.completeState.desiredState.workloads;
                     const workloadStates = json.response.completeState.workloadStates;
@@ -200,10 +253,14 @@ const app = Vue.createApp({
                         const workload = workloads[state.instanceName.workloadName];
                         state.tags = workload ? workload.tags : [];
                     }
-                    this.workloadStates = workloadStates;
-                    this.desiredState = completeState.desiredState;
+                    
+                    if (completeState && completeState.desiredState) {
+                        this.desiredState = completeState.desiredState;
+                    }
+                    
+                }).catch((error) => {
+                    console.log('There has been a problem with your fetch operation: ', error.message);
 
-                    console.log(workloads);
                     for (let [workloadName, workdloadDefinition] of Object.entries(workloads)) {
                         if ("dependencies" in workdloadDefinition) {
                             for (let [dependency, condition] of Object.entries(workdloadDefinition.dependencies)) {
@@ -217,15 +274,32 @@ const app = Vue.createApp({
                     }
                     console.log(this.workloadDependencies);
                 });
-        },
-        getColor(value) {
+          },
+
+          getColor(value) { // Updated colored background for tags so that colors do not get too dark for legibility of black text
             let hash = 0;
-            for(let i = 0; i < value.length; i++) {
-              hash = value.charCodeAt(i) + ((hash << 5) - hash);
+            for (let i = 0; i < value.length; i++) {
+                hash = value.charCodeAt(i) + ((hash << 5) - hash);
             }
-            let color = ((hash & 0x00FFFFFF) | 0x1000000).toString(16).substring(1);
-            return `#${color}`;
+        
+            // Split hash into R, G, and B values
+            let r = (hash & 0xFF0000) >> 16;
+            let g = (hash & 0x00FF00) >> 8;
+            let b = hash & 0x0000FF;
+           
+            // Scale RGB values to avoid dark colors. Here 128 ensures colors are on the brighter half of the spectrum.
+            r = Math.floor((r + 256) / 2);
+            g = Math.floor((g + 256) / 2);
+            b = Math.floor((b + 256) / 2);
+        
+            // Convert R, G, B values to hexadecimal and pad with 0's if necessary
+            r = r.toString(16).padStart(2, '0');
+            g = g.toString(16).padStart(2, '0');
+            b = b.toString(16).padStart(2, '0');
+        
+            return '#' + r + g + b;
         },
+
         drawDependencyGraph() {
             /*
                 Todos:
@@ -326,6 +400,7 @@ const app = Vue.createApp({
             // invalidation.then(() => simulation.stop());
             // let chart = Object.assign(svg.node(), {scales: {color}});
         },
+
     },
 
     computed: { // Filter functionality is implemented here. If either key or value of the filterTag are existing in a workload, it gets displayed, otherwise hidden in the dashboard.
@@ -342,8 +417,86 @@ const app = Vue.createApp({
                     return false;
                 }
             });
-        }
+        },
+        /* Check dependencies between workloads for Debug Mode visualization */
 
+        checkDependency() {
+            return (workloadState) => {
+              const equivalentStates = {
+                "ADD_COND_RUNNING": "RUNNING_OK", // Not quite sure if this is intended, but it works for now. Problem is that conditions and states are named differently and there has to be some equivalency check.
+                "RUNNING_OK": "ADD_COND_RUNNING"
+                // more equivalencies can be added
+              };
+          
+              if (workloadState && this.desiredState && this.desiredState.workloads && workloadState.instanceName && 'workloadName' in workloadState.instanceName && workloadState.instanceName.workloadName in this.desiredState.workloads) {
+                let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
+                if (dependencies && Object.keys(dependencies).length > 0) {
+                  let allFound = true;
+                  for (let dependency in dependencies) {
+                    let workload = this.workloadStates.find(workload => workload.instanceName && 'workloadName' in workload.instanceName && 
+                    workload.instanceName.workloadName === dependency);
+                    if (workload && workload.executionState && Object.keys(workload.executionState).length > 0) {
+                      let desiredValue = dependencies[dependency];
+                      let actualValue = workload.executionState[Object.keys(workload.executionState)[0]];
+          
+                      if (equivalentStates[actualValue]) {
+                        actualValue = equivalentStates[actualValue];
+                      }
+          
+                      if (actualValue !== desiredValue) {
+                        allFound = false; // A dependency doesn't match required/equivalent state
+                        break;
+                      }
+          
+                    } else {
+                      allFound = false; // Dependency not found
+                      break;
+                    }
+                  }
+          
+                  return allFound ? 'found' : 'missing';
+                }
+              }
+              return false;
+            }
+          },
+          
+          getDependencyText() {
+            return (workloadState) => {
+              const equivalentStates = {
+                "ADD_COND_RUNNING": "RUNNING_OK", // Not quite sure if this is intended, but it works for now. Problem is that conditions and states are named differently and there has to be some equivalency check.
+                "RUNNING_OK": "ADD_COND_RUNNING"
+                // more equivalencies can be added
+              };
+          
+              if (workloadState && this.desiredState && this.desiredState.workloads && workloadState.instanceName && workloadState.instanceName.workloadName in this.desiredState.workloads) {
+                let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
+                if (dependencies && Object.keys(dependencies).length > 0) {
+                  let dependencyText = '';
+                  for (let dependency in dependencies) {
+                    let workload = this.workloadStates.find(workload => workload.instanceName.workloadName === dependency);
+                    if (workload && workload.executionState) {
+                       // If the dependent workload exists in workloadStates list
+                      let desiredValue = dependencies[dependency];
+                      let actualValue = workload.executionState[Object.keys(workload.executionState)[0]];
+                      let actualMappedValue = equivalentStates[actualValue] || actualValue;
+                      if (actualMappedValue === desiredValue) {
+                        dependencyText += dependency + ' -> ' + desiredValue + ' is a match';
+                      } else {
+                        dependencyText += dependency + ' -> ' + desiredValue + ' does not match current state ' + actualMappedValue;
+                      }
+                    } else {
+                      // If the dependent workload is missing from workloadStates list
+                      let value = dependencies[dependency];
+                      dependencyText += dependency + ' -> ' + value + ' is missing';
+                    }
+                  }
+                  return dependencyText; // <-- It will return dependency text after checking and forming the text for all dependencies
+                }
+              }
+              return "No dependencies";
+            }
+          }
     },
 
     mounted() {

@@ -25,6 +25,72 @@
     }
     </style>
 
+	<style>
+		.color-box {
+			background-color: red;  /* Debug message*/
+			padding: 20px;
+			color: black; 
+			font-size: 30px;  
+		}
+	</style>
+
+	<style> /* Style code for displaying matching table entries in Debug Mode in green*/
+		.match {
+			color: green;
+		}
+	</style>
+
+	<style> /* Style code for displaying mismatching table entries in Debug Mode in red*/
+		.mismatch {
+			color: red;
+		}
+	</style>
+
+	<style> /* Align cells in the table to the left */
+		#workloadTable td {
+			text-align: left;
+		}
+	</style>
+
+	<style> /*If the execution state of a workload is 'RUNNING_OK', make the text green*/
+	.running-ok {
+	  color: green;
+	}
+	</style>
+
+	<style>
+		.color-box {
+			background-color: red;  /* Debug message*/
+			padding: 20px;
+			color: black; 
+			font-size: 30px;  
+		}
+	</style>
+
+	<style> /* Style code for displaying matching table entries in Debug Mode in green*/
+		.match {
+			color: green;
+		}
+	</style>
+
+	<style> /* Style code for displaying mismatching table entries in Debug Mode in red*/
+		.mismatch {
+			color: red;
+		}
+	</style>
+
+	<style> /* Align cells in the table to the left */
+		#workloadTable td {
+			text-align: left;
+		}
+	</style>
+
+	<style> /*If the execution state of a workload is 'RUNNING_OK', make the text green*/
+	.running-ok {
+	  color: green;
+	}
+	</style>
+
 </head>
 <body id="app">
 	<input type="checkbox" id="nav--super-vertical-responsive">
@@ -41,6 +107,12 @@
 		</nav>
 	</aside>
 
+	<!--<body>
+		<div class="color-box">
+			Debug Mode
+		</div>
+	</body>-->
+
 	<main class="g--10 g-m--12 m--2 m-m--0 no-margin-vertical" role="main">
 		<header class="container--wrap">
 			<img src="%% url_for('static', filename='ankaios_logo.png') %%" style="width:10%">
@@ -49,37 +121,131 @@
 		<div class="g--10 m--1" v-if="showHome">
 			<h2 class="fade-in-from-top color--pink">Welcome to the Ankaios Dashboard</h2>
 		</div>
+		<!--Debug-->
+		<div class="g--10 m--1" v-if="showDebug">
+			<h2 class="fade-in-from-top color--pink">Debug Mode</h2>
+			<button v-on:click="deleteCheckedWorkloads()" class="btn--raised btn--red btn-to-right" id="deleteBtn">Delete</button>
+			<button v-on:click="switchForm()" class="btn--raised btn--blue" id="newWorkloadBtn">New Workload</button> 
+			<label> <!--Filter label for workload tags-->
+				<input type="text" v-model="filterTag" placeholder="Filter by tag" />
+				</label>
+				<div v-if="isFormOpen" class="g--8 card">
+					<div class="g--12">
+						<label>
+							WorkloadName: <input type="text" v-model="workloadName">
+						</label>
+					</div>
+					<div class="g--12">
+						<label>
+							Agent: <input type="text" v-model="agent">
+						</label>
+					</div>
+					<div class="g--12">
+						<label>
+							Runtime: <input type="text" v-model="runtime">
+						</label>
+					</div>
+					<div class="g--12">
+						<label>
+							Restart Policy: 
+							<select name="restartPolicy" id="selectRestartPolicy" v-model="restartPolicy">
+								<option value="NEVER">NEVER</option>
+								<option value="ALWAYS">ALWAYS</option>
+								<option value="ON_FAILURE">ON_FAILURE</option>
+							</select>
+						</label>
+					</div>
+					<div class="g--12">
+						<label>
+							Tags (Json-Format: {"key1": "value1", "key2": "value2", ...}): <br>
+							<textarea v-model="tags"></textarea>
+						</label>
+					</div>
+					<div class="g--12">
+						<label>
+							Runtime Config: <br>
+							<textarea v-model="runtimeConfig"></textarea>
+						</label>
+					</div>
+					<button v-on:click="addWorkload()" class="btn--raised btn--gray" id="addBtn">Add</button>
+					<button v-on:click="closeForm()" class="btn--raised btn--blue" id="addBtn">Close</button>
+				</div>
+	
+				<table class="g--8 card" id="workloadTable">
+					<thead>
+						<tr>
+							<th>Workload Name</th>
+							<th>Workload Details</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(workloadState, index) in workloadStates" :key="index">						
+							<td>
+								{{ workloadState.instanceName.workloadName }}
+							</td>
+							<td>
+								<pre>
+									Agent: {{ desiredState.workloads[workloadState.instanceName.workloadName].agent }} 
+									Started by: {{ desiredState.workloads[workloadState.instanceName.workloadName].tags[0].value }}
+									Running in: {{ desiredState.workloads[workloadState.instanceName.workloadName].tags[1].value }}
+									Runtime: {{ desiredState.workloads[workloadState.instanceName.workloadName].runtime }}
+									ID: {{ workloadState.instanceName.id }}
+								</pre>
+								<div :class="{ 'match': checkDependency(workloadState) === 'found', 'mismatch': checkDependency(workloadState) === 'missing' }"> <!-- If something is wrong with the dependencies, display dependency and execution state in red -->
+								<pre>
+									Dependencies: {{ getDependencyText(workloadState) }}
+								</pre>
+								<pre :class="{ 'running-ok': workloadState.executionState[Object.keys(workloadState.executionState)[0]] === 'RUNNING_OK' }">
+									Execution State: {{ workloadState.executionState[Object.keys(workloadState.executionState)[0]] }} <!-- adding execution state -->
+								</pre>
+								</div>
+							</td>
+					  </tr>
+					</tbody>
+				  </table>          
+		</div>
+                      
 		<!-- login -->
 		<div class="g--10 m--1" v-if="showLogin">
 			<div class="g--8 card">
 				<label for="pwd">Enter the password:</label>
-				<input type="password" id="pwd" name="pwd" v-model="password" @keyup.enter="login()" placeholder="password">
-				<button v-on:click="login()" class="btn--raised btn--blue" id="loginBttn">Login</button>
+				<input type="password" id="pwd" name="pwd" v-model="password" @keyup.enter="viewLogin()" placeholder="password">
+				<button v-on:click="viewLogin()" class="btn--raised btn--blue" id="loginBttn">Login</button>
 			</div>
 		</div>
 		<!-- Config -->
 		<div class="g--10 m--1" v-if="showConfig">
 			<div class="g--8 card">
 				<div class="g--12">
+					<div class="g--10 m--1" v-if="debugWindow == true">
+					<label>
+						ID for {{config.workloadName}} on {{config.agent}}: <br>  
+						<!--{{state.instanceName.id}} <br> -->
+						Runtime Config for {{config.workloadName}} on {{config.agent}}: <br>
+						<textarea v-model="config.runtimeConfig" :disabled="!config.edit"></textarea>
+					</label>
+					</div>
+					<div class="g--10 m--1" v-if="debugWindow == false">
 					<label>
 						Runtime Config for {{config.workloadName}} on {{config.agent}}: <br>
 						<textarea v-model="config.runtimeConfig" :disabled="!config.edit"></textarea>
 					</label>
+</div>					
 				</div>
-				<button v-on:click="switchEdit()" class="btn--raised btn--blue" id="editBttn">Edit</button>
-				<button v-on:click="applyConfig()" class="btn--raised btn--blue" id="saveBttn">Save</button>
-				<button v-on:click="closeConfig()" class="btn--raised btn--blue" id="closeBttn">Close</button>
+				<button v-on:click="switchEdit()" class="btn--raised btn--blue" id="addBtn">Edit</button>
+				<button v-on:click="applyConfig()" class="btn--raised btn--blue" id="addBtn">Save</button>
+				<button v-on:click="closeConfig()" class="btn--raised btn--blue" id="addBtn">Close</button>
 			</div>
 		</div>
+
 		<!-- Workloads -->
-	  
 		<div class="g--10 m--1" v-if="showWorkloads">
+			<h2 class="fade-in-from-top color--pink">Workloads</h2>
 			<button v-on:click="deleteCheckedWorkloads()" class="btn--raised btn--red btn-to-right" id="deleteBtn">Delete</button>
-			<button v-on:click="switchForm()" class="btn--raised btn--blue" id="newWorkloadBtn">New Workload</button>
-			
-                      
-      		<label> <!--Filter label for workload tags-->
-				<input type="text" v-model="filterTag" placeholder="Filter by tag" />
+			<button v-on:click="switchForm()" class="btn--raised btn--blue" id="newWorkloadBtn">New Workload</button>               
+      		
+			<label> <!--Filter label for workload tags-->
+			<input type="text" v-model="filterTag" placeholder="Filter by tag" />
 			</label>
 			<div v-if="isFormOpen" class="g--8 card">
 				<div class="g--12">
@@ -140,7 +306,7 @@
 					  <td>{{state.instanceName.workloadName}}</td>
 					  <td>{{state.instanceName.agentName}}</td>
 					  <td>{{state.executionState.running}}</td>
-					  <td><button class="btn--float" v-on:click="openConfig(state.instanceName.workloadName)">+</button></td>
+            		  <td><button class="btn--float" v-on:click="openConfig(state.instanceName.workloadName)">+</button></td>
 					  <td>
 						  <ul>
 							  <li v-for="tag in state.tags">

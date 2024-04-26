@@ -222,16 +222,20 @@ const app = Vue.createApp({
         },
 
         loadState() {
-            let completeState = null, workloads = null, workloadStates = null;
-        
             fetch('/completeState')
                 .then(response => {
-                    if (response.ok) {
-                        return response.json();
+                    if (!response.ok) {
+                        if (response.status == 405) {
+                            console.log("User not logged in. Changing to Login Page.")
+                            this.changeView("login");
+                        }
+                        return Promise.reject(response);
                     } else {
-                        throw new Error('Network response was not ok');
+                        return response.json();
                     }
                 }).then(json => {
+                    let completeState = null, workloads = null, workloadStates = null;
+                    
                     if (json && json.response && json.response.completeState) {
                         completeState = json.response.completeState;
         
@@ -253,10 +257,7 @@ const app = Vue.createApp({
                     if (completeState && completeState.desiredState) {
                         this.desiredState = completeState.desiredState;
                     }
-        
-                }).catch((error) => {
-                    console.log('There has been a problem with your fetch operation: ', error.message);
-        
+
                     if (workloads) {
                         for (let [workloadName, workdloadDefinition] of Object.entries(workloads)) {
                             if ("dependencies" in workdloadDefinition) {
@@ -271,6 +272,9 @@ const app = Vue.createApp({
                         }
                         console.log(this.dependencies);
                     }
+        
+                }).catch((error) => {
+                    console.log('There has been a problem with your fetch operation: ', error.message);
                 });
         },
 
@@ -299,10 +303,7 @@ const app = Vue.createApp({
         },
 
         drawDependencyGraph() {
-            /*
-                Todos:
-                    - legende einfügen               
-            */
+            console.log(this.dependencies);
             const width = 750;
             const height = 400;
             const types = Array.from(new Set(this.dependencies.map(d => d.type)));

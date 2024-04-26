@@ -45,6 +45,18 @@
 		}
 	</style>
 
+	<style> /* Align cells in the table to the left */
+		#workloadTable td {
+			text-align: left;
+		}
+	</style>
+
+	<style> /*If the execution state of a workload is 'RUNNING_OK', make the text green*/
+	.running-ok {
+	  color: green;
+	}
+	</style>
+
 </head>
 <body id="app">
 	<input type="checkbox" id="nav--super-vertical-responsive">
@@ -130,43 +142,30 @@
 					<thead>
 						<tr>
 							<th>Workload Name</th>
-							<th>Desired State</th>
-							<th>Workload State</th>
+							<th>Workload Details</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr v-for="(workloadState, index) in workloadStates" :key="index">
-							<td>{{ workloadState.instanceName.workloadName }}</td>							
+						<tr v-for="(workloadState, index) in workloadStates" :key="index">						
 							<td>
-								<pre :class="desiredState.workloads[workloadState.instanceName.workloadName].agent == workloadState.instanceName.agentName ? 'match' : ''">
+								{{ workloadState.instanceName.workloadName }}
+							</td>
+							<td>
+								<pre>
 									Agent: {{ desiredState.workloads[workloadState.instanceName.workloadName].agent }} 
-								</pre>
-								<pre>
 									Started by: {{ desiredState.workloads[workloadState.instanceName.workloadName].tags[0].value }}
-								</pre>
-								<pre>
 									Running in: {{ desiredState.workloads[workloadState.instanceName.workloadName].tags[1].value }}
-								</pre>
-								<pre>
 									Runtime: {{ desiredState.workloads[workloadState.instanceName.workloadName].runtime }}
+									ID: {{ workloadState.instanceName.id }}
 								</pre>
-								<div :class="{ 'match': checkDependency(workloadState) === 'found', 'mismatch': checkDependency(workloadState) === 'missing' }">
+								<div :class="{ 'match': checkDependency(workloadState) === 'found', 'mismatch': checkDependency(workloadState) === 'missing' }"> <!-- If something is wrong with the dependencies, display dependency and execution state in red -->
 								<pre>
 									Dependencies: {{ getDependencyText(workloadState) }}
 								</pre>
-								</div>
-							</td>
-							<td>
-								<pre :class="desiredState.workloads[workloadState.instanceName.workloadName].agent == workloadState.instanceName.agentName ? 'match' : ''">
-									Agent: {{ workloadState.instanceName.agentName }}
-								</pre>
-								<pre>
-									ID: {{ workloadState.instanceName.id }}
-								</pre>
-								<pre>
+								<pre :class="{ 'running-ok': workloadState.executionState[Object.keys(workloadState.executionState)[0]] === 'RUNNING_OK' }">
 									Execution State: {{ workloadState.executionState[Object.keys(workloadState.executionState)[0]] }} <!-- adding execution state -->
-								<!--Key: {{ Object.keys(workloadState.executionState)[0] }},-->
 								</pre>
+								</div>
 							</td>
 					  </tr>
 					</tbody>

@@ -66,12 +66,12 @@ workloads:
       deny: []
     restartPolicy: NEVER
     dependencies:
-      EV_Charging_Session: ADD_COND_FAILED
+      EV_Charging_Start: ADD_COND_FAILED
     tags:
       - key: Started by
         value: Charging Circuit
       - key: Running in
-        value: Infotainment
+        value: Instrument Cluster
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5004:5001"]
@@ -92,7 +92,7 @@ workloads:
       - key: Started by
         value: Charging Circuit
       - key: Running in
-        value: Infotainment
+        value: Instrument Cluster
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5005:5001"]

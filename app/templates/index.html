@@ -202,7 +202,14 @@
 							</td>
 					  </tr>
 					</tbody>
-				  </table>          
+				  </table> 
+				  <div class="g--8 card">
+					<!-- Hier soll der Graph hinnne -->
+					<button v-on:click="drawDependencyGraph()" class="btn--raised btn--gray" id="addBtn">Show/Refresh Dependency Graph</button>
+					<div id="dependencyGraph">
+						<svg></svg>
+					</div>
+				</div>         
 		</div>
                       
 		<!-- login -->
@@ -321,16 +328,6 @@
 			</table>
 		</div>
 
-		<!-- Debug -->
-		<div class="g--10 m--1" v-if="showDebug">
-			<div class="g--8 card">
-				<!-- Hier soll der Graph hinnne -->
-				<button v-on:click="drawDependencyGraph()" class="btn--raised btn--gray" id="addBtn">Show/Refresh Dependency Graph</button>
-				<div id="dependencyGraph">
-					<svg></svg>
-				</div>
-			</div>
-		</div>
 	</main>
 </body>
 

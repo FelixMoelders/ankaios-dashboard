@@ -41,7 +41,7 @@ const app = Vue.createApp({
             desiredState: {},
             workloadStates: [],
             workloadState: [],
-            workloadDependencies: [],
+            //workloadDependencies: [],
             timer: null,
             checkedWorkloads: [],
             isFormOpen: false,
@@ -55,7 +55,7 @@ const app = Vue.createApp({
             runtimeConfig: "image: docker.io/library/nginx\ncommandOptions: [\"-p\", \"8080:80\"]",
             filterTag: '', // Filter Tag for dashboard gets written/updated here
             showID: false,
-            dependencies: "None",
+            dependencies: [],
             password: "",
         };
     },
@@ -110,27 +110,6 @@ const app = Vue.createApp({
             this.completeState;
 
         },
-
-
-
-
-      /*  toReadableFormat(object) {
-            if (typeof object !== "object") {
-                return object;
-            }
-
-            let output = {}
-            for (let key in object) {
-                if (typeof object[key] === "object") {
-                    output[key] = this.toReadableFormat(object[key]);
-                } else {
-                    output[key] = object[key];
-                }
-            }
-
-            return output;
-        }, */
-  
 
         switchForm() {
             this.isFormOpen = !this.isFormOpen;
@@ -243,38 +222,57 @@ const app = Vue.createApp({
         },
 
         loadState() {
+            let completeState = null, workloads = null, workloadStates = null;
+        
             fetch('/completeState')
-                .then(response => response.json())
-                .then(json => {
-                    const completeState = json.response.completeState;
-                    const workloads = json.response.completeState.desiredState.workloads;
-                    const workloadStates = json.response.completeState.workloadStates;
-                    for (const state of workloadStates) {
-                        const workload = workloads[state.instanceName.workloadName];
-                        state.tags = workload ? workload.tags : [];
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Network response was not ok');
                     }
-                    
+                }).then(json => {
+                    if (json && json.response && json.response.completeState) {
+                        completeState = json.response.completeState;
+        
+                        if (json.response.completeState.desiredState) {
+                            workloads = json.response.completeState.desiredState.workloads;
+                        }
+        
+                        workloadStates = json.response.completeState.workloadStates;
+                    }
+        
+                    if (workloadStates && workloads) {
+                        for (const state of workloadStates) {
+                            const workload = workloads[state.instanceName.workloadName];
+                            state.tags = workload ? workload.tags : [];
+                        }
+                        this.workloadStates = workloadStates;
+                    }
+        
                     if (completeState && completeState.desiredState) {
                         this.desiredState = completeState.desiredState;
                     }
-                    
+        
                 }).catch((error) => {
                     console.log('There has been a problem with your fetch operation: ', error.message);
-
-                    for (let [workloadName, workdloadDefinition] of Object.entries(workloads)) {
-                        if ("dependencies" in workdloadDefinition) {
-                            for (let [dependency, condition] of Object.entries(workdloadDefinition.dependencies)) {
-                                this.workloadDependencies.push({
-                                    source: workloadName, 
-                                    target: dependency, 
-                                    type: condition
-                                });
+        
+                    if (workloads) {
+                        for (let [workloadName, workdloadDefinition] of Object.entries(workloads)) {
+                            if ("dependencies" in workdloadDefinition) {
+                                for (let [dependency, condition] of Object.entries(workdloadDefinition.dependencies)) {
+                                    this.dependencies.push({
+                                        source: workloadName,
+                                        target: dependency,
+                                        type: condition
+                                    });
+                                }
                             }
                         }
+                        console.log(this.dependencies);
                     }
-                    console.log(this.workloadDependencies);
                 });
-          },
+        },
 
           getColor(value) { // Updated colored background for tags so that colors do not get too dark for legibility of black text
             let hash = 0;
@@ -307,9 +305,9 @@ const app = Vue.createApp({
             */
             const width = 750;
             const height = 400;
-            const types = Array.from(new Set(this.workloadDependencies.map(d => d.type)));
-            const nodes = Array.from(new Set(this.workloadDependencies.flatMap(l => [l.source, l.target])), id => ({id}));
-            const links = this.workloadDependencies.map(d => Object.create(d))
+            const types = Array.from(new Set(this.dependencies.map(d => d.type)));
+            const nodes = Array.from(new Set(this.dependencies.flatMap(l => [l.source, l.target])), id => ({id}));
+            const links = this.dependencies.map(d => Object.create(d))
             const color = d3.scaleOrdinal(types, d3.schemeCategory10);
 
             d3.selectAll("g > *").remove(); // delete all g elements in order to clear the svg for refresh.

@@ -12,7 +12,7 @@ class CustomFlask(Flask):
         variable_end_string='%%',
     ))
 
-dashboard = CustomFlask(__name__)
+dashboard = CustomFlask(__name__, static_folder = 'static/assets/', template_folder = 'static/')
 dashboard.config['SECRET_KEY'] = str(uuid.uuid4())
 
 login_manager = LoginManager()

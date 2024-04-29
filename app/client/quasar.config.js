@@ -63,6 +63,44 @@ module.exports = configure(function (/* ctx */) {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 
+      afterBuild({ quasarConf }) {
+        const fs = require("node:fs");
+        const path = require("path");
+
+        var indexHtml = fs.readFileSync(
+          path.join(quasarConf.build.distDir, "index.html"),
+          "utf-8"
+        );
+
+        const jsFileRe = new RegExp('(?<="/assets/index.)[a-z0-9]*(?=.js")');
+        const cssFileRe = new RegExp('(?<="/assets/index.)[a-z0-9]*(?=.css")');
+
+        const jsFile = "index.".concat(indexHtml.match(jsFileRe), ".js");
+        const cssFile = "index.".concat(indexHtml.match(cssFileRe), ".css");
+
+        const jsPattern = '"/assets/'.concat(jsFile, '"');
+        const cssPattern = '"/assets/'.concat(cssFile, '"');
+
+        const jsReplacement = "\"%% url_for('static', filename='".concat(
+          jsFile,
+          "') %%\""
+        );
+        const cssReplacement = "\"%% url_for('static', filename='".concat(
+          cssFile,
+          "') %%\""
+        );
+
+        const indexHtmlNew = indexHtml
+          .replace(jsPattern, jsReplacement)
+          .replace(cssPattern, cssReplacement);
+
+        fs.writeFileSync(
+          path.join(quasarConf.build.distDir, "index.html"),
+          indexHtmlNew,
+          "utf-8"
+        );
+      },
+
       vitePlugins: [
         [
           "vite-plugin-checker",

@@ -1,0 +1,1 @@
+import{Q as e}from"./QPage.52eccad4.js";import{q as t,s,t as a,v as o}from"./index.c04cf57c.js";import"./render.9edc164a.js";const r=o("h6",null,"This is the content of the Workloads tab",-1),m=Object.assign({name:"WorkloadsView"},{__name:"WorkloadsView",setup(c){return(n,l)=>(t(),s(e,{class:"flex flex-center"},{default:a(()=>[r]),_:1}))}});export{m as default};

@@ -33,7 +33,7 @@ workloads:
       - key: Running in
         value: Infotainment
     dependencies:
-      workload_a: ADD_COND_RUNNING
+      Select_Destination: DEL_COND_RUNNING
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5002:5001"]

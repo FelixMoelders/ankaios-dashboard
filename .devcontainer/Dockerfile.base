@@ -21,6 +21,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install \
     # java for plantuml
     default-jre \
+    nodejs \
+    npm \
     git \
     graphviz \
     # MkDocs Material and social card
@@ -84,6 +86,11 @@ RUN curl -sL https://github.com/pseudomuto/protoc-gen-doc/releases/download/v1.5
 # without making them group writable. Easiest fix is to change to the correct user before the install,
 # s.t. the owner is correct from the start.
 USER ${USERNAME}
+
+# Install quasar cli
+# RUN sudo mkdir /usr/local/lib/node_modules
+# RUN sudo chmod a+w /usr/local/lib/node_modules
+RUN sudo npm install -g @quasar/cli
 
 # Install cargo cli tools
 RUN cargo install cargo-llvm-cov --locked; \

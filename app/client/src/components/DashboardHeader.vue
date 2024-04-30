@@ -7,7 +7,7 @@
       <q-space />
 
       <div class="q-gutter-sm row items-center no-wrap">
-        <loginBtn />
+        <loginBtn @clickLoginBtn="$emit('clickLoginBtn')" />
       </div>
     </q-toolbar>
   </q-header>

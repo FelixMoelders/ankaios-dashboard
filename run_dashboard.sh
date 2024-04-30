@@ -56,7 +56,7 @@ if [[ ! -f ${ANK_BIN_DIR}/ank-server || ! -f ${ANK_BIN_DIR}/ank-agent ]]; then
 fi
 
 echo Building dashboard ...
-podman build "${@:2}" -t dashboard:0.0 -f ./Dockerfile ${SCRIPT_DIR}/../../
+podman build "${@:2}" --ignorefile ./.containerignore -t dashboard:0.0 -f ./Dockerfile ${SCRIPT_DIR}/../../
 echo done.
 
 if pgrep -x "ank-server" >/dev/null

@@ -1,0 +1,3 @@
+# Exclude the node_modules folder, bcause npm install is called
+# in Dockerfile. Allows the usage of artifacts and speeds up the copy commands.
+**/node_modules

@@ -5,6 +5,10 @@ RUN apk update && apk add --update-cache \
     && rm -rf /var/cache/apk/* \
     && python3 -m ensurepip && pip3 install protobuf==3.20.2 && pip3 install Flask && pip3 install flask-login
 
+RUN apk add nodejs npm yarn 
+
+RUN npm install -g @quasar/cli
+
 FROM base as dev
 
 RUN apk update && apk add --update-cache \
@@ -21,4 +25,9 @@ ENV PYTHONPATH="${PYTHONPATH}:/usr/local/lib/ankaios"
 COPY --from=dev /usr/local/lib/ankaios /usr/local/lib/ankaios
 COPY /workspaces/ankaios-dashboard/app /ankaios-dashboard
 
-ENTRYPOINT ["python3", "-u", "/ankaios-dashboard/main.py"]
+WORKDIR /ankaios-dashboard/client
+RUN npm install
+RUN quasar build
+
+WORKDIR /ankaios-dashboard
+ENTRYPOINT ["python3", "-u", "main.py"]

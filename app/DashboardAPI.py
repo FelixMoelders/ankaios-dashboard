@@ -50,7 +50,7 @@ def login():
 
 
 @dashboard.route('/logout')
-@login_required
+# TODO @login_required
 def logout():
     logout_user()
     return Response("Logged out.", status=200)
@@ -60,24 +60,24 @@ def debug():
     return render_template('debug.html')
 
 @dashboard.route('/completeState', methods=['GET'])
-@login_required
+# TODO @login_required
 def get_complete_state():
     return ank_comm_service.get_complete_state()
 
 @dashboard.route('/addNewWorkload', methods=['POST'])
-@login_required
+# TODO @login_required
 def add_new_workload():
     print(ank_comm_service.add_new_workload(request.json))
     return Response("Workload added.", status=200, mimetype='application/json')
 
 @dashboard.route('/deleteWorkloads', methods=['POST'])
-@login_required
+# TODO @login_required
 def delete_workloads():
     print(ank_comm_service.deleteWorkloads(request.json))
     return Response("Workloads deleted.", status=200, mimetype='application/json')
 
 @dashboard.route('/updateConfig', methods=['POST'])
-@login_required
+# TODO @login_required
 def update_config():
     print(ank_comm_service.update_config(request.json))
     return Response("Workloads deleted.", status=200, mimetype='application/json')

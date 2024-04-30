@@ -5,7 +5,11 @@
       @clickLoginBtn="openLogin"
     />
     <dashboardDrawer :drawerOpen="drawerOpen" />
-    <dashboardLogin :loginOpen="loginOpen" @clickCloseLoginBtn="openLogin" />
+    <dashboardLogin
+      :loginOpen="loginOpen"
+      @clickCloseLoginBtn="openLogin"
+      title="Login to Ankaios Dashboard"
+    />
     <q-page-container>
       <router-view />
     </q-page-container>

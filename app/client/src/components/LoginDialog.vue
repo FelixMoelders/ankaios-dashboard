@@ -9,6 +9,7 @@
       <q-card-section>
         <q-form class="q-px-sm q-pt-md">
           <q-input
+            color="secondary"
             square
             clearable
             v-model="user"
@@ -22,6 +23,7 @@
             </template>
           </q-input>
           <q-input
+            color="secondary"
             square
             clearable
             v-model="password"
@@ -63,7 +65,6 @@
 
 <script setup>
 import { ref, toRef } from "vue";
-import closeLoginBtn from "components/CloseLoginButton.vue";
 
 function required(val) {
   return (val && val.length > 0) || "Mandatory field";

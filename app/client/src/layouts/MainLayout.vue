@@ -8,7 +8,7 @@
     <dashboardLogin
       :loginOpen="loginOpen"
       @clickCloseLoginBtn="openLogin"
-      title="Login to Ankaios Dashboard"
+      title="Login"
     />
     <q-page-container>
       <router-view />

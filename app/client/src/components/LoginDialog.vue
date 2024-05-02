@@ -1,10 +1,25 @@
-<!-- TODO: Bei PW-Feld das Visibility- und Clear-Icon in ihrer Position vertauschen (Clear-Icon muss ganz nach rechts) -->
+<!-- TODO:
+  / Bei PW-Feld das Visibility- und Clear-Icon in ihrer Position vertauschen (Clear-Icon muss ganz nach rechts)
+  / Easy-Close zur Karte hinzufügen
+  / Close-Button für Card hinzufügen
+  / Button für PW-Change hinzufügen
+-->
 
 <template>
   <q-dialog v-model="loginOpen">
     <q-card square class="shadow-24" style="width: 400px; height: 540px">
-      <q-card-section class="bg-secondary">
-        <h4 class="text-h5 text-white q-my-xs">{{ title }}</h4>
+      <q-card-section class="row items-center bg-secondary">
+        <div class="text-h5 text-white q-my-xs">{{ title }}</div>
+        <q-space />
+        <q-btn
+          flat
+          round
+          dense
+          v-close-popup
+          @click="$emit('clickCloseLoginBtn')"
+        >
+          <q-icon name="close" color="white" />
+        </q-btn>
       </q-card-section>
       <q-card-section>
         <q-form class="q-px-sm q-pt-md">

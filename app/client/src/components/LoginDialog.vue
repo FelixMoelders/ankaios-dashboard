@@ -72,7 +72,9 @@
         />
       </q-card-actions>
       <q-card-section class="text-center q-pa-sm">
-        <p class="text-grey-6">Change password?</p>
+        <div @click="changePW" class="text-grey-6 cursor-pointer">
+          Change password?
+        </div>
       </q-card-section>
     </q-card>
   </q-dialog>
@@ -93,6 +95,10 @@ function switchVisibility() {
 
 function submit() {
   console.log("Submitted credentials");
+}
+
+function changePW() {
+  console.log("Changed password");
 }
 
 const props = defineProps({

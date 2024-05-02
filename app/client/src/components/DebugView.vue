@@ -10,8 +10,11 @@
           <q-card-section>
             <div class="text-h6">{{workloadState.instanceName.workloadName}}</div>
             <div>{{desiredState.workloads[workloadState.instanceName.workloadName].agent}}</div>
-            <div>{{ workloadState.executionState[Object.keys(workloadState.executionState)[0]] }}</div>
-            <div>{{ getDependencyText(workloadState)}}</div>
+            <div :style="{color: workloadState.executionState[Object.keys(workloadState.executionState)[0]] === 'RUNNING_OK' ? 'green' : 'red'}">
+            {{ workloadState.executionState[Object.keys(workloadState.executionState)[0]] }}</div>
+            <div v-for="dependency in getDependencyText(workloadState)" :key="dependency.text" :style="{color: dependency.status === 'match' ? 'green' : 'red'}">
+                {{ dependency.text }}
+            </div>
           </q-card-section>
         </q-card>
       </div>
@@ -216,6 +219,39 @@ export default {
             // let chart = Object.assign(svg.node(), {scales: {color}});
         },*/
 
+        getDependencyText(workloadState) {
+
+const equivalentStates = {
+     "ADD_COND_RUNNING": "RUNNING_OK",
+     "RUNNING_OK": "ADD_COND_RUNNING"
+ };
+
+let dependenciesList = [];
+
+if (workloadState && this.desiredState && this.desiredState.workloads && workloadState.instanceName && workloadState.instanceName.workloadName in this.desiredState.workloads) {
+ let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
+ if (dependencies && Object.keys(dependencies).length > 0) {
+   for (let dependency in dependencies) {
+     let workload = this.workloadStates.find(workload => workload.instanceName.workloadName === dependency);
+     if (workload && workload.executionState) {
+       let desiredValue = dependencies[dependency];
+       let actualValue = workload.executionState[Object.keys(workload.executionState)[0]];
+       let actualMappedValue = equivalentStates[actualValue] || actualValue;
+       if (actualMappedValue === desiredValue) {
+          dependenciesList.push({text: `${dependency} -> ${desiredValue} is a match`, status: 'match'});
+       } else {
+          dependenciesList.push({text: `${dependency} -> ${desiredValue} does not match current state ${actualMappedValue}`, status: 'no-match'});
+       }
+     } else {
+       let value = dependencies[dependency];
+       dependenciesList.push({text: `${dependency} -> ${value} is missing`, status: 'missing'});
+     }
+   }
+ }
+}
+return (dependenciesList.length > 0)? dependenciesList : [{text: "No dependencies", status: 'match'}];
+}
+
     },
   computed: { // Filter functionality is implemented here. If either key or value of the filterTag are existing in a workload, it gets displayed, otherwise hidden in the dashboard.
         filteredWorkloads() {
@@ -273,44 +309,9 @@ export default {
               }
               return false;
             }
-          },
-
-          getDependencyText() {
-            return (workloadState) => {
-              const equivalentStates = {
-                "ADD_COND_RUNNING": "RUNNING_OK", // Not quite sure if this is intended, but it works for now. Problem is that conditions and states are named differently and there has to be some equivalency check.
-                "RUNNING_OK": "ADD_COND_RUNNING"
-                // more equivalencies can be added
-              };
-
-              if (workloadState && this.desiredState && this.desiredState.workloads && workloadState.instanceName && workloadState.instanceName.workloadName in this.desiredState.workloads) {
-                let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
-                if (dependencies && Object.keys(dependencies).length > 0) {
-                  let dependencyText = '';
-                  for (let dependency in dependencies) {
-                    let workload = this.workloadStates.find(workload => workload.instanceName.workloadName === dependency);
-                    if (workload && workload.executionState) {
-                       // If the dependent workload exists in workloadStates list
-                      let desiredValue = dependencies[dependency];
-                      let actualValue = workload.executionState[Object.keys(workload.executionState)[0]];
-                      let actualMappedValue = equivalentStates[actualValue] || actualValue;
-                      if (actualMappedValue === desiredValue) {
-                        dependencyText += dependency + ' -> ' + desiredValue + ' is a match';
-                      } else {
-                        dependencyText += dependency + ' -> ' + desiredValue + ' does not match current state ' + actualMappedValue;
-                      }
-                    } else {
-                      // If the dependent workload is missing from workloadStates list
-                      let value = dependencies[dependency];
-                      dependencyText += dependency + ' -> ' + value + ' is missing';
-                    }
-                  }
-                  return dependencyText; // <-- It will return dependency text after checking and forming the text for all dependencies
-                }
-              }
-              return "No dependencies";
-            }
           }
+
+
     },
 
   mounted() {

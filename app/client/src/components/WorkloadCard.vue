@@ -37,10 +37,8 @@
             <q-card-section v-if="currentSection === 'dependencies'">
               <div v-for="workloadState in workloadStates.filter(ws => ws.instanceName.workloadName === currentWorkloadName)"
             :key="workloadState.instanceName.workloadName">
-                <div :style="{ color: workloadState.executionState[Object.keys(workloadState.executionState)[0]] === 'RUNNING_OK' ? 'green' : 'red' }">
-                  {{ workloadState.executionState[Object.keys(workloadState.executionState)[0]] }}
-                </div>
-                <div v-for="dependency in getDependencyText(workloadState)" :key="dependency.text" :style="{ color: dependency.status === 'match' ? 'green' : 'red' }">
+                <div v-for="dependency in getDependencyText(workloadState)" :key="dependency.text" >
+                  <q-icon name= "lens" :color="dependency.status === 'match' ? 'green' : 'red'" />
                   {{ dependency.text }}
                 </div>
               </div>
@@ -94,21 +92,23 @@ export default {
               let workload = this.workloadStates.find(workload => workload.instanceName.workloadName === dependency);
               if (workload && workload.executionState) {
                 let desiredValue = dependencies[dependency];
+                let displayValue = desiredValue === 'ADD_COND_RUNNING' ? 'Running' : desiredValue;
                 let actualValue = workload.executionState[Object.keys(workload.executionState)[0]];
                 let actualMappedValue = equivalentStates[actualValue] || actualValue;
                 if (actualMappedValue === desiredValue) {
-                    dependenciesList.push({text: `${dependency} -> ${desiredValue} is a match`, status: 'match'});
+                    dependenciesList.push({text: `${dependency}: ${displayValue} `, status: 'match'});
                 } else {
-                    dependenciesList.push({text: `${dependency} -> ${desiredValue} does not match current state ${actualMappedValue}`, status: 'no-match'});
+                    dependenciesList.push({text: `${dependency}: ${displayValue} does not match current state ${actualMappedValue}`, status: 'no-match'});
                 }
               } else {
                 let value = dependencies[dependency];
-                dependenciesList.push({text: `${dependency} -> ${value} is missing`, status: 'missing'});
+                dependenciesList.push({text: `${dependency}: ${value} is missing`, status: 'missing'});
               }
             }
           }
           }
-          return (dependenciesList.length > 0)? dependenciesList : [{text: "No dependencies", status: 'match'}];
+                  dependenciesList.sort((a, b) => a.text.localeCompare(b.text));
+                  return (dependenciesList.length > 0) ? dependenciesList : [{text: "No dependencies", status: 'match'}];
       },
 
       handleDependencyButtonClick() {
@@ -146,7 +146,7 @@ export default {
                             const workload = workloads[state.instanceName.workloadName];
                             state.tags = workload ? workload.tags : [];
                         }
-                        this.workloadStates = workloadStates;
+                        this.workloadStates = workloadStates.sort((a, b) => a.instanceName.workloadName.localeCompare(b.instanceName.workloadName));
                     }
 
                     if (completeState && completeState.desiredState) {

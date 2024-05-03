@@ -19,7 +19,12 @@
         </div>
 
         <q-card-actions class="row justify-end">
-            <q-btn rounded icon="sync_alt" color="blue" @click="currentSection = currentSection === 'dependencies' ? '' : 'dependencies'" />
+          <q-btn
+              rounded
+              icon="sync_alt"
+              color="blue"
+              @click="currentSection = currentSection !== 'dependencies' || (currentWorkloadName !== workload.instanceName.workloadName) ? 'dependencies' : ''; currentWorkloadName = workload.instanceName.workloadName"
+          />
             <q-btn rounded icon="settings" color="blue" @click="currentSection = currentSection === 'config' ? '' : 'config'" />
         </q-card-actions>
 
@@ -30,8 +35,15 @@
         <q-slide-transition>
 
             <q-card-section v-if="currentSection === 'dependencies'">
-                <!-- Hier kommt der Code von Oemuer hin -->
-                Dependencies
+              <div v-for="workloadState in workloadStates.filter(ws => ws.instanceName.workloadName === currentWorkloadName)"
+            :key="workloadState.instanceName.workloadName">
+                <div :style="{ color: workloadState.executionState[Object.keys(workloadState.executionState)[0]] === 'RUNNING_OK' ? 'green' : 'red' }">
+                  {{ workloadState.executionState[Object.keys(workloadState.executionState)[0]] }}
+                </div>
+                <div v-for="dependency in getDependencyText(workloadState)" :key="dependency.text" :style="{ color: dependency.status === 'match' ? 'green' : 'red' }">
+                  {{ dependency.text }}
+                </div>
+              </div>
             </q-card-section>
 
             <q-card-section v-if="currentSection === 'config'">
@@ -49,9 +61,117 @@ export default {
     data() {
         return {
             currentSection: "",
+            showHome: true,
+            desiredState: {},
+            workloadStates: [],
+            workloadState: [],
+            timer: null,
+            workloadName: "",
+            tags: "",
+            agent: "agent_A",
+            dependencies: [],
+            password: "",
+            selectedWorkload: "",
+            currentWorkloadName: null,
         }
+
     },
     methods: {
+
+      getDependencyText(workloadState) {
+
+        const equivalentStates = {
+          "ADD_COND_RUNNING": "RUNNING_OK",
+          "RUNNING_OK": "ADD_COND_RUNNING"
+        };
+
+          let dependenciesList = [];
+
+          if (workloadState && this.desiredState && this.desiredState.workloads && workloadState.instanceName && workloadState.instanceName.workloadName in this.desiredState.workloads) {
+          let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
+          if (dependencies && Object.keys(dependencies).length > 0) {
+            for (let dependency in dependencies) {
+              let workload = this.workloadStates.find(workload => workload.instanceName.workloadName === dependency);
+              if (workload && workload.executionState) {
+                let desiredValue = dependencies[dependency];
+                let actualValue = workload.executionState[Object.keys(workload.executionState)[0]];
+                let actualMappedValue = equivalentStates[actualValue] || actualValue;
+                if (actualMappedValue === desiredValue) {
+                    dependenciesList.push({text: `${dependency} -> ${desiredValue} is a match`, status: 'match'});
+                } else {
+                    dependenciesList.push({text: `${dependency} -> ${desiredValue} does not match current state ${actualMappedValue}`, status: 'no-match'});
+                }
+              } else {
+                let value = dependencies[dependency];
+                dependenciesList.push({text: `${dependency} -> ${value} is missing`, status: 'missing'});
+              }
+            }
+          }
+          }
+          return (dependenciesList.length > 0)? dependenciesList : [{text: "No dependencies", status: 'match'}];
+      },
+
+      handleDependencyButtonClick() {
+            this.selectedWorkload = this.workload.instanceName.workloadName;
+            this.currentSection = this.currentSection === 'dependencies' ? '' : 'dependencies';
+        },
+
+      loadState() {
+            fetch('/completeState')
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status == 405) {
+                            console.log("User not logged in. Changing to Login Page.")
+                            this.changeView("login");
+                        }
+                        return Promise.reject(response);
+                    } else {
+                        return response.json();
+                    }
+                }).then(json => {
+                    let completeState = null, workloads = null, workloadStates = null;
+
+                    if (json && json.response && json.response.completeState) {
+                        completeState = json.response.completeState;
+
+                        if (json.response.completeState.desiredState) {
+                            workloads = json.response.completeState.desiredState.workloads;
+                        }
+
+                        workloadStates = json.response.completeState.workloadStates;
+                    }
+
+                    if (workloadStates && workloads) {
+                        for (const state of workloadStates) {
+                            const workload = workloads[state.instanceName.workloadName];
+                            state.tags = workload ? workload.tags : [];
+                        }
+                        this.workloadStates = workloadStates;
+                    }
+
+                    if (completeState && completeState.desiredState) {
+                        this.desiredState = completeState.desiredState;
+                    }
+
+                    if (workloads) {
+                        for (let [workloadName, workdloadDefinition] of Object.entries(workloads)) {
+                            if ("dependencies" in workdloadDefinition) {
+                                for (let [dependency, condition] of Object.entries(workdloadDefinition.dependencies)) {
+                                    this.dependencies.push({
+                                        source: workloadName,
+                                        target: dependency,
+                                        type: condition
+                                    });
+                                }
+                            }
+                        }
+                        console.log(this.dependencies);
+                    }
+
+                }).catch((error) => {
+                    console.log('There has been a problem with your fetch operation: ', error.message);
+                });
+        },
 
     },
     computed: {
@@ -74,7 +194,66 @@ export default {
                 default:
                     return "gray";
             }
-        }
-    }
-}
+        },
+
+
+
+        checkDependency() {
+            return (workloadState) => {
+              const equivalentStates = {
+                "ADD_COND_RUNNING": "RUNNING_OK", // Not quite sure if this is intended, but it works for now. Problem is that conditions and states are named differently and there has to be some equivalency check.
+                "RUNNING_OK": "ADD_COND_RUNNING"
+                // more equivalencies can be added
+              };
+
+              if (workloadState && this.desiredState && this.desiredState.workloads && workloadState.instanceName && 'workloadName' in workloadState.instanceName && workloadState.instanceName.workloadName in this.desiredState.workloads) {
+                let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
+                if (dependencies && Object.keys(dependencies).length > 0) {
+                  let allFound = true;
+                  for (let dependency in dependencies) {
+                    let workload = this.workloadStates.find(workload => workload.instanceName && 'workloadName' in workload.instanceName &&
+                    workload.instanceName.workloadName === dependency);
+                    if (workload && workload.executionState && Object.keys(workload.executionState).length > 0) {
+                      let desiredValue = dependencies[dependency];
+                      let actualValue = workload.executionState[Object.keys(workload.executionState)[0]];
+
+                      if (equivalentStates[actualValue]) {
+                        actualValue = equivalentStates[actualValue];
+                      }
+
+                      if (actualValue !== desiredValue) {
+                        allFound = false; // A dependency doesn't match required/equivalent state
+                        break;
+                      }
+
+                    } else {
+                      allFound = false; // Dependency not found
+                      break;
+                    }
+                  }
+
+                  return allFound ? 'found' : 'missing';
+                }
+              }
+              return false;
+            }
+          }
+    },
+
+    mounted() {
+    this.timer = setInterval(() => {
+        this.loadState();
+    }, 2000);
+},
+
+beforeUnmount() {
+    clearInterval(this.timer);
+},
+
+};
+
+
+
 </script>
+
+

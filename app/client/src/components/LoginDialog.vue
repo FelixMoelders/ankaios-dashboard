@@ -1,8 +1,6 @@
 <!-- TODO:
   / Bei PW-Feld das Visibility- und Clear-Icon in ihrer Position vertauschen (Clear-Icon muss ganz nach rechts)
   / Easy-Close zur Karte hinzufügen
-  / Close-Button für Card hinzufügen
-  / Button für PW-Change hinzufügen
 -->
 
 <template>
@@ -24,6 +22,7 @@
       <q-card-section>
         <q-form class="q-px-sm q-pt-md">
           <q-input
+            ref="userField"
             color="secondary"
             square
             clearable
@@ -38,6 +37,7 @@
             </template>
           </q-input>
           <q-input
+            ref="pwField"
             color="secondary"
             square
             clearable
@@ -72,7 +72,7 @@
         />
       </q-card-actions>
       <q-card-section class="text-center q-pa-sm">
-        <div @click="changePW" class="text-grey-6 cursor-pointer">
+        <div @click="changePwd" class="text-grey-6 cursor-pointer">
           Change password?
         </div>
       </q-card-section>
@@ -82,6 +82,9 @@
 
 <script setup>
 import { ref, toRef } from "vue";
+import { useQuasar } from "quasar";
+
+const emit = defineEmits("clickCloseLoginBtn");
 
 function required(val) {
   return (val && val.length > 0) || "Mandatory field";
@@ -94,10 +97,37 @@ function switchVisibility() {
 }
 
 function submit() {
-  console.log("Submitted credentials");
+  if (user.value == "" || password.value == "") {
+    $q.notify({
+      type: "warning",
+      message: "Missing input",
+    });
+    userField.value.validate();
+    pwField.value.validate();
+  } else {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pwd: password }),
+    };
+    fetch("/login", requestOptions).then(function (res) {
+      if (res.status == 200) {
+        $q.notify({
+          type: "positive",
+          message: "Login successful!",
+        });
+        emit("clickCloseLoginBtn");
+      } else if (res.status == 401) {
+        $q.notify({
+          type: "negative",
+          message: "Wrong password",
+        });
+      }
+    });
+  }
 }
 
-function changePW() {
+function changePwd() {
   console.log("Changed password");
 }
 
@@ -113,4 +143,7 @@ const passwordFieldType = ref("password");
 const visibility = ref(false);
 const visibilityIcon = ref("visibility_off");
 const btnLabel = ref("Let's go!");
+const $q = useQuasar();
+const userField = ref("");
+const pwField = ref("");
 </script>

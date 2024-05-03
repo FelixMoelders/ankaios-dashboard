@@ -11,7 +11,7 @@ workloads:
     restartPolicy: NEVER
     tags:
       - key: Started by
-        value: Driver
+        value: Front Passenger
       - key: Running in
         value: AC Unit
     runtimeConfig: |
@@ -33,7 +33,7 @@ workloads:
       - key: Running in
         value: Infotainment
     dependencies:
-      workload_a: ADD_COND_RUNNING
+      Infotainment_Screen_On: ADD_COND_RUNNING
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5002:5001"]
@@ -69,6 +69,7 @@ workloads:
     restartPolicy: NEVER
     dependencies:
       EV_Charging_Start: ADD_COND_FAILED
+      Infotainment_Screen_On: ADD_COND_RUNNING
     tags:
       - key: Started by
         value: Charging Circuit
@@ -98,4 +99,23 @@ workloads:
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5005:5001"]
+
+  Infotainment_Screen_On:
+    runtime: podman
+    agent: agent_C
+    restart: true
+    updateStrategy: AT_LEAST_ONCE
+    accessRights:
+      allow: []
+      deny: []
+    restartPolicy: NEVER
+    dependencies:
+    tags:
+      - key: Started by
+        value: Driver
+      - key: Running in
+        value: Instrument Cluster
+    runtimeConfig: |
+      image: dashboard:0.0
+      commandOptions: ["-p", "5006:5001"]
 

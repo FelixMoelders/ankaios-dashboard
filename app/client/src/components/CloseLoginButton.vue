@@ -1,0 +1,10 @@
+<template>
+  <q-btn
+    icon="close"
+    @click="$emit('clickCloseLoginBtn')"
+    flat
+    round
+    dense
+    v-close-popup
+  />
+</template>

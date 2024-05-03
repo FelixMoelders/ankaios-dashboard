@@ -1,0 +1,1 @@
+import{Q as e}from"./QPage.59075cda.js";import{y as t,z as a,A as s,C as o}from"./index.98ae7f60.js";const c=o("h6",null,"This is the content of the Home tab",-1),l=Object.assign({name:"HomeView"},{__name:"HomeView",setup(n){return(r,_)=>(t(),a(e,{class:"flex flex-center"},{default:s(()=>[c]),_:1}))}});export{l as default};

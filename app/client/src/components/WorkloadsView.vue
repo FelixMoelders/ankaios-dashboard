@@ -1,12 +1,18 @@
 <template>
   <q-page padding>
     <div class="row justify-between items-center q-pa-md"> 
-      <div class="text-h5">Workloads</div> 
+      <div>
+        <div class="text-h5">Workloads <q-btn color="secondary" icon="add_circle" @click="addworkload = true" /></div>
+        
+      </div>
       <q-input v-model="search" placeholder="Search..." filled dense debounce="300"/> 
     </div>
+
+    <AddWorkloadDialog v-model="addworkload" />
+
     <div class="q-pa-md row q-gutter-md">
       <div class="col-md-3" v-for="workload in filteredWorkloads" :key="workload.instanceName.id">
-        <WorkloadCard :workload="workload"/>
+        <WorkloadCard :workload="workload" :desiredState="desiredState"/>
       </div>
     </div>
   </q-page>
@@ -14,12 +20,14 @@
 
 <script>
 import WorkloadCard from './WorkloadCard.vue'
+import AddWorkloadDialog from "./AddWorkloadDialog.vue"
 
 export default {
   data() {
     return {
       search: '',
       workloads: [],
+      addworkload: false,
     }
   },
   methods: {
@@ -35,7 +43,6 @@ export default {
               state.tags = workload ? workload.tags : [];
           }
           this.workloads = workloadStates;
-          console.log(this.workloads);
           this.desiredState = completeState.desiredState;
           console.log(this.desiredState);
         });

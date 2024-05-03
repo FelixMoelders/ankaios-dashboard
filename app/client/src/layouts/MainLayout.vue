@@ -1,7 +1,15 @@
 <template>
   <q-layout view="hHh Lpr lff" class="shadow-2 rounded-borders">
-    <dashboardHeader @clickDrawerBtn="toggleDrawer" />
+    <dashboardHeader
+      @clickDrawerBtn="toggleDrawer"
+      @clickLoginBtn="openLogin"
+    />
     <dashboardDrawer :drawerOpen="drawerOpen" />
+    <dashboardLogin
+      :loginOpen="loginOpen"
+      @clickCloseLoginBtn="openLogin"
+      title="Login"
+    />
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -12,11 +20,17 @@
 import { ref } from "vue";
 import dashboardHeader from "components/DashboardHeader.vue";
 import dashboardDrawer from "components/DashboardDrawer.vue";
+import dashboardLogin from "components/LoginDialog.vue";
 
 const drawerOpen = ref(true);
+const loginOpen = ref(false);
 
 function toggleDrawer() {
   drawerOpen.value = !drawerOpen.value;
+}
+
+function openLogin() {
+  loginOpen.value = !loginOpen.value;
 }
 
 defineOptions({

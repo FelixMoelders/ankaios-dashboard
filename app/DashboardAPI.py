@@ -39,7 +39,7 @@ def home():
 
 @dashboard.route('/login', methods=['POST'])
 def login():
-    pwd = request.json["password"]
+    pwd = request.json['pwd']['_value']
     if pwd == os.environ.get('PASSWORD', DEFAULT_PASSWORD):
         user = User(str(uuid.uuid4))
         login_user(user)

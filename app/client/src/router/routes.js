@@ -1,7 +1,7 @@
 const routes = [
   {
     path: "/",
-    redirect: { path: "/home" },
+    redirect: { path: "/nologin" },
     component: () => import("layouts/MainLayout.vue"),
     children: [
       {

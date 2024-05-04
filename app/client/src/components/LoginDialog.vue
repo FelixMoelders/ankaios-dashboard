@@ -25,11 +25,12 @@
             ref="userField"
             color="secondary"
             square
-            clearable
+            clearable="false"
             v-model="user"
             type="text"
             lazy-rules
             :rules="[required]"
+            no-error-icon="true"
             label="User"
           >
             <template v-slot:prepend>
@@ -40,11 +41,12 @@
             ref="pwField"
             color="secondary"
             square
-            clearable
+            clearable="false"
             v-model="password"
             :type="passwordFieldType"
             lazy-rules
             :rules="[required]"
+            no-error-icon="true"
             label="Password"
           >
             <template v-slot:prepend>
@@ -84,7 +86,7 @@
 import { ref, toRef } from "vue";
 import { useQuasar } from "quasar";
 
-const emit = defineEmits("clickCloseLoginBtn");
+const emit = defineEmits(["clickCloseLoginBtn", "userLoggedIn"]);
 
 function required(val) {
   return (val && val.length > 0) || "Mandatory field";
@@ -99,7 +101,7 @@ function switchVisibility() {
 function submit() {
   if (user.value == "" || password.value == "") {
     $q.notify({
-      type: "warning",
+      type: "negative",
       message: "Missing input",
     });
     userField.value.validate();
@@ -116,6 +118,7 @@ function submit() {
           type: "positive",
           message: "Login successful!",
         });
+        emit("userLoggedIn");
         emit("clickCloseLoginBtn");
       } else if (res.status == 401) {
         $q.notify({

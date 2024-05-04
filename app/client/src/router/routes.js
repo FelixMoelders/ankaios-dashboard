@@ -19,6 +19,10 @@ const routes = [
         path: "/about",
         component: () => import("components/AboutView.vue"),
       },
+      {
+        path: "/nologin",
+        component: () => import("components/NotLoggedInView.vue"),
+      },
     ],
   },
 

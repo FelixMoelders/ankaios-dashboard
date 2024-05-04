@@ -5,6 +5,7 @@
         v-model="loggedIn"
         v-for="item in items"
         :key="item.name"
+        :id="'item' + item.name"
         clickable
         v-ripple
         @click="flagActiveItem(item.name)"
@@ -29,13 +30,15 @@
 </template>
 
 <script setup>
-import { ref, toRef } from "vue";
+import { ref, toRef, onUpdated } from "vue";
 
 const props = defineProps({
   loggedIn: Boolean,
 });
 
 const loggedIn = toRef(props, "loggedIn");
+
+onUpdated(() => document.getElementById("itemHome").click());
 
 const items = ref([
   {

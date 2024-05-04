@@ -4,10 +4,11 @@
       @clickDrawerBtn="toggleDrawer"
       @clickLoginBtn="openLogin"
     />
-    <dashboardDrawer :drawerOpen="drawerOpen" />
+    <dashboardDrawer :drawerOpen="drawerOpen" :loggedIn="loggedIn" />
     <dashboardLogin
       :loginOpen="loginOpen"
       @clickCloseLoginBtn="openLogin"
+      @userLoggedIn="unlockApp"
       title="Login"
     />
     <q-page-container>
@@ -24,6 +25,7 @@ import dashboardLogin from "components/LoginDialog.vue";
 
 const drawerOpen = ref(true);
 const loginOpen = ref(false);
+const loggedIn = ref(false);
 
 function toggleDrawer() {
   drawerOpen.value = !drawerOpen.value;
@@ -31,6 +33,10 @@ function toggleDrawer() {
 
 function openLogin() {
   loginOpen.value = !loginOpen.value;
+}
+
+function unlockApp(){
+  loggedIn.value = !loggedIn.value
 }
 
 defineOptions({

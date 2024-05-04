@@ -10,7 +10,7 @@
     bordered
     class="bg-grey-3"
   >
-    <drawerItems />
+    <drawerItems :loggedIn="loggedIn" />
   </q-drawer>
 </template>
 
@@ -22,7 +22,9 @@ const miniState = ref(true);
 
 const props = defineProps({
   drawerOpen: Boolean,
+  loggedIn: Boolean,
 });
 
 const drawerOpen = toRef(props, "drawerOpen");
+const loggedIn = toRef(props, "loggedIn");
 </script>

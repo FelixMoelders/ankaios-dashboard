@@ -1,3 +1,13 @@
+function guardRoutes(to, from, next) {
+  fetch("/checkAuthentication").then(function (res) {
+    if (res.status == 200) {
+      next();
+    } else if (res.status == 401) {
+      next("/nologin");
+    }
+  });
+}
+
 const routes = [
   {
     path: "/",
@@ -6,18 +16,22 @@ const routes = [
     children: [
       {
         path: "/home",
+        beforeEnter: guardRoutes,
         component: () => import("components/HomeView.vue"),
       },
       {
         path: "/workloads",
+        beforeEnter: guardRoutes,
         component: () => import("components/WorkloadsView.vue"),
       },
       {
         path: "/debug",
+        beforeEnter: guardRoutes,
         component: () => import("components/DebugView.vue"),
       },
       {
         path: "/about",
+        beforeEnter: guardRoutes,
         component: () => import("components/AboutView.vue"),
       },
       {

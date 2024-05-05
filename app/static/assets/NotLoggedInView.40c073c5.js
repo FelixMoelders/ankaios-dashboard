@@ -1,1 +1,0 @@
-import{Q as e}from"./QPage.5a474d43.js";import{y as o,z as t,A as a,C as s}from"./index.cb16c9e7.js";const n=s("h6",null,"You need to log in to access the Ankaios Dashboard.",-1),d=Object.assign({name:"NotLoggedInView"},{__name:"NotLoggedInView",setup(c){return(r,_)=>(o(),t(e,{class:"flex flex-center"},{default:a(()=>[n]),_:1}))}});export{d as default};

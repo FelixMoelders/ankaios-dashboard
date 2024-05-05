@@ -102,7 +102,7 @@ function submit() {
   if (user.value == "" || password.value == "") {
     $q.notify({
       type: "negative",
-      message: "Missing input",
+      message: "Missing input, we can't log you in :(",
     });
     userField.value.validate();
     pwField.value.validate();
@@ -116,14 +116,16 @@ function submit() {
       if (res.status == 200) {
         $q.notify({
           type: "positive",
-          message: "Login successful!",
+          message: "Login successful, great to see you! :)",
         });
-        emit("userLoggedIn");
+        emit("userLoggedIn", user.value);
         emit("clickCloseLoginBtn");
+        user.value = "";
+        password.value = "";
       } else if (res.status == 401) {
         $q.notify({
           type: "negative",
-          message: "Wrong password",
+          message: "Wrong password, we can't log you in :(",
         });
       }
     });

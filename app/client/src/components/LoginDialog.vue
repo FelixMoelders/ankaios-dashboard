@@ -47,7 +47,7 @@
             lazy-rules
             :rules="[required]"
             no-error-icon="true"
-            label="Password"
+            :label="showNewPwField ? 'Old password' : 'Password'"
           >
             <template v-slot:prepend>
               <q-icon name="lock" />

@@ -63,8 +63,13 @@ def checkAuthentication():
 
 @dashboard.route('/setNewPwd', methods=['POST'])
 def setNewPwd():
-    os.environ['PASSWORD'] = request.json['newPwd']['_value']
-    return Response("Changed password.", status=200)
+    pwd_old = request.json['pwd']['_value']  
+    pwd_new = request.json['newPwd']['_value']
+    if pwd_old == os.environ.get('PASSWORD', DEFAULT_PASSWORD):
+        os.environ['PASSWORD'] = pwd_new
+        return Response("Changed password.", status=200)
+    else:
+        return Response("Did not change password.", status=401)
 
 @dashboard.route('/debug')
 def debug():

@@ -60,6 +60,22 @@
               />
             </template>
           </q-input>
+          <q-input
+            v-if="showNewPwField"
+            ref="newPwField"
+            color="secondary"
+            square
+            clearable="false"
+            v-model="newPassword"
+            type="text"
+            lazy-rules
+            no-error-icon="true"
+            label="New password"
+          >
+            <template v-slot:prepend>
+              <q-icon name="lock" />
+            </template>
+          </q-input>
         </q-form>
       </q-card-section>
 
@@ -74,7 +90,7 @@
         />
       </q-card-actions>
       <q-card-section class="text-center q-pa-sm">
-        <div @click="changePwd" class="text-grey-6 cursor-pointer">
+        <div @click="toggleNewPwField" class="text-grey-6 cursor-pointer">
           Change password?
         </div>
       </q-card-section>
@@ -99,7 +115,11 @@ function switchVisibility() {
 }
 
 function submit() {
-  if (user.value == "" || password.value == "") {
+  if (
+    (!showNewPwField.value && (user.value == "" || password.value == "")) ||
+    (showNewPwField.value &&
+      (user.value == "" || password.value == "" || showNewPwField.value == ""))
+  ) {
     $q.notify({
       type: "negative",
       message: "Missing input, we can't log you in :(",
@@ -107,33 +127,52 @@ function submit() {
     userField.value.validate();
     pwField.value.validate();
   } else {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pwd: password }),
-    };
-    fetch("/login", requestOptions).then(function (res) {
-      if (res.status == 200) {
-        $q.notify({
-          type: "positive",
-          message: "Login successful, great to see you! :)",
-        });
-        emit("userLoggedIn", user.value);
-        emit("clickCloseLoginBtn");
-        user.value = "";
-        password.value = "";
-      } else if (res.status == 401) {
-        $q.notify({
-          type: "negative",
-          message: "Wrong password, we can't log you in :(",
-        });
-      }
-    });
+    if (!showNewPwField.value) {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pwd: password }),
+      };
+      fetch("/login", requestOptions).then(function (res) {
+        if (res.status == 200) {
+          $q.notify({
+            type: "positive",
+            message: "Login successful, great to see you! :)",
+          });
+          emit("userLoggedIn", user.value);
+          emit("clickCloseLoginBtn");
+          user.value = "";
+          password.value = "";
+        } else if (res.status == 401) {
+          $q.notify({
+            type: "negative",
+            message: "Wrong password, we can't log you in :(",
+          });
+        }
+      });
+    } else if (showNewPwField.value) {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newPwd: newPassword }),
+      };
+      fetch("/setNewPwd", requestOptions).then(function (res) {
+        if (res.status == 200) {
+          $q.notify({
+            type: "positive",
+            message: "Changed password successfully, good job!",
+          });
+          user.value = "";
+          password.value = "";
+          newPassword.value = "";
+        }
+      });
+    }
   }
 }
 
-function changePwd() {
-  console.log("Changed password");
+function toggleNewPwField() {
+  showNewPwField.value = !showNewPwField.value;
 }
 
 const props = defineProps({
@@ -151,4 +190,6 @@ const btnLabel = ref("Let's go!");
 const $q = useQuasar();
 const userField = ref("");
 const pwField = ref("");
+const newPassword = ref("");
+const showNewPwField = ref(false);
 </script>

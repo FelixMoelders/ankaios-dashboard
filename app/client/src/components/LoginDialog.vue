@@ -67,13 +67,24 @@
             square
             clearable="false"
             v-model="newPassword"
-            type="text"
+            :type="passwordFieldTypeNewPw"
             lazy-rules
             no-error-icon="true"
             label="New password"
           >
             <template v-slot:prepend>
-              <q-icon name="lock" />
+              <q-icon
+                class="text-negative"
+                name="close"
+                @click="toggleNewPwField"
+              />
+            </template>
+            <template v-slot:append>
+              <q-icon
+                :name="visibilityIconNewPw"
+                @click="switchVisibilityNewPw"
+                class="cursor-pointer"
+              />
             </template>
           </q-input>
         </q-form>
@@ -112,6 +123,14 @@ function switchVisibility() {
   visibility.value = !visibility.value;
   passwordFieldType.value = visibility.value ? "text" : "password";
   visibilityIcon.value = visibility.value ? "visibility" : "visibility_off";
+}
+
+function switchVisibilityNewPw() {
+  visibilityNewPw.value = !visibilityNewPw.value;
+  passwordFieldTypeNewPw.value = visibilityNewPw.value ? "text" : "password";
+  visibilityIconNewPw.value = visibilityNewPw.value
+    ? "visibility"
+    : "visibility_off";
 }
 
 function submit() {
@@ -186,6 +205,9 @@ const password = ref("");
 const passwordFieldType = ref("password");
 const visibility = ref(false);
 const visibilityIcon = ref("visibility_off");
+const passwordFieldTypeNewPw = ref("password");
+const visibilityNewPw = ref(false);
+const visibilityIconNewPw = ref("visibility_off");
 const btnLabel = ref("Let's go!");
 const $q = useQuasar();
 const userField = ref("");

@@ -1,7 +1,10 @@
 <template>
-  <q-page class="flex flex-center">
-    <h6>You need to log in to access the Ankaios Dashboard.</h6>
-  </q-page>
+  <div class="q-pa-md q-gutter-sm">
+    <q-banner class="bg-grey text-white q-mt-xl">
+      Welcome to the Ankaios Dashboard. Log in and take off!
+      <q-icon size="sm" class="q-ml-xs" name="rocket_launch" />
+    </q-banner>
+  </div>
 </template>
 
 <script setup>

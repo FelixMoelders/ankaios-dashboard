@@ -12,8 +12,8 @@ const routes = [
         component: () => import("components/WorkloadsView.vue"),
       },
       {
-        path: "/debug",
-        component: () => import("components/DebugView.vue"),
+        path: "/dependencygraph",
+        component: () => import("components/DependencyGraphView.vue"),
       },
       {
         path: "/about",

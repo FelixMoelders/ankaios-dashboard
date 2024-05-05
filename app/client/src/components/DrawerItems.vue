@@ -50,9 +50,9 @@ const items = ref([
     activeIconColor: "text-secondary",
   },
   {
-    name: "Debug",
+    name: "DependencyGraph",
     isActive: false,
-    icon: "bug_report",
+    icon: "mediation",
     defaultTextColor: "text-dark",
     activeTextColor: "text-secondary",
     defaultIconColor: "text-grey",

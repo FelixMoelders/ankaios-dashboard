@@ -23,6 +23,9 @@
       "boot/*": [
         "src/boot/*"
       ],
+      "utils/*": [
+        "src/utils/*"
+      ],
       "stores/*": [
         "src/stores/*"
       ],

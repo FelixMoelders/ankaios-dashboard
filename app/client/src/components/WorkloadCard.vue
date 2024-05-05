@@ -21,7 +21,7 @@
         <q-card-actions class="row justify-end">
           <q-btn
               rounded
-              icon="sync_alt"
+              icon="mediation"
               color="blue"
               @click="currentSection = currentSection !== 'dependencies' || (currentWorkloadName !== workload.instanceName.workloadName) ? 'dependencies' : ''; currentWorkloadName = workload.instanceName.workloadName"
           />
@@ -54,6 +54,9 @@
 </template>
 
 <script>
+
+import { EventBus } from '../utils/EventBus';
+
 export default {
     props: ['workload'],
     data() {
@@ -154,18 +157,21 @@ export default {
                     }
 
                     if (workloads) {
-                        for (let [workloadName, workdloadDefinition] of Object.entries(workloads)) {
-                            if ("dependencies" in workdloadDefinition) {
-                                for (let [dependency, condition] of Object.entries(workdloadDefinition.dependencies)) {
-                                    this.dependencies.push({
-                                        source: workloadName,
-                                        target: dependency,
-                                        type: condition
-                                    });
-                                }
-                            }
-                        }
-                        console.log(this.dependencies);
+                    const dependencies = [];
+                    for (let [workloadName, workloadDefinition] of Object.entries(workloads)) {
+                      if ("dependencies" in workloadDefinition) {
+                        for (let [dependency, condition] of Object.entries(workloadDefinition.dependencies)) {
+                          dependencies.push({
+                            source: workloadName,
+                            target: dependency,
+                            type: condition
+                          });
+                         }
+                       }
+                     }
+
+                      EventBus.emit('update-dependencies', dependencies);
+                      console.log(dependencies);
                     }
 
                 }).catch((error) => {

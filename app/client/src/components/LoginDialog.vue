@@ -69,6 +69,7 @@
             v-model="newPassword"
             :type="passwordFieldTypeNewPw"
             lazy-rules
+            :rules="[required]"
             no-error-icon="true"
             label="New password"
           >
@@ -192,6 +193,7 @@ function submit() {
 
 function toggleNewPwField() {
   showNewPwField.value = !showNewPwField.value;
+  newPassword.value = "";
 }
 
 const props = defineProps({

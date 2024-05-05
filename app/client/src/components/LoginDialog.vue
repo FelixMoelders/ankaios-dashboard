@@ -1,8 +1,3 @@
-<!-- TODO:
-  / Bei PW-Feld das Visibility- und Clear-Icon in ihrer Position vertauschen (Clear-Icon muss ganz nach rechts)
-  / Easy-Close zur Karte hinzufügen
--->
-
 <template>
   <q-dialog v-model="loginOpen">
     <q-card square class="shadow-24" style="width: 400px; height: 540px">

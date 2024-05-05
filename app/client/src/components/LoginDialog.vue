@@ -1,16 +1,10 @@
 <template>
-  <q-dialog v-model="loginOpen">
+  <q-dialog v-model="loginOpen" persistent>
     <q-card square class="shadow-24" style="width: 400px; height: 540px">
       <q-card-section class="row items-center bg-secondary">
         <div class="text-h5 text-white q-my-xs">{{ title }}</div>
         <q-space />
-        <q-btn
-          flat
-          round
-          dense
-          v-close-popup
-          @click="$emit('clickCloseLoginBtn')"
-        >
+        <q-btn flat round dense @click="$emit('clickCloseLoginBtn')">
           <q-icon name="close" color="white" />
         </q-btn>
       </q-card-section>

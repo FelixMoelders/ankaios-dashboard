@@ -138,7 +138,7 @@ function submit() {
   if (
     (!showNewPwField.value && (user.value == "" || password.value == "")) ||
     (showNewPwField.value &&
-      (user.value == "" || password.value == "" || showNewPwField.value == ""))
+      (user.value == "" || password.value == "" || newPassword.value == ""))
   ) {
     $q.notify({
       type: "negative",
@@ -146,6 +146,7 @@ function submit() {
     });
     userField.value.validate();
     pwField.value.validate();
+    newPwField.value.validate();
   } else {
     if (!showNewPwField.value) {
       const requestOptions = {
@@ -168,13 +169,14 @@ function submit() {
             type: "negative",
             message: "Wrong password, we can't log you in :(",
           });
+          pwField.value.focus();
         }
       });
     } else if (showNewPwField.value) {
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ newPwd: newPassword }),
+        body: JSON.stringify({ pwd: password, newPwd: newPassword }),
       };
       fetch("/setNewPwd", requestOptions).then(function (res) {
         if (res.status == 200) {
@@ -186,6 +188,12 @@ function submit() {
           password.value = "";
           newPassword.value = "";
           toggleNewPwField();
+        } else if (res.status == 401) {
+          $q.notify({
+            type: "negative",
+            message: "Wrong password, we can't change it :(",
+          });
+          pwField.value.focus();
         }
       });
     }
@@ -215,6 +223,7 @@ const btnLabel = ref("Let's go!");
 const $q = useQuasar();
 const userField = ref("");
 const pwField = ref("");
+const newPwField = ref("");
 const newPassword = ref("");
 const showNewPwField = ref(false);
 </script>

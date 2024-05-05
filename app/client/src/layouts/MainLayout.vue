@@ -1,14 +1,17 @@
 <template>
   <q-layout view="hHh Lpr lff" class="shadow-2 rounded-borders">
     <dashboardHeader
+      :loggedInUser="loggedInUser"
+      :loggedIn="loggedIn"
       @clickDrawerBtn="toggleDrawer"
       @clickLoginBtn="openLogin"
+      @clickLogoutBtn="changeLoginState"
     />
     <dashboardDrawer :drawerOpen="drawerOpen" :loggedIn="loggedIn" />
     <dashboardLogin
       :loginOpen="loginOpen"
       @clickCloseLoginBtn="openLogin"
-      @userLoggedIn="unlockApp"
+      @userLoggedIn="changeLoginState"
       title="Login"
     />
     <q-page-container>
@@ -26,6 +29,7 @@ import dashboardLogin from "components/LoginDialog.vue";
 const drawerOpen = ref(true);
 const loginOpen = ref(false);
 const loggedIn = ref(false);
+const loggedInUser = ref("");
 
 function toggleDrawer() {
   drawerOpen.value = !drawerOpen.value;
@@ -35,8 +39,9 @@ function openLogin() {
   loginOpen.value = !loginOpen.value;
 }
 
-function unlockApp(){
-  loggedIn.value = !loggedIn.value
+function changeLoginState(val) {
+  loggedInUser.value = val;
+  loggedIn.value = !loggedIn.value;
 }
 
 defineOptions({

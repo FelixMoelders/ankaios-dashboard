@@ -185,6 +185,7 @@ function submit() {
           user.value = "";
           password.value = "";
           newPassword.value = "";
+          toggleNewPwField();
         }
       });
     }

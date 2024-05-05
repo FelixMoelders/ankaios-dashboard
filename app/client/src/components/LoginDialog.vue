@@ -91,7 +91,11 @@
         />
       </q-card-actions>
       <q-card-section class="text-center q-pa-sm">
-        <div @click="toggleNewPwField" class="text-grey-6 cursor-pointer">
+        <div
+          v-if="!showNewPwField"
+          @click="toggleNewPwField"
+          class="text-grey-6 cursor-pointer"
+        >
           Change password?
         </div>
       </q-card-section>

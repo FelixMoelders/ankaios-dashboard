@@ -17,12 +17,12 @@
 
         <q-separator />
 
-        <div v-for="tag in workload.tags" :key="tag.key">
+        <div v-for="tag in desiredState.workloads[workload.instanceName.workloadName].tags" :key="tag.key">
             <q-badge outline color="primary" :label="tag.key + ': ' + tag.value" />
         </div>
 
         <q-card-actions class="row justify-end">
-            <q-btn rounded icon="sync_alt" color="primary" @click="currentSection = currentSection === 'dependencies' ? '' : 'dependencies'; currentWorkloadName = workload.instanceName.workloadName" />
+            <q-btn rounded icon="sync_alt" color="primary" @click="currentSection = currentSection === 'dependencies' ? '' : 'dependencies'; currentWorkloadName = workload.instanceName.workloadName;" />
             <q-btn rounded icon="settings" color="secondary" @click="currentSection = currentSection === 'config' ? '' : 'config'" />
         </q-card-actions>
 
@@ -34,7 +34,7 @@
 
             <q-card-section v-if="currentSection === 'dependencies'">
               <div v-for="workloadState in workloadStates.filter(ws => ws.instanceName.workloadName === currentWorkloadName)"
-            :key="workloadState.instanceName.workloadName">
+                :key="workloadState.instanceName.workloadName">
                 <div :style="{ color: workloadState.executionState[Object.keys(workloadState.executionState)[0]] === 'RUNNING_OK' ? 'green' : 'red' }">
                   {{ workloadState.executionState[Object.keys(workloadState.executionState)[0]] }}
                 </div>

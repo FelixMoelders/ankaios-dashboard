@@ -1,11 +1,11 @@
 <template>
   <q-page padding>
-    <div class="row justify-between items-center q-pa-md"> 
+    <div class="row justify-between items-center q-pa-md">
       <div>
         <div class="text-h5">Workloads <q-btn color="secondary" icon="add_circle" @click="addworkload = true" /></div>
-        
+
       </div>
-      <q-input v-model="search" placeholder="Search..." filled dense debounce="300"/> 
+      <q-input v-model="search" placeholder="Search..." filled dense debounce="300"/>
     </div>
 
     <AddWorkloadDialog v-model="addworkload" />
@@ -21,6 +21,7 @@
 <script>
 import WorkloadCard from './WorkloadCard.vue'
 import AddWorkloadDialog from "./AddWorkloadDialog.vue"
+import { EventBus } from '../utils/EventBus';
 
 export default {
   data() {
@@ -59,22 +60,24 @@ export default {
                   }
               }
               if (workloads) {
-                  this.dependencies = [];
-                  for (let [workloadName, workdloadDefinition] of Object.entries(workloads)) {
-                      if ("dependencies" in workdloadDefinition) {
-                          for (let [dependency, condition] of Object.entries(workdloadDefinition.dependencies)) {
-                              this.dependencies.push({
-                                  source: workloadName,
-                                  target: dependency,
-                                  type: condition
+                  const dependencies = [];
+                  for (let [workloadName, workloadDefinition] of Object.entries(workloads)) {
+                      if ("dependencies" in workloadDefinition) {
+                          for (let [dependency, condition] of Object.entries(workloadDefinition.dependencies)) {
+                              dependencies.push({
+                                source: workloadName,
+                                target: dependency,
+                                type: condition
                               });
                           }
                       }
                   }
-                  console.log(this.workloads);
-                  console.log(this.desiredState);
-                  console.log(this.dependencies);
+                  EventBus.emit('update-dependencies', dependencies);
+                  console.log(dependencies);
               }
+              console.log(this.workloads);
+              console.log(this.desiredState);
+              console.log(this.dependencies);
 
           }).catch((error) => {
               console.log('There has been a problem with your fetch operation: ', error.message);
@@ -89,7 +92,7 @@ export default {
       if (!this.search) {
         return this.workloads
       }
-      return this.workloads.filter(workload => workload.instanceName.workloadName.toLowerCase().includes(this.search.toLowerCase()) 
+      return this.workloads.filter(workload => workload.instanceName.workloadName.toLowerCase().includes(this.search.toLowerCase())
         || workload.instanceName.agentName.toLowerCase().includes(this.search.toLowerCase()))
     }
   },

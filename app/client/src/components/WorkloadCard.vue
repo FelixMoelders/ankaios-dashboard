@@ -22,7 +22,7 @@
         </div>
 
         <q-card-actions class="row justify-end">
-            <q-btn rounded icon="sync_alt" color="primary" @click="currentSection = currentSection === 'dependencies' ? '' : 'dependencies'; currentWorkloadName = workload.instanceName.workloadName;" />
+            <q-btn rounded icon="mediation" color="primary" @click="currentSection = currentSection === 'dependencies' ? '' : 'dependencies'; currentWorkloadName = workload.instanceName.workloadName;" />
             <q-btn rounded icon="settings" color="secondary" @click="currentSection = currentSection === 'config' ? '' : 'config'" />
         </q-card-actions>
 

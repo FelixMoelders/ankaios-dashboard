@@ -48,36 +48,52 @@ def login():
     else:
         return Response("Wrong password.", status=401)
 
-
 @dashboard.route('/logout')
-# TODO @login_required
+@login_required
 def logout():
     logout_user()
     return Response("Logged out.", status=200)
+
+@dashboard.route('/checkAuthentication', methods=['GET'])
+def checkAuthentication():
+    if current_user.is_authenticated:
+        return Response("Authenticated.", status=200)
+    else:
+        return Response("Not authenticated.", status=401)
+
+@dashboard.route('/setNewPwd', methods=['POST'])
+def setNewPwd():
+    pwd_old = request.json['pwd']['_value']  
+    pwd_new = request.json['newPwd']['_value']
+    if pwd_old == os.environ.get('PASSWORD', DEFAULT_PASSWORD):
+        os.environ['PASSWORD'] = pwd_new
+        return Response("Changed password.", status=200)
+    else:
+        return Response("Did not change password.", status=401)
 
 @dashboard.route('/debug')
 def debug():
     return render_template('debug.html')
 
 @dashboard.route('/completeState', methods=['GET'])
-# TODO @login_required
+@login_required
 def get_complete_state():
     return ank_comm_service.get_complete_state()
 
 @dashboard.route('/addNewWorkload', methods=['POST'])
-# TODO @login_required
+@login_required
 def add_new_workload():
     print(ank_comm_service.add_new_workload(request.json))
     return Response("Workload added.", status=200, mimetype='application/json')
 
 @dashboard.route('/deleteWorkloads', methods=['POST'])
-# TODO @login_required
+@login_required
 def delete_workloads():
     print(ank_comm_service.deleteWorkloads(request.json))
     return Response("Workloads deleted.", status=200, mimetype='application/json')
 
 @dashboard.route('/updateConfig', methods=['POST'])
-# TODO @login_required
+@login_required
 def update_config():
     print(ank_comm_service.update_config(request.json))
     return Response("Workloads deleted.", status=200, mimetype='application/json')

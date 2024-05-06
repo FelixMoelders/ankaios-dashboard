@@ -2,12 +2,14 @@
   <q-scroll-area class="fit" :horizontal-thumb-style="{ opacity: 0 }">
     <q-list padding>
       <q-item
+        v-model="loggedIn"
         v-for="item in items"
         :key="item.name"
+        :id="'item' + item.name"
         clickable
         v-ripple
         @click="flagActiveItem(item.name)"
-        :to="'/' + item.name.toLowerCase()"
+        :to="loggedIn ? '/' + item.name.toLowerCase() : '/nologin'"
       >
         <q-item-section avatar>
           <q-icon
@@ -28,7 +30,15 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, toRef, onUpdated } from "vue";
+
+const props = defineProps({
+  loggedIn: Boolean,
+});
+
+const loggedIn = toRef(props, "loggedIn");
+
+onUpdated(() => document.getElementById("itemHome").click());
 
 const items = ref([
   {

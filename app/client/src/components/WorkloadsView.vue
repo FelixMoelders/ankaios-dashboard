@@ -12,7 +12,7 @@
 
     <div class="q-pa-md row q-gutter-md">
       <div class="col-md-3" v-for="workload in filteredWorkloads" :key="workload.instanceName.id">
-        <WorkloadCard :workload="workload" :desiredState="desiredState"/>
+        <WorkloadCard :workload="workload" :workloadStates="workloads" :desiredState="desiredState" :dependencies="dependencies" />
       </div>
     </div>
   </q-page>
@@ -27,26 +27,59 @@ export default {
     return {
       search: '',
       workloads: [],
+      dependencies: [],
       addworkload: false,
+      desiredState: {},
     }
   },
   methods: {
     loadState() {
       fetch('/completeState')
-        .then(response => response.json())
-        .then(json => {
-          const completeState = json.response.completeState;
-          const workloads = json.response.completeState.desiredState.workloads;
-          const workloadStates = json.response.completeState.workloadStates;
-          for (const state of workloadStates) {
-              const workload = workloads[state.instanceName.workloadName];
-              state.tags = workload ? workload.tags : [];
-          }
-          this.workloads = workloadStates;
-          this.desiredState = completeState.desiredState;
-          console.log(this.desiredState);
-        });
-    },
+          .then(response => {
+              if (!response.ok) {
+                  if (response.status == 405) {
+                      console.log("User not logged in. Changing to Login Page.")
+                      this.changeView("login");
+                  }
+                  return Promise.reject(response);
+              } else {
+                  return response.json();
+              }
+          }).then(json => {
+              let completeState = null, workloads = null;
+
+              if (json && json.response && json.response.completeState && json.response.completeState.workloadStates) {
+                  completeState = json.response.completeState;
+                  this.workloads = completeState.workloadStates;
+                  if (completeState.desiredState) {
+                      this.desiredState = completeState.desiredState;
+                      if (completeState.desiredState.workloads) {
+                          workloads = completeState.desiredState.workloads;
+                      }
+                  }
+              }
+              if (workloads) {
+                  this.dependencies = [];
+                  for (let [workloadName, workdloadDefinition] of Object.entries(workloads)) {
+                      if ("dependencies" in workdloadDefinition) {
+                          for (let [dependency, condition] of Object.entries(workdloadDefinition.dependencies)) {
+                              this.dependencies.push({
+                                  source: workloadName,
+                                  target: dependency,
+                                  type: condition
+                              });
+                          }
+                      }
+                  }
+                  console.log(this.workloads);
+                  console.log(this.desiredState);
+                  console.log(this.dependencies);
+              }
+
+          }).catch((error) => {
+              console.log('There has been a problem with your fetch operation: ', error.message);
+          });
+        },
     toggle(id) {
       this.showConfig[id] = !this.showConfig[id];
     }

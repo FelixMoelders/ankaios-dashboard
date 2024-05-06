@@ -22,7 +22,7 @@
         </div>
 
         <q-card-actions class="row justify-end">
-            <q-btn rounded icon="sync_alt" color="primary" @click="currentSection = currentSection === 'dependencies' ? '' : 'dependencies'" />
+            <q-btn rounded icon="sync_alt" color="primary" @click="currentSection = currentSection === 'dependencies' ? '' : 'dependencies'; currentWorkloadName = workload.instanceName.workloadName" />
             <q-btn rounded icon="settings" color="secondary" @click="currentSection = currentSection === 'config' ? '' : 'config'" />
         </q-card-actions>
 
@@ -45,7 +45,7 @@
             </q-card-section>
 
             <q-card-section v-if="currentSection === 'config'">
-                
+
                 <ConfigSection :state="getState(workload.instanceName.workloadName)" />
 
             </q-card-section>
@@ -74,23 +74,13 @@
 import ConfigSection from './ConfigSection.vue'
 
 export default {
-    props: ['workload', 'desiredState'],
+    props: ['workload', 'desiredState', 'dependencies', 'workloadStates'],
     data() {
         return {
             confirm: false,
             currentSection: "",
-            showHome: true,
-            desiredState: {},
-            workloadStates: [],
+            currentWorkloadName: "",
             workloadState: [],
-            timer: null,
-            workloadName: "",
-            tags: "",
-            agent: "agent_A",
-            dependencies: [],
-            password: "",
-            selectedWorkload: "",
-            currentWorkloadName: null,
         }
 
     },
@@ -163,64 +153,7 @@ export default {
             return (dependenciesList.length > 0)? dependenciesList : [{text: "No dependencies", status: 'match'}];
         },
         handleDependencyButtonClick() {
-            this.selectedWorkload = this.workload.instanceName.workloadName;
             this.currentSection = this.currentSection === 'dependencies' ? '' : 'dependencies';
-        },
-        loadState() {
-            fetch('/completeState')
-                .then(response => {
-                    if (!response.ok) {
-                        if (response.status == 405) {
-                            console.log("User not logged in. Changing to Login Page.")
-                            this.changeView("login");
-                        }
-                        return Promise.reject(response);
-                    } else {
-                        return response.json();
-                    }
-                }).then(json => {
-                    let completeState = null, workloads = null, workloadStates = null;
-
-                    if (json && json.response && json.response.completeState) {
-                        completeState = json.response.completeState;
-
-                        if (json.response.completeState.desiredState) {
-                            workloads = json.response.completeState.desiredState.workloads;
-                        }
-
-                        workloadStates = json.response.completeState.workloadStates;
-                    }
-
-                    if (workloadStates && workloads) {
-                        for (const state of workloadStates) {
-                            const workload = workloads[state.instanceName.workloadName];
-                            state.tags = workload ? workload.tags : [];
-                        }
-                        this.workloadStates = workloadStates;
-                    }
-
-                    if (completeState && completeState.desiredState) {
-                        this.desiredState = completeState.desiredState;
-                    }
-
-                    if (workloads) {
-                        for (let [workloadName, workdloadDefinition] of Object.entries(workloads)) {
-                            if ("dependencies" in workdloadDefinition) {
-                                for (let [dependency, condition] of Object.entries(workdloadDefinition.dependencies)) {
-                                    this.dependencies.push({
-                                        source: workloadName,
-                                        target: dependency,
-                                        type: condition
-                                    });
-                                }
-                            }
-                        }
-                        console.log(this.dependencies);
-                    }
-
-                }).catch((error) => {
-                    console.log('There has been a problem with your fetch operation: ', error.message);
-                });
         },
         checkDependency() {
             return (workloadState) => {
@@ -268,14 +201,6 @@ export default {
             const lastKey = keys[keys.length - 1];
             return lastKey;
         }
-    },
-    mounted() {
-        this.timer = setInterval(() => {
-            this.loadState();
-        }, 2000);
-    },
-    beforeUnmount() {
-        clearInterval(this.timer);
     },
 };
 </script>

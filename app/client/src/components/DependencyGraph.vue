@@ -7,7 +7,8 @@
 // Assuming linkArc and drag are extracted to a utils file named dependencyGraph.js
 import { linkArc, drag } from '../utils/dependencyGraph';
 import * as d3 from 'd3';
-import { EventBus } from '../utils/EventBus'
+import { EventBus } from '../utils/EventBus';
+import debounce from 'lodash/debounce'; // Prevent rapid redrawing of the Dependency Graph and jumping around legend entries
 
 export default {
   props: {
@@ -25,7 +26,7 @@ export default {
   },
 
   methods: {
-    drawDependencyGraph() {
+    drawDependencyGraph: debounce(function() {
             console.log(this.dependencies);
             const width = 750;
             const height = 400;
@@ -122,7 +123,7 @@ export default {
 
             // invalidation.then(() => simulation.stop());
             // let chart = Object.assign(svg.node(), {scales: {color}});
-        },
+        }, 500),
     linkArc,
     drag,
   },

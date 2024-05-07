@@ -23,23 +23,24 @@ export default {
   methods: {
     drawDependencyGraph() {
             console.log(this.dependencies);
-            const width = 750;
-            const height = 400;
-            const types = Array.from(new Set(this.dependencies.map(d => d.type)));
+            const width = 1500;
+            const height = 800;
+            const types = Array.from(new Set(this.dependencies.map(d => d.type))).sort();
             const nodes = Array.from(new Set(this.dependencies.flatMap(l => [l.source, l.target])), id => ({id}));
             const links = this.dependencies.map(d => Object.create(d))
-            const color = d3.scaleOrdinal(types, d3.schemeCategory10);
+            const customColors = ["#C10015", "#21BA45"];
+            const color = d3.scaleOrdinal(types, customColors); // Added customized colors for workload states, i.e. green for ADD_COND_RUNNING and red for ADD_COND_FAILED
             d3.select("svg").selectAll("*").remove(); // delete elements in the svg for refresh.
             const simulation = d3.forceSimulation(nodes)
-                .force("link", d3.forceLink(links).id(d => d.id))
-                .force("charge", d3.forceManyBody().strength(-400))
+                .force("link", d3.forceLink(links).id(d => d.id).distance(150))
+                .force("charge", d3.forceManyBody().strength(-1600))
                 .force("x", d3.forceX())
                 .force("y", d3.forceY());
             const svg = d3.select("svg")
                 .attr("viewBox", [-width / 2, -height / 2, width, height])
                 .attr("width", width)
                 .attr("height", height)
-                .attr("style", "max-width: 100%; height: auto; font: 12px sans-serif;");
+                .attr("style", "max-width: 100%; height: auto; font: 18px sans-serif;");
             // Create legend
             var legend = svg.selectAll(".legend")
                 .data(color.domain())
@@ -47,12 +48,12 @@ export default {
                 .attr("class", "legend")
                 .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
             legend.append("rect")
-                .attr("x", -350)
+                .attr("x", -750)
                 .attr("width", 18)
                 .attr("height", 18)
                 .style("fill", color);
             legend.append("text")
-                .attr("x", -325)
+                .attr("x", -725)
                 .attr("y", 9)
                 .attr("dy", ".35em")
                 .text(function(d) { return d; });
@@ -72,7 +73,7 @@ export default {
                 .attr("d", "M0,-5L10,0L0,5");
             const link = svg.append("g")
                 .attr("fill", "none")
-                .attr("stroke-width", 1.5)
+                .attr("stroke-width", 3)
                 .selectAll("path")
                 .data(links)
                 .join("path")
@@ -89,9 +90,9 @@ export default {
             node.append("circle")
                 .attr("stroke", "white")
                 .attr("stroke-width", 1.5)
-                .attr("r", 4);
+                .attr("r", 8);
             node.append("text")
-                .attr("x", 8)
+                .attr("x", 12)
                 .attr("y", "0.31em")
                 .text(d => d.id)
                 .clone(true).lower()

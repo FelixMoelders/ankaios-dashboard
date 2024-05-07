@@ -2,7 +2,7 @@
   <q-page padding>
     <div class="row justify-between items-center q-pa-md">
       <div>
-        <div class="text-h5">Workloads <q-btn color="secondary" icon="add_circle" @click="addworkload = true" /></div>
+        <div class="text-h5">Workloads <q-btn small round color="secondary" icon="add" @click="addworkload = true" style="margin-left: 20px" /></div>
 
       </div>
       <q-input v-model="search" placeholder="Search..." filled dense debounce="300"/>

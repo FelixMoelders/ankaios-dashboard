@@ -25,7 +25,8 @@ const routes = [
         component: () => import("components/WorkloadsView.vue"),
       },
       {
-        path: "/dependencygraph",
+        path: "/dependencies",
+        beforeEnter: guardRoutes,
         component: () => import("components/DependencyGraphView.vue"),
       },
       {

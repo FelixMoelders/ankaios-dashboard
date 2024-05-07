@@ -60,7 +60,7 @@ const items = ref([
     activeIconColor: "text-secondary",
   },
   {
-    name: "DependencyGraph",
+    name: "Dependencies",
     isActive: false,
     icon: "mediation",
     defaultTextColor: "text-dark",

@@ -18,12 +18,12 @@
         <q-separator />
 
         <div v-for="tag in desiredState.workloads[workload.instanceName.workloadName].tags" :key="tag.key">
-            <q-badge outline color="primary" :label="tag.key + ': ' + tag.value" />
+            <q-badge color="secondary" :label="tag.key + ': ' + tag.value" />
         </div>
 
         <q-card-actions class="row justify-end">
-            <q-btn rounded icon="mediation" color="primary" @click="currentSection = currentSection === 'dependencies' ? '' : 'dependencies'; currentWorkloadName = workload.instanceName.workloadName;" />
-            <q-btn rounded icon="settings" color="secondary" @click="currentSection = currentSection === 'config' ? '' : 'config'" />
+            <q-btn rounded icon="mediation" color="primary small" @click="currentSection = currentSection === 'dependencies' ? '' : 'dependencies'" />
+            <q-btn rounded icon="settings" color="secondary small" @click="currentSection = currentSection === 'config' ? '' : 'config'" />
         </q-card-actions>
 
         </q-card-section>
@@ -31,22 +31,22 @@
         <q-separator />
 
         <q-slide-transition>
-
             <q-card-section v-if="currentSection === 'dependencies'">
               <div v-for="workloadState in workloadStates.filter(ws => ws.instanceName.workloadName === currentWorkloadName)"
                 :key="workloadState.instanceName.workloadName">
-                <div :style="{ color: workloadState.executionState[Object.keys(workloadState.executionState)[0]] === 'RUNNING_OK' ? 'green' : 'red' }">
+                <div>
+                  <q-badge rounded :color="workloadState.executionState[Object.keys(workloadState.executionState)[0]] === 'RUNNING_OK' ? 'positive' : 'negative'" class="q-mr-sm" />
                   {{ workloadState.executionState[Object.keys(workloadState.executionState)[0]] }}
                 </div>
-                <div v-for="dependency in getDependencyText(workloadState)" :key="dependency.text" :style="{ color: dependency.status === 'match' ? 'green' : 'red' }">
-                  {{ dependency.text }}
+                <div v-for="dependency in getDependencyText(workloadState)" :key="dependency.text" >
+                  <q-badge rounded :color="dependency.status === 'match' ? 'positive' : 'negative'" class="q-mr-sm" /> {{ dependency.text }}
                 </div>
               </div>
             </q-card-section>
 
             <q-card-section v-if="currentSection === 'config'">
 
-                <ConfigSection :state="getState(workload.instanceName.workloadName)" />
+                <ConfigSection :state="state" />
 
             </q-card-section>
 
@@ -81,20 +81,11 @@ export default {
             currentSection: "",
             currentWorkloadName: "",
             workloadState: [],
+            state: {runtimeConfig: "test"},
         }
 
     },
     methods: {
-        getState(workloadName) {
-            for (let [name, definition] of Object.entries(this.desiredState.workloads)) {
-                if (name == workloadName) {
-                    let state = { ...definition };
-                    state["name"] = name;
-                    console.log(state);
-                    return state;
-                }
-            }
-        },
         deleteWorkload() {
             const requestOptions = {
                 method: 'POST',
@@ -105,7 +96,6 @@ export default {
                 .then(response => console.log(response.status));
         },
         chooseExecutionColor(execState) {
-            console.log(execState);
             switch (execState) {
                 case "running":
                     return "green";
@@ -150,6 +140,7 @@ export default {
                     }
                 }
             }
+            dependenciesList = dependenciesList.sort((a, b) => a.text.localeCompare(b.text));
             return (dependenciesList.length > 0)? dependenciesList : [{text: "No dependencies", status: 'match'}];
         },
         handleDependencyButtonClick() {
@@ -201,7 +192,19 @@ export default {
             const lastKey = keys[keys.length - 1];
             return lastKey;
         }
-    },
+  },
+  mounted() {
+    this.currentWorkloadName = this.workload.instanceName.workloadName;
+
+    for (let [name, definition] of Object.entries(this.desiredState.workloads)) {
+        definition = {...definition};
+        if (name === this.currentWorkloadName) {
+            this.state = JSON.parse(JSON.stringify(definition));
+            this.state["name"] = name;
+            break;
+        }
+    }
+  }
 };
 </script>
 

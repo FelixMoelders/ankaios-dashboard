@@ -3,17 +3,26 @@
     <div class="row justify-between items-center q-pa-md">
       <div>
         <div class="text-h5">Workloads <q-btn small round color="secondary" icon="add" @click="addworkload = true" style="margin-left: 20px" /></div>
-
       </div>
-      <q-input v-model="search" placeholder="Search..." filled dense debounce="300"/>
+      <div class="row justify-between">
+        <q-input v-model="search" placeholder="Search..." filled dense debounce="300"/>
+        <q-select style="width: 125px; margin-left: 10px" filled v-model="filterState" :options="options" label="State Filter" />
+      </div>
     </div>
 
     <AddWorkloadDialog v-model="addworkload" />
 
     <div class="q-pa-md row q-gutter-md">
-      <div class="col-md-3" v-for="workload in filteredWorkloads" :key="workload.instanceName.id">
+      <div class="col-md-3" v-for="workload in paginatedWorkloads" :key="workload.instanceName.id">
         <WorkloadCard :workload="workload" :workloadStates="workloads" :desiredState="desiredState" :dependencies="dependencies" />
       </div>
+    </div>
+    <div class="q-pa-lg flex flex-center">
+      <q-pagination
+        v-model="currentPage"
+        :max="maxPages"
+        @update:model-value="updatePage"
+      />
     </div>
   </q-page>
 </template>
@@ -30,7 +39,11 @@ export default {
       workloads: [],
       dependencies: [],
       addworkload: false,
+      filterState: "all",
+      options: ["all", "running", "pending", "failed", "succeeded", "stopping"],
       desiredState: {},
+      currentPage: 1,
+      pageSize: 9,
     }
   },
   methods: {
@@ -73,28 +86,69 @@ export default {
                       }
                   }
                   EventBus.emit('update-dependencies', dependencies);
-                  console.log(dependencies);
               }
-              console.log(this.workloads);
-              console.log(this.desiredState);
-              console.log(this.dependencies);
 
           }).catch((error) => {
               console.log('There has been a problem with your fetch operation: ', error.message);
           });
-        },
+    },
     toggle(id) {
       this.showConfig[id] = !this.showConfig[id];
+    },
+    updatePage(page) {
+      this.currentPage = page;
+    },
+    getLastItemOfExecState(execState) {
+            const keys = Object.keys(execState);
+            const lastKey = keys[keys.length - 1];
+            return lastKey;
     }
   },
   computed: {
+    sortedWorkloads() {
+      return this.workloads.sort((a, b) => a.instanceName.workloadName.localeCompare(b.instanceName.workloadName));
+    },
     filteredWorkloads() {
-      if (!this.search) {
-        return this.workloads
+      if (!this.search && !this.filterState) {
+        return this.sortedWorkloads
       }
-      return this.workloads.filter(workload => workload.instanceName.workloadName.toLowerCase().includes(this.search.toLowerCase())
-        || workload.instanceName.agentName.toLowerCase().includes(this.search.toLowerCase()))
-    }
+      return this.sortedWorkloads.filter(workload => {
+        let search = this.search.toLowerCase();
+
+        let workloadName = workload.instanceName.workloadName.toLowerCase();
+        let agentName = workload.instanceName.agentName.toLowerCase();
+
+        let desiredState = this.desiredState.workloads[workload.instanceName.workloadName];
+        let runtimeConfig = desiredState.runtimeConfig.toLowerCase();
+        let tags = desiredState.tags;
+
+        const tagKeyExists = tags.some(item => item.key.toLowerCase().includes(search));
+        const tagValueExists = tags.some(item => item.value.toLowerCase().includes(search));
+
+        let execStateFits = false;
+        if (this.filterState == "all") {
+          execStateFits = true;
+        } else if (this.filterState == this.getLastItemOfExecState(workload.executionState)) {
+          execStateFits = true;
+        }
+
+        return (workloadName.includes(search)
+                || agentName.includes(search)
+                || runtimeConfig.includes(search)
+                || tagKeyExists
+                || tagValueExists)
+                && execStateFits
+      })
+    },
+    paginatedWorkloads() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+
+      return this.filteredWorkloads.slice(start, end);
+    },
+    maxPages() {
+      return Math.ceil(this.filteredWorkloads.length / this.pageSize);
+    },
   },
   mounted() {
     this.timer = setInterval(() => {

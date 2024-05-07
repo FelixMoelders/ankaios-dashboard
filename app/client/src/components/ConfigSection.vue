@@ -26,7 +26,7 @@ export default {
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     workloadName: this.state.name,
                     agent: this.state.agent,
                     runtimeConfig: this.runtimeConfig,

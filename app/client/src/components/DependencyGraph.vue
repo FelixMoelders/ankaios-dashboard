@@ -24,7 +24,7 @@ export default {
     drawDependencyGraph() {
             console.log(this.dependencies);
             const width = 1500;
-            const height = 800;
+            const height = 1000;
             const types = Array.from(new Set(this.dependencies.map(d => d.type))).sort();
             const nodes = Array.from(new Set(this.dependencies.flatMap(l => [l.source, l.target])), id => ({id}));
             const links = this.dependencies.map(d => Object.create(d))
@@ -32,8 +32,8 @@ export default {
             const color = d3.scaleOrdinal(types, customColors); // Added customized colors for workload states, i.e. green for ADD_COND_RUNNING and red for ADD_COND_FAILED
             d3.select("svg").selectAll("*").remove(); // delete elements in the svg for refresh.
             const simulation = d3.forceSimulation(nodes)
-                .force("link", d3.forceLink(links).id(d => d.id).distance(150))
-                .force("charge", d3.forceManyBody().strength(-1600))
+                .force("link", d3.forceLink(links).id(d => d.id).distance(100))
+                .force("charge", d3.forceManyBody().strength(-800))
                 .force("x", d3.forceX())
                 .force("y", d3.forceY());
             const svg = d3.select("svg")

@@ -11,7 +11,14 @@
 
                     <q-input filled v-model="workloadName" label="Workload Name" />
 
-                    <q-input filled v-model="agent" label="Agent" />
+                    <!-- Drop-down selection menu for pre-existing agents list-->
+                    <q-select
+                      filled
+                      v-model="agent"
+                      :options="agentsList"
+                      label="Agent"
+                      style="width: 300px"
+                    />
 
                     <q-input filled v-model="runtime" label="Runtime" />
 
@@ -24,7 +31,7 @@
                 </div>
 
                 <q-card-actions class="row justify-end">
-                    <q-btn icon="save" color="secondary" label="Save" @click="submit" v-close-popup />
+                    <q-btn icon="add" color="secondary" label="Add" @click="submit" v-close-popup />
                 </q-card-actions>
             </q-card-section>
         </q-card>
@@ -39,7 +46,8 @@ export default {
     data() {
         return {
             workloadName: "",
-            agent: "",
+            agent: null,
+            agentsList: ['agent_A', 'agent_B', 'agent_C'], // TO DO: Implement dynamic fetching of existing agents?
             runtimeConfig: "image: IMAGE_NAME \ncommandOptions: [\"flag\", \"value\"]",
             tags: "{\"key1\": \"value1\", \"key2\": \"value2\"}",
             restartPolicy: "NEVER",
@@ -61,7 +69,7 @@ export default {
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     workloadName: this.workloadName,
                     agent: this.agent,
                     runtime: this.runtime,
@@ -70,8 +78,9 @@ export default {
                     runtimeConfig: this.runtimeConfig
                 })
             };
-            fetch('/addNewWorkload', requestOptions)
-                .then(response => console.log(response.status));
+            fetch('/addNewWorkload', requestOptions) //Added 'Workload Added' Message upon adding a new workload
+                .then(response => { console.log(response.status)
+                  this.$q.notify('Workload Added')});
         },
         close() {
             this.showDialog = false;

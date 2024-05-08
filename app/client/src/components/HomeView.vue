@@ -53,6 +53,17 @@
       </q-card>
     </div>
   </div>
+
+  <!-- Anzahl der apexcharts wie gewünscht erweitern -->
+  <div class="row justify-center">
+      <div class="col-2">
+          <apexchart type="donut" :options="chartOptions" :series="series"></apexchart>
+      </div>
+      <div class="col-2">
+          <apexchart type="donut" :options="chartOptions" :series="series"></apexchart>
+      </div>
+  </div>
+
   <div class="row justify-center">
     <div class="col-12 q-py-xl q-px-xl">
       <q-table
@@ -84,57 +95,79 @@
   </div>
 </template>
 
-<script setup>
-defineOptions({
-  name: "HomeView",
-});
-
+<script>
 import { ref } from "vue";
+import VueApexCharts from "vue3-apexcharts";
 
-const filter = ref("");
-
-const rows = [
-  {
-    Name: "Frozen Yogurt",
-    Agent: 159,
-    Runtime: 6.0,
-    Dependecies: 24,
-    Tags: 4.0,
-    State: 87,
-  },
-  {
-    Name: "Frozen Yogurt",
-    Agent: 159,
-    Runtime: 6.0,
-    Dependecies: 24,
-    Tags: 4.0,
-    State: 87,
-  },
-  {
-    Name: "Frozen Yogurt",
-    Agent: 159,
-    Runtime: 6.0,
-    Dependecies: 24,
-    Tags: 4.0,
-    State: 87,
-  },
-  {
-    Name: "Frozen Yogurt",
-    Agent: 159,
-    Runtime: 6.0,
-    Dependecies: 24,
-    Tags: 4.0,
-    State: 87,
-  },
-  {
-    Name: "Frozen Yogurt",
-    Agent: 159,
-    Runtime: 6.0,
-    Dependecies: 24,
-    Tags: 4.0,
-    State: 87,
-  },
-];
+export default {
+    data() {
+        return {
+            filter: ref(""),
+            rows: [
+              {
+                Name: "Frozen Yogurt",
+                Agent: 159,
+                Runtime: 6.0,
+                Dependecies: 24,
+                Tags: 4.0,
+                State: 87,
+              },
+              {
+                Name: "Frozen Yogurt",
+                Agent: 159,
+                Runtime: 6.0,
+                Dependecies: 24,
+                Tags: 4.0,
+                State: 87,
+              },
+              {
+                Name: "Frozen Yogurt",
+                Agent: 159,
+                Runtime: 6.0,
+                Dependecies: 24,
+                Tags: 4.0,
+                State: 87,
+              },
+              {
+                Name: "Frozen Yogurt",
+                Agent: 159,
+                Runtime: 6.0,
+                Dependecies: 24,
+                Tags: 4.0,
+                State: 87,
+              },
+              {
+                Name: "Frozen Yogurt",
+                Agent: 159,
+                Runtime: 6.0,
+                Dependecies: 24,
+                Tags: 4.0,
+                State: 87,
+              },
+            ],
+            series: [44, 55, 41, 17, 15],
+            chartOptions: {
+              chart: {
+                type: 'donut',
+              },
+              responsive: [{
+                breakpoint: 480,
+                options: {
+                  chart: {
+                    width: 200
+                  },
+                  legend: {
+                    position: 'bottom'
+                  }
+                }
+              }]
+            },
+        }
+    },
+    components: {
+      apexchart: VueApexCharts,
+    },
+}
 </script>
 
 <style lang="scss">
@@ -170,3 +203,9 @@ const rows = [
   border: none;
 }
 </style>
+
+<script setup>
+defineOptions({
+  name: "HomeView",
+});
+</script>

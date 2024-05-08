@@ -53,10 +53,120 @@
       </q-card>
     </div>
   </div>
+  <div class="row justify-center">
+    <div class="col-12 q-py-xl q-px-xl">
+      <q-table
+        title="Workloads"
+        flat
+        bordered
+        square
+        dense
+        :rows="rows"
+        :columns="columns"
+        row-key="name"
+        :filter="filter"
+      >
+        <template v-slot:top-right>
+          <q-input
+            dense
+            color="teal"
+            borderless
+            v-model="filter"
+            placeholder="Search"
+          >
+            <template v-slot:prepend>
+              <q-icon class="text-grey" name="search" />
+            </template>
+          </q-input>
+        </template>
+      </q-table>
+    </div>
+  </div>
 </template>
 
 <script setup>
 defineOptions({
   name: "HomeView",
 });
+
+import { ref } from "vue";
+
+const filter = ref("");
+
+const rows = [
+  {
+    Name: "Frozen Yogurt",
+    Agent: 159,
+    Runtime: 6.0,
+    Dependecies: 24,
+    Tags: 4.0,
+    State: 87,
+  },
+  {
+    Name: "Frozen Yogurt",
+    Agent: 159,
+    Runtime: 6.0,
+    Dependecies: 24,
+    Tags: 4.0,
+    State: 87,
+  },
+  {
+    Name: "Frozen Yogurt",
+    Agent: 159,
+    Runtime: 6.0,
+    Dependecies: 24,
+    Tags: 4.0,
+    State: 87,
+  },
+  {
+    Name: "Frozen Yogurt",
+    Agent: 159,
+    Runtime: 6.0,
+    Dependecies: 24,
+    Tags: 4.0,
+    State: 87,
+  },
+  {
+    Name: "Frozen Yogurt",
+    Agent: 159,
+    Runtime: 6.0,
+    Dependecies: 24,
+    Tags: 4.0,
+    State: 87,
+  },
+];
 </script>
+
+<style lang="scss">
+.q-table__bottom-item {
+  font-size: 10px;
+  color: $grey-7;
+}
+
+.q-field__native {
+  font-size: 10px;
+  color: $grey-7;
+}
+
+.q-field__append {
+  color: $grey-7;
+}
+
+.q-table thead {
+  background-color: $secondary;
+  color: white;
+}
+
+.q-table__bottom {
+  background-color: $grey-3;
+  padding: 0px 15px;
+}
+
+.q-table--dense .q-table__bottom {
+  min-height: 0px;
+}
+
+.q-table__top {
+  border: none;
+}
+</style>

@@ -112,199 +112,194 @@
   </div>
 </template>
 
-<script>
-import { ref } from "vue";
-import VueApexCharts from "vue3-apexcharts";
+<script setup>
+defineOptions({
+  name: "HomeView",
+});
 
-export default {
-  data() {
-    return {
-      filter: ref(""),
-      rows: [
-        {
-          Name: "Frozen Yogurt",
-          Agent: 159,
-          Runtime: 6.0,
-          Dependecies: 24,
-          Tags: 4.0,
-          State: 87,
-        },
-        {
-          Name: "Frozen Yogurt",
-          Agent: 159,
-          Runtime: 6.0,
-          Dependecies: 24,
-          Tags: 4.0,
-          State: 87,
-        },
-        {
-          Name: "Frozen Yogurt",
-          Agent: 159,
-          Runtime: 6.0,
-          Dependecies: 24,
-          Tags: 4.0,
-          State: 87,
-        },
-        {
-          Name: "Frozen Yogurt",
-          Agent: 159,
-          Runtime: 6.0,
-          Dependecies: 24,
-          Tags: 4.0,
-          State: 87,
-        },
-        {
-          Name: "Frozen Yogurt",
-          Agent: 159,
-          Runtime: 6.0,
-          Dependecies: 24,
-          Tags: 4.0,
-          State: 87,
-        },
-      ],
-      series: [44, 55, 41, 50, 80],
-      chartOptionsDonut1: {
-        chart: {
-          type: "donut",
-        },
-        legend: { show: false },
-        responsive: [
-          {
-            breakpoint: 1000,
-            options: {
-              chart: {
-                width: 200,
-              },
-              legend: {
-                show: false,
-              },
-              dataLabels: {
-                enabled: false,
-              },
-            },
-          },
-        ],
-        theme: {
-          mode: "light",
-          palette: "palette3",
-          monochrome: {
-            enabled: false,
-            color: "#9C27B0",
-            shadeTo: "light",
-            shadeIntensity: 0.8,
-          },
-        },
-        title: {
-          text: "Workloads per Agent",
-          align: "left",
-          margin: 10,
-          offsetX: 0,
-          offsetY: 0,
-          floating: false,
-          style: {
-            fontSize: "14px",
-            fontWeight: "bold",
-            fontFamily: undefined,
-            color: "#263238",
-          },
-        },
-      },
-      chartOptionsDonut2: {
-        chart: {
-          type: "donut",
-        },
-        legend: { show: false },
-        responsive: [
-          {
-            breakpoint: 1000,
-            options: {
-              chart: {
-                width: 200,
-              },
-              legend: {
-                show: false,
-              },
-              dataLabels: {
-                enabled: false,
-              },
-            },
-          },
-        ],
-        theme: {
-          mode: "light",
-          palette: "palette3",
-          monochrome: {
-            enabled: false,
-            color: "#9C27B0",
-            shadeTo: "light",
-            shadeIntensity: 0.8,
-          },
-        },
-        title: {
-          text: "Workload status",
-          align: "left",
-          margin: 10,
-          offsetX: 0,
-          offsetY: 0,
-          floating: false,
-          style: {
-            fontSize: "14px",
-            fontWeight: "bold",
-            fontFamily: undefined,
-            color: "#263238",
-          },
-        },
-      },
-      chartOptionsDonut3: {
-        chart: {
-          type: "donut",
-        },
-        legend: { show: false },
-        responsive: [
-          {
-            breakpoint: 1000,
-            options: {
-              chart: {
-                width: 200,
-              },
-              legend: {
-                show: false,
-              },
-              dataLabels: {
-                enabled: false,
-              },
-            },
-          },
-        ],
-        theme: {
-          mode: "light",
-          palette: "palette3",
-          monochrome: {
-            enabled: false,
-            color: "#9C27B0",
-            shadeTo: "light",
-            shadeIntensity: 0.8,
-          },
-        },
-        title: {
-          text: "Workload runtimes",
-          align: "left",
-          margin: 10,
-          offsetX: 0,
-          offsetY: 0,
-          floating: false,
-          style: {
-            fontSize: "14px",
-            fontWeight: "bold",
-            fontFamily: undefined,
-            color: "#263238",
-          },
-        },
-      },
-    };
+import { ref } from "vue";
+import apexchart from "vue3-apexcharts";
+
+const filter = ref("");
+const rows = [
+  {
+    Name: "Frozen Yogurt",
+    Agent: 159,
+    Runtime: 6.0,
+    Dependecies: 24,
+    Tags: 4.0,
+    State: 87,
   },
-  components: {
-    apexchart: VueApexCharts,
+  {
+    Name: "Frozen Yogurt",
+    Agent: 159,
+    Runtime: 6.0,
+    Dependecies: 24,
+    Tags: 4.0,
+    State: 87,
+  },
+  {
+    Name: "Frozen Yogurt",
+    Agent: 159,
+    Runtime: 6.0,
+    Dependecies: 24,
+    Tags: 4.0,
+    State: 87,
+  },
+  {
+    Name: "Frozen Yogurt",
+    Agent: 159,
+    Runtime: 6.0,
+    Dependecies: 24,
+    Tags: 4.0,
+    State: 87,
+  },
+  {
+    Name: "Frozen Yogurt",
+    Agent: 159,
+    Runtime: 6.0,
+    Dependecies: 24,
+    Tags: 4.0,
+    State: 87,
+  },
+];
+const series = [44, 55, 41, 50, 80];
+const chartOptionsDonut1 = {
+  chart: {
+    type: "donut",
+  },
+  legend: { show: false },
+  responsive: [
+    {
+      breakpoint: 1000,
+      options: {
+        chart: {
+          width: 200,
+        },
+        legend: {
+          show: false,
+        },
+        dataLabels: {
+          enabled: false,
+        },
+      },
+    },
+  ],
+  theme: {
+    mode: "light",
+    palette: "palette3",
+    monochrome: {
+      enabled: false,
+      color: "#9C27B0",
+      shadeTo: "light",
+      shadeIntensity: 0.8,
+    },
+  },
+  title: {
+    text: "Workloads per Agent",
+    align: "left",
+    margin: 10,
+    offsetX: 0,
+    offsetY: 0,
+    floating: false,
+    style: {
+      fontSize: "14px",
+      fontWeight: "bold",
+      fontFamily: undefined,
+      color: "#263238",
+    },
+  },
+};
+const chartOptionsDonut2 = {
+  chart: {
+    type: "donut",
+  },
+  legend: { show: false },
+  responsive: [
+    {
+      breakpoint: 1000,
+      options: {
+        chart: {
+          width: 200,
+        },
+        legend: {
+          show: false,
+        },
+        dataLabels: {
+          enabled: false,
+        },
+      },
+    },
+  ],
+  theme: {
+    mode: "light",
+    palette: "palette3",
+    monochrome: {
+      enabled: false,
+      color: "#9C27B0",
+      shadeTo: "light",
+      shadeIntensity: 0.8,
+    },
+  },
+  title: {
+    text: "Workload status",
+    align: "left",
+    margin: 10,
+    offsetX: 0,
+    offsetY: 0,
+    floating: false,
+    style: {
+      fontSize: "14px",
+      fontWeight: "bold",
+      fontFamily: undefined,
+      color: "#263238",
+    },
+  },
+};
+const chartOptionsDonut3 = {
+  chart: {
+    type: "donut",
+  },
+  legend: { show: false },
+  responsive: [
+    {
+      breakpoint: 1000,
+      options: {
+        chart: {
+          width: 200,
+        },
+        legend: {
+          show: false,
+        },
+        dataLabels: {
+          enabled: false,
+        },
+      },
+    },
+  ],
+  theme: {
+    mode: "light",
+    palette: "palette3",
+    monochrome: {
+      enabled: false,
+      color: "#9C27B0",
+      shadeTo: "light",
+      shadeIntensity: 0.8,
+    },
+  },
+  title: {
+    text: "Workload runtimes",
+    align: "left",
+    margin: 10,
+    offsetX: 0,
+    offsetY: 0,
+    floating: false,
+    style: {
+      fontSize: "14px",
+      fontWeight: "bold",
+      fontFamily: undefined,
+      color: "#263238",
+    },
   },
 };
 </script>
@@ -349,9 +344,3 @@ export default {
   border: none;
 }
 </style>
-
-<script setup>
-defineOptions({
-  name: "HomeView",
-});
-</script>

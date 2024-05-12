@@ -66,6 +66,7 @@
     <div class="col-3">
       <apexchart
         class="q-pt-lg"
+        ref="donut1"
         type="donut"
         :options="chartOptionsDonut1"
         :series="Object.values(workloadsPerAgent)"
@@ -74,6 +75,7 @@
     <div class="col-3">
       <apexchart
         class="q-pt-lg"
+        ref="donut2"
         type="donut"
         :options="chartOptionsDonut2"
         :series="Object.values(workloadsPerStatus)"
@@ -82,6 +84,7 @@
     <div class="col-3">
       <apexchart
         class="q-pt-lg"
+        ref="donut3"
         type="donut"
         :options="chartOptionsDonut3"
         :series="Object.values(workloadsPerRuntime)"
@@ -93,6 +96,9 @@
     <div class="col-12 q-pt-lg q-px-xl">
       <q-table
         title="Workloads"
+        rows-per-page-label="Workloads per page:"
+        no-data-label="Sorry, we didn't find anything for you :("
+        no-results-label="Sorry, we didn't find anything for you :("
         flat
         bordered
         square
@@ -105,7 +111,7 @@
         <template v-slot:top-right>
           <q-input
             dense
-            color="teal"
+            color="secondary"
             borderless
             v-model="filter"
             placeholder="Search"
@@ -123,11 +129,6 @@
       </q-table>
     </div>
   </div>
-
-  <div>
-    <q-btn @click="loadState()" />
-    {{ dependencies }}
-  </div>
 </template>
 
 <script setup>
@@ -135,15 +136,18 @@ defineOptions({
   name: "HomeView",
 });
 
-import { ref, reactive, computed } from "vue";
+import { ref, computed, onBeforeUnmount } from "vue";
 import apexchart from "vue3-apexcharts";
-import testjson from "../../test.json";
 
 const filter = ref("");
+var workloadStates = ref([]);
+var desiredState = ref({});
+const donut1 = ref("");
+const donut2 = ref("");
+const donut3 = ref("");
 
 const numberOfWorkloads = computed(() => {
-  const w = testjson.response.completeState.workloadStates;
-  return Object.keys(w).length;
+  return Object.keys(workloadStates.value).length;
 });
 
 const numberOfAgents = computed(() => {
@@ -174,127 +178,127 @@ const strRuntimes = computed(() => {
 });
 
 const workloadsPerRuntime = computed(() => {
-  const d = testjson.response.completeState.desiredState.workloads;
-  const n = Object.keys(d).length;
-  var list = [];
   const counter = {};
 
-  for (let i = 0; i < n; i++) {
-    list[i] = Object.values(d)[i].runtime;
-  }
+  if (Object.keys(desiredState.value).length > 0) {
+    const n = Object.keys(desiredState.value.workloads).length;
+    var list = [];
 
-  list.sort().forEach((runtime) => {
-    if (counter[runtime]) {
-      counter[runtime] += 1;
-    } else {
-      counter[runtime] = 1;
+    for (let i = 0; i < n; i++) {
+      list[i] = Object.values(desiredState.value.workloads)[i].runtime;
     }
-  });
+
+    list.sort().forEach((runtime) => {
+      if (counter[runtime]) {
+        counter[runtime] += 1;
+      } else {
+        counter[runtime] = 1;
+      }
+    });
+  }
 
   return counter;
 });
 
 const workloadsPerStatus = computed(() => {
-  const w = testjson.response.completeState.workloadStates;
-  const n = Object.keys(w).length;
+  const n = Object.keys(workloadStates.value).length;
   var list = [];
   const counter = {};
 
-  for (let i = 0; i < n; i++) {
-    list[i] = Object.keys(w[i].executionState);
-  }
-
-  list.sort().forEach((status) => {
-    if (counter[status]) {
-      counter[status] += 1;
-    } else {
-      counter[status] = 1;
+  if (n > 0) {
+    for (let i = 0; i < n; i++) {
+      list[i] = Object.keys(workloadStates.value[i].executionState);
     }
-  });
+
+    list.sort().forEach((status) => {
+      if (counter[status]) {
+        counter[status] += 1;
+      } else {
+        counter[status] = 1;
+      }
+    });
+  }
 
   return counter;
 });
 
 const workloadsPerAgent = computed(() => {
-  const w = testjson.response.completeState.workloadStates;
-  const n = Object.keys(w).length;
+  const n = Object.keys(workloadStates.value).length;
   var list = [];
   const counter = {};
 
-  for (let i = 0; i < n; i++) {
-    list[i] = w[i].instanceName.agentName;
-  }
-
-  list.sort().forEach((agent) => {
-    if (counter[agent]) {
-      counter[agent] += 1;
-    } else {
-      counter[agent] = 1;
+  if (n > 0) {
+    for (let i = 0; i < n; i++) {
+      list[i] = workloadStates.value[i].instanceName.agentName;
     }
-  });
+
+    list.sort().forEach((agent) => {
+      if (counter[agent]) {
+        counter[agent] += 1;
+      } else {
+        counter[agent] = 1;
+      }
+    });
+  }
 
   return counter;
 });
 
 const dependencies = computed(() => {
-  const d = testjson.response.completeState.desiredState;
-  const n = Object.keys(d.workloads).length;
   var list = [];
-  for (let i = 0; i < n; i++) {
-    if ("dependencies" in Object.values(d.workloads)[i]) {
-      list[i] = Object.keys(Object.values(d.workloads)[i].dependencies).join(
-        ", "
-      );
-    } else {
-      list[i] = "None";
+
+  if (Object.keys(desiredState.value).length > 0) {
+    const workloads = desiredState.value.workloads;
+    const n = Object.keys(workloads).length;
+
+    for (let i = 0; i < n; i++) {
+      if ("dependencies" in Object.values(workloads)[i]) {
+        list[i] = Object.keys(Object.values(workloads)[i].dependencies)
+          .sort()
+          .join(", ");
+      } else {
+        list[i] = "None";
+      }
     }
   }
+
   return list;
 });
 
 const rows = computed(() => {
-  const w = testjson.response.completeState.workloadStates;
-  const d = testjson.response.completeState.desiredState;
-  const n = Object.keys(w).length;
+  const n = Object.keys(workloadStates.value).length;
   var list = [];
 
-  for (let i = 0; i < n; i++) {
-    list[i] = {
-      Name: w[i].instanceName.workloadName,
-      Agent: w[i].instanceName.agentName,
-      Runtime: Object.values(d.workloads)[i].runtime,
-      Dependencies: dependencies.value[i],
-      Tags: Object.values(d.workloads)[i].tags[0].value,
-      State: Object.keys(w[i].executionState),
-    };
+  if (n > 0) {
+    for (let i = 0; i < n; i++) {
+      const j = Object.keys(desiredState.value.workloads).indexOf(
+        workloadStates.value[i].instanceName.workloadName
+      );
+      list[i] = {
+        Name: workloadStates.value[i].instanceName.workloadName,
+        Agent: workloadStates.value[i].instanceName.agentName,
+        Runtime: Object.values(desiredState.value.workloads)[j].runtime,
+        Dependencies: dependencies.value[j],
+        Tags: Object.values(desiredState.value.workloads)[j].tags[0].value,
+        State: Object.keys(workloadStates.value[i].executionState),
+      };
+    }
   }
 
   return list;
 });
 
-/*const rows_new = computed(() => {
-  const n = Object.keys(testjson).length;
-  var list = [];
-  for (let i = 0; i < n; i++) {
-    list[i] = {
-      Name: workloadStates[i].value.instanceName.workloadName,
-      Agent: workloadStates[i].value.instanceName.agentName,
-      Runtime: desiredState.value.workloads[i].runtime,
-      Dependencies: "Hello",
-      Tags: "World",
-      State: workloadStates[i].value.executionState.running,
-    };
-  }
-  return list;
-});*/
-
-const series = [44, 55, 41, 50, 80];
 const chartOptionsDonut1 = {
   chart: {
     type: "donut",
+    animations: {
+      dynamicAnimation: {
+        enabled: false,
+      },
+    },
   },
   legend: { show: false },
-  labels: Object.keys(workloadsPerAgent.value),
+  labels: [],
   responsive: [
     {
       breakpoint: 1000,
@@ -336,9 +340,15 @@ const chartOptionsDonut1 = {
     },
   },
 };
+
 const chartOptionsDonut2 = {
   chart: {
     type: "donut",
+    animations: {
+      dynamicAnimation: {
+        enabled: false,
+      },
+    },
   },
   legend: { show: false },
   labels: Object.keys(workloadsPerStatus.value),
@@ -386,6 +396,11 @@ const chartOptionsDonut2 = {
 const chartOptionsDonut3 = {
   chart: {
     type: "donut",
+    animations: {
+      dynamicAnimation: {
+        enabled: false,
+      },
+    },
   },
   legend: { show: false },
   labels: Object.keys(workloadsPerRuntime.value),
@@ -431,13 +446,87 @@ const chartOptionsDonut3 = {
   },
 };
 
-var workloadStates = ref([]);
-var desiredState = ref({});
+function aggregateRuntimes(desiredState) {
+  const counter = {};
+
+  if (Object.keys(desiredState).length > 0) {
+    const n = Object.keys(desiredState.workloads).length;
+    var list = [];
+
+    for (let i = 0; i < n; i++) {
+      list[i] = Object.values(desiredState.workloads)[i].runtime;
+    }
+
+    list.sort().forEach((runtime) => {
+      if (counter[runtime]) {
+        counter[runtime] += 1;
+      } else {
+        counter[runtime] = 1;
+      }
+    });
+  }
+
+  return counter;
+}
+
+function aggregateStates(workloads) {
+  const n = Object.keys(workloads).length;
+  var list = [];
+  const counter = {};
+
+  if (n > 0) {
+    for (let i = 0; i < n; i++) {
+      list[i] = Object.keys(workloads[i].executionState);
+    }
+
+    list.sort().forEach((status) => {
+      if (counter[status]) {
+        counter[status] += 1;
+      } else {
+        counter[status] = 1;
+      }
+    });
+  }
+
+  return counter;
+}
+
+function aggregateAgents(workloads) {
+  const n = Object.keys(workloads).length;
+  var list = [];
+  const counter = {};
+
+  if (n > 0) {
+    for (let i = 0; i < n; i++) {
+      list[i] = workloads[i].instanceName.agentName;
+    }
+
+    list.sort().forEach((agent) => {
+      if (counter[agent]) {
+        counter[agent] += 1;
+      } else {
+        counter[agent] = 1;
+      }
+    });
+  }
+
+  return counter;
+}
 
 function loadState() {
   fetch("/completeState")
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        if (response.status == 405) {
+          console.log("User not logged in.");
+        }
+        return Promise.reject(response);
+      } else {
+        return response.json();
+      }
+    })
     .then((json) => {
+      console.log(json);
       let completeState = null;
       if (
         json &&
@@ -450,6 +539,18 @@ function loadState() {
         if (completeState.desiredState) {
           desiredState.value = completeState.desiredState;
         }
+
+        donut1.value.updateOptions({
+          labels: Object.keys(aggregateAgents(workloadStates.value)),
+        });
+
+        donut2.value.updateOptions({
+          labels: Object.keys(aggregateStates(workloadStates.value)),
+        });
+
+        donut3.value.updateOptions({
+          labels: Object.keys(aggregateRuntimes(desiredState.value)),
+        });
       }
     })
     .catch((error) => {
@@ -458,56 +559,13 @@ function loadState() {
         error.message
       );
     });
-  /*fetch("/completeState")
-    .then((response) => response.json())
-    .then((json) => {
-      let completeState = null;
-      console.log(json);
-      console.log(json.response);
-      console.log(json.response.completeState);
-      console.log(json.response.completeState.workloadStates);
-      if (
-        json &&
-        json.response &&
-        json.response.completeState &&
-        json.response.completeState.workloadStates
-      ) {
-        completeState = json.response.completeState;
-        workloads.value = completeState.workloadStates;
-        if (completeState.desiredState) {
-          desiredState.value = completeState.desiredState;
-          if (completeState.desiredState.workloads) {
-            workloads.value = completeState.desiredState.workloads;
-          }
-        }
-      }
-
-      if (workloads.value) {
-        const dependencies = [];
-        for (let [workloadName, workloadDefinition] of Object.entries(
-          workloads
-        )) {
-          if ("dependencies" in workloadDefinition) {
-            for (let [dependency, condition] of Object.entries(
-              workloadDefinition.dependencies
-            )) {
-              dependencies.push({
-                source: workloadName,
-                target: dependency,
-                type: condition,
-              });
-            }
-          }
-        }
-      }
-    })
-    .catch((error) => {
-      console.log(
-        "There has been a problem with your fetch operation: ",
-        error.message
-      );
-    });*/
 }
+
+let timerId = setInterval(() => loadState(), 2000);
+
+onBeforeUnmount(() => {
+  clearInterval(timerId);
+});
 </script>
 
 <style lang="scss">

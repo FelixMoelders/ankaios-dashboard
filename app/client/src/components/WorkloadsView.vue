@@ -113,17 +113,22 @@ export default {
         return this.sortedWorkloads
       }
       return this.sortedWorkloads.filter(workload => {
+        console.log(workload);
         let search = this.search.toLowerCase();
 
         let workloadName = workload.instanceName.workloadName.toLowerCase();
         let agentName = workload.instanceName.agentName.toLowerCase();
 
         let desiredState = this.desiredState.workloads[workload.instanceName.workloadName];
+
+        if (!desiredState) {
+          return false;
+        }
+
         let runtimeConfig = desiredState.runtimeConfig.toLowerCase();
         let tags = desiredState.tags;
-
-        const tagKeyExists = tags.some(item => item.key.toLowerCase().includes(search));
-        const tagValueExists = tags.some(item => item.value.toLowerCase().includes(search));
+        let tagKeyExists = tags.some(item => item.key.toLowerCase().includes(search));
+        let tagValueExists = tags.some(item => item.value.toLowerCase().includes(search));
 
         let execStateFits = false;
         if (this.filterState == "all") {

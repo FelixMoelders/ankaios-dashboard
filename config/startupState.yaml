@@ -36,177 +36,177 @@ workloads:
       image: dashboard:0.0
       commandOptions: ["-p", "5020:5001", "-e", "PASSWORD=admin"]
 
-  Automatic_Climate_Control_3:
-    runtime: podman
-    agent: agent_A
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: AC Unit
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5021:5001", "-e", "PASSWORD=admin"]
+  # Automatic_Climate_Control_3:
+  #   runtime: podman
+  #   agent: agent_A
+  #   restart: true
+  #   updateStrategy: AT_LEAST_ONCE
+  #   accessRights:
+  #     allow: []
+  #     deny: []
+  #   restartPolicy: NEVER
+  #   tags:
+  #     - key: Started by
+  #       value: Front Passenger
+  #     - key: Running in
+  #       value: AC Unit
+  #   runtimeConfig: |
+  #     image: dashboard:0.0
+  #     commandOptions: ["-p", "5021:5001", "-e", "PASSWORD=admin"]
 
-  Automatic_Climate_Control_4:
-    runtime: podman
-    agent: agent_A
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: AC Unit
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5022:5001", "-e", "PASSWORD=admin"]
+  # Automatic_Climate_Control_4:
+  #   runtime: podman
+  #   agent: agent_A
+  #   restart: true
+  #   updateStrategy: AT_LEAST_ONCE
+  #   accessRights:
+  #     allow: []
+  #     deny: []
+  #   restartPolicy: NEVER
+  #   tags:
+  #     - key: Started by
+  #       value: Front Passenger
+  #     - key: Running in
+  #       value: AC Unit
+  #   runtimeConfig: |
+  #     image: dashboard:0.0
+  #     commandOptions: ["-p", "5022:5001", "-e", "PASSWORD=admin"]
 
-  Automatic_Climate_Control_5:
-    runtime: podman
-    agent: agent_A
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: AC Unit
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5023:5001", "-e", "PASSWORD=admin"]
+  # Automatic_Climate_Control_5:
+  #   runtime: podman
+  #   agent: agent_A
+  #   restart: true
+  #   updateStrategy: AT_LEAST_ONCE
+  #   accessRights:
+  #     allow: []
+  #     deny: []
+  #   restartPolicy: NEVER
+  #   tags:
+  #     - key: Started by
+  #       value: Front Passenger
+  #     - key: Running in
+  #       value: AC Unit
+  #   runtimeConfig: |
+  #     image: dashboard:0.0
+  #     commandOptions: ["-p", "5023:5001", "-e", "PASSWORD=admin"]
 
-  Automatic_Climate_Control_6:
-    runtime: podman
-    agent: agent_A
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: AC Unit
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5024:5001", "-e", "PASSWORD=admin"]
-
-
-  Navigation:
-    runtime: podman
-    agent: agent_B
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: Infotainment
-    dependencies:
-      Infotainment_Screen_On: ADD_COND_RUNNING
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5002:5001"]
-
-  Smartphone_Music_Streaming:
-    runtime: podman
-    agent: agent_C
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    dependencies:
-      Smartphone_Bluetooth_Connection: ADD_COND_RUNNING
-    tags:
-      - key: Started by
-        value: Rear Passenger
-      - key: Running in
-        value: Infotainment
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5003:5001"]
-
-  EV_Charging_Error:
-    runtime: podman
-    agent: agent_D
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    dependencies:
-      EV_Charging_Start: ADD_COND_FAILED
-      Infotainment_Screen_On: ADD_COND_RUNNING
-    tags:
-      - key: Started by
-        value: Charging Circuit
-      - key: Running in
-        value: Instrument Cluster
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5004:5001"]
+  # Automatic_Climate_Control_6:
+  #   runtime: podman
+  #   agent: agent_A
+  #   restart: true
+  #   updateStrategy: AT_LEAST_ONCE
+  #   accessRights:
+  #     allow: []
+  #     deny: []
+  #   restartPolicy: NEVER
+  #   tags:
+  #     - key: Started by
+  #       value: Front Passenger
+  #     - key: Running in
+  #       value: AC Unit
+  #   runtimeConfig: |
+  #     image: dashboard:0.0
+  #     commandOptions: ["-p", "5024:5001", "-e", "PASSWORD=admin"]
 
 
-  EV_Charging_Start:
-    runtime: podman
-    agent: agent_D
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    dependencies:
-    commandArgs: [ "-c", "sleep 10; exit 1" ]
-    tags:
-      - key: Started by
-        value: Charging Circuit
-      - key: Running in
-        value: Instrument Cluster
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5005:5001"]
+  # Navigation:
+  #   runtime: podman
+  #   agent: agent_B
+  #   restart: true
+  #   updateStrategy: AT_LEAST_ONCE
+  #   accessRights:
+  #     allow: []
+  #     deny: []
+  #   restartPolicy: NEVER
+  #   tags:
+  #     - key: Started by
+  #       value: Front Passenger
+  #     - key: Running in
+  #       value: Infotainment
+  #   dependencies:
+  #     Infotainment_Screen_On: ADD_COND_RUNNING
+  #   runtimeConfig: |
+  #     image: dashboard:0.0
+  #     commandOptions: ["-p", "5002:5001"]
 
-  Infotainment_Screen_On:
-    runtime: podman
-    agent: agent_C
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    dependencies:
-    tags:
-      - key: Started by
-        value: Driver
-      - key: Running in
-        value: Instrument Cluster
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5006:5001"]
+  # Smartphone_Music_Streaming:
+  #   runtime: podman
+  #   agent: agent_C
+  #   restart: true
+  #   updateStrategy: AT_LEAST_ONCE
+  #   accessRights:
+  #     allow: []
+  #     deny: []
+  #   restartPolicy: NEVER
+  #   dependencies:
+  #     Smartphone_Bluetooth_Connection: ADD_COND_RUNNING
+  #   tags:
+  #     - key: Started by
+  #       value: Rear Passenger
+  #     - key: Running in
+  #       value: Infotainment
+  #   runtimeConfig: |
+  #     image: dashboard:0.0
+  #     commandOptions: ["-p", "5003:5001"]
+
+  # EV_Charging_Error:
+  #   runtime: podman
+  #   agent: agent_D
+  #   restart: true
+  #   updateStrategy: AT_LEAST_ONCE
+  #   accessRights:
+  #     allow: []
+  #     deny: []
+  #   restartPolicy: NEVER
+  #   dependencies:
+  #     EV_Charging_Start: ADD_COND_FAILED
+  #     Infotainment_Screen_On: ADD_COND_RUNNING
+  #   tags:
+  #     - key: Started by
+  #       value: Charging Circuit
+  #     - key: Running in
+  #       value: Instrument Cluster
+  #   runtimeConfig: |
+  #     image: dashboard:0.0
+  #     commandOptions: ["-p", "5004:5001"]
+
+
+  # EV_Charging_Start:
+  #   runtime: podman
+  #   agent: agent_D
+  #   restart: true
+  #   updateStrategy: AT_LEAST_ONCE
+  #   accessRights:
+  #     allow: []
+  #     deny: []
+  #   restartPolicy: NEVER
+  #   dependencies:
+  #   commandArgs: [ "-c", "sleep 10; exit 1" ]
+  #   tags:
+  #     - key: Started by
+  #       value: Charging Circuit
+  #     - key: Running in
+  #       value: Instrument Cluster
+  #   runtimeConfig: |
+  #     image: dashboard:0.0
+  #     commandOptions: ["-p", "5005:5001"]
+
+  # Infotainment_Screen_On:
+  #   runtime: podman
+  #   agent: agent_C
+  #   restart: true
+  #   updateStrategy: AT_LEAST_ONCE
+  #   accessRights:
+  #     allow: []
+  #     deny: []
+  #   restartPolicy: NEVER
+  #   dependencies:
+  #   tags:
+  #     - key: Started by
+  #       value: Driver
+  #     - key: Running in
+  #       value: Instrument Cluster
+  #   runtimeConfig: |
+  #     image: dashboard:0.0
+  #     commandOptions: ["-p", "5006:5001"]
 

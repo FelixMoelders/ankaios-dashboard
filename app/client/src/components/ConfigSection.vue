@@ -41,7 +41,11 @@ export default {
         },
     },
     mounted() {
+      if (this.state.runtimeConfig) {
         this.runtimeConfig = this.state.runtimeConfig;
+      } else {
+        this.runtimeConfig = "";
+      }
     }
 }
 

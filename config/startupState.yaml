@@ -1,6 +1,6 @@
 apiVersion: v0.1
 workloads:
-  Automatic_Climate_Control:
+  Ankaios_Dashboard:
     runtime: podman
     agent: agent_A
     restart: true
@@ -9,13 +9,8 @@ workloads:
       allow: []
       deny: []
     restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: AC Unit
     runtimeConfig: |
-      image: dashboard:0.0
+      image: ghcr.io/felixmoelders/ankaios-dashboard:latest
       commandOptions: ["-p", "5001:5001", "-e", "PASSWORD=admin"]
   
   Automatic_Climate_Control_2:

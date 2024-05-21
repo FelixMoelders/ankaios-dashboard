@@ -18,6 +18,9 @@ Add the following entry to your startupState.yaml for ankaios and you are ready 
          allow: []
          deny: []
       restartPolicy: NEVER
+      tags:
+         - key: ankaios
+           value: dashboard
       runtimeConfig: |
          image: ghcr.io/felixmoelders/ankaios-dashboard:latest
          commandOptions: ["-p", "5001:5001", "-e", "PASSWORD=admin"]

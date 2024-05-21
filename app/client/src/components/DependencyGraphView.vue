@@ -44,7 +44,11 @@ export default {
                     if (workloadStates && workloads) {
                         for (const state of workloadStates) {
                             const workload = workloads[state.instanceName.workloadName];
-                            state.tags = workload ? workload.tags : [];
+                            state.tags = [];
+                            if (workload && 'tags' in workload) {
+                              state.tags = workload.tags;
+                            }
+
                         }
                         this.workloadStates = workloadStates.sort((a, b) => a.instanceName.workloadName.localeCompare(b.instanceName.workloadName));
                     }

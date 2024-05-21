@@ -60,6 +60,8 @@ export default {
                   return response.json();
               }
           }).then(json => {
+            console.log("loadState");
+            console.log(json);
               let completeState = null, workloads = null;
 
               if (json && json.response && json.response.completeState && json.response.completeState.workloadStates) {
@@ -126,9 +128,15 @@ export default {
         }
 
         let runtimeConfig = desiredState.runtimeConfig.toLowerCase();
-        let tags = desiredState.tags;
-        let tagKeyExists = tags.some(item => item.key.toLowerCase().includes(search));
-        let tagValueExists = tags.some(item => item.value.toLowerCase().includes(search));
+
+        let tagKeyExists = false;
+        let tagValueExists = false;
+
+        if ('tags' in desiredState) {
+          let tags = desiredState.tags;
+          tagKeyExists = tags.some(item => item.key.toLowerCase().includes(search));
+          tagValueExists = tags.some(item => item.value.toLowerCase().includes(search));
+        }
 
         let execStateFits = false;
         if (this.filterState == "all") {

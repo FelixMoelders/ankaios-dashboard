@@ -274,12 +274,16 @@ const rows = computed(() => {
       const j = Object.keys(desiredState.value.workloads).indexOf(
         workloadStates.value[i].instanceName.workloadName
       );
+      let tags = "";
+      if (Object.values(desiredState.value.workloads)[j].tags) {
+        tags = Object.values(desiredState.value.workloads)[j].tags[0].value;
+      }
       list[i] = {
         Name: workloadStates.value[i].instanceName.workloadName,
         Agent: workloadStates.value[i].instanceName.agentName,
         Runtime: Object.values(desiredState.value.workloads)[j].runtime,
         Dependencies: dependencies.value[j],
-        Tags: Object.values(desiredState.value.workloads)[j].tags[0].value,
+        Tags: tags,
         State: Object.keys(workloadStates.value[i].executionState),
       };
     }

@@ -9,101 +9,31 @@ workloads:
       allow: []
       deny: []
     restartPolicy: NEVER
+    tags:
+      - key: Ankaios
+        value: Dashboard
     runtimeConfig: |
       image: ghcr.io/felixmoelders/ankaios-dashboard:latest
       commandOptions: ["-p", "5001:5001", "-e", "PASSWORD=admin"]
+
+  Automatic_Climate_Control:
+    runtime: podman
+    agent: agent_A
+    restart: true
+    updateStrategy: AT_LEAST_ONCE
+    accessRights:
+      allow: []
+      deny: []
+    restartPolicy: NEVER
+    tags:
+      - key: Started by
+        value: Front Passenger
+      - key: Running in
+        value: AC Unit
+    runtimeConfig: |
+      image: dashboard:0.0
+      commandOptions: ["-p", "5002:5001", "-e", "PASSWORD=admin"]
   
-  Automatic_Climate_Control_2:
-    runtime: podman
-    agent: agent_A
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: AC Unit
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5020:5001", "-e", "PASSWORD=admin"]
-
-  Automatic_Climate_Control_3:
-    runtime: podman
-    agent: agent_A
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: AC Unit
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5021:5001", "-e", "PASSWORD=admin"]
-
-  Automatic_Climate_Control_4:
-    runtime: podman
-    agent: agent_A
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: AC Unit
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5022:5001", "-e", "PASSWORD=admin"]
-
-  Automatic_Climate_Control_5:
-    runtime: podman
-    agent: agent_A
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: AC Unit
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5023:5001", "-e", "PASSWORD=admin"]
-
-  Automatic_Climate_Control_6:
-    runtime: podman
-    agent: agent_A
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: AC Unit
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5024:5001", "-e", "PASSWORD=admin"]
-
-
   Navigation:
     runtime: podman
     agent: agent_B
@@ -113,16 +43,16 @@ workloads:
       allow: []
       deny: []
     restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: Infotainment
+    #tags:
+    #  - key: Started by
+    #    value: Front Passenger
+    #  - key: Running in
+    #    value: Infotainment
     dependencies:
       Infotainment_Screen_On: ADD_COND_RUNNING
     runtimeConfig: |
       image: dashboard:0.0
-      commandOptions: ["-p", "5002:5001"]
+      commandOptions: ["-p", "5003:5001", "-e", "PASSWORD=admin"]
 
   Smartphone_Music_Streaming:
     runtime: podman
@@ -142,11 +72,11 @@ workloads:
         value: Infotainment
     runtimeConfig: |
       image: dashboard:0.0
-      commandOptions: ["-p", "5003:5001"]
+      commandOptions: ["-p", "5004:5001", "-e", "PASSWORD=admin"]
 
   EV_Charging_Error:
     runtime: podman
-    agent: agent_D
+    agent: agent_B
     restart: true
     updateStrategy: AT_LEAST_ONCE
     accessRights:
@@ -163,12 +93,12 @@ workloads:
         value: Instrument Cluster
     runtimeConfig: |
       image: dashboard:0.0
-      commandOptions: ["-p", "5004:5001"]
+      commandOptions: ["-p", "5005:5001", "-e", "PASSWORD=admin"]
 
 
   EV_Charging_Start:
     runtime: podman
-    agent: agent_D
+    agent: agent_C
     restart: true
     updateStrategy: AT_LEAST_ONCE
     accessRights:
@@ -184,7 +114,7 @@ workloads:
         value: Instrument Cluster
     runtimeConfig: |
       image: dashboard:0.0
-      commandOptions: ["-p", "5005:5001"]
+      commandOptions: ["-p", "5006:5001", "-e", "PASSWORD=admin"]
 
   Infotainment_Screen_On:
     runtime: podman
@@ -203,5 +133,5 @@ workloads:
         value: Instrument Cluster
     runtimeConfig: |
       image: dashboard:0.0
-      commandOptions: ["-p", "5006:5001"]
+      commandOptions: ["-p", "5007:5001", "-e", "PASSWORD=admin"]
 

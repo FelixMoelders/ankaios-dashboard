@@ -4,7 +4,7 @@
       <q-card square flat bordered class="q-mt-lg">
         <q-card-section horizontal class="bg-grey-2">
           <q-card-section class="bg-secondary">
-            <q-icon name="person" size="md" color="white" />
+            <q-icon name="auto_awesome_motion" size="md" color="white" />
           </q-card-section>
           <q-card-section class="q-pt-xs">
             <div class="text-h5 q-mt-sm q-mb-xs">
@@ -19,7 +19,7 @@
       <q-card square flat bordered class="q-mt-lg">
         <q-card-section horizontal class="bg-grey-2">
           <q-card-section class="bg-secondary">
-            <q-icon name="person" size="md" color="white" />
+            <q-icon name="widgets" size="md" color="white" />
           </q-card-section>
           <q-card-section class="q-pt-xs">
             <div class="text-h5 q-mt-sm q-mb-xs">
@@ -34,7 +34,7 @@
       <q-card square flat bordered class="q-mt-lg">
         <q-card-section horizontal class="bg-grey-2">
           <q-card-section class="bg-secondary">
-            <q-icon name="person" size="md" color="white" />
+            <q-icon name="mediation" size="md" color="white" />
           </q-card-section>
           <q-card-section class="q-pt-xs">
             <div class="text-h5 q-mt-sm q-mb-xs">
@@ -49,7 +49,7 @@
       <q-card square flat bordered class="q-mt-lg">
         <q-card-section horizontal class="bg-grey-2">
           <q-card-section class="bg-secondary">
-            <q-icon name="person" size="md" color="white" />
+            <q-icon name="code" size="md" color="white" />
           </q-card-section>
           <q-card-section class="q-pt-xs">
             <div class="text-h5 q-mt-sm q-mb-xs">

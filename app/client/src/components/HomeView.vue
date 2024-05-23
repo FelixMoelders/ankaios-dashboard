@@ -123,7 +123,7 @@
         </template>
         <template v-slot:body-cell-Tags="props">
           <q-td :props="props">
-            <q-badge color="primary" :label="props.value" />
+            <q-badge v-if="props.value" color="primary" :label="props.value" /> <!-- display empty cell in home view if workload has no tags  -->
           </q-td>
         </template>
       </q-table>
@@ -136,7 +136,7 @@ defineOptions({
   name: "HomeView",
 });
 
-import { ref, computed, onBeforeUnmount } from "vue";
+import {ref, computed, onMounted, onBeforeUnmount } from "vue";
 import apexchart from "vue3-apexcharts";
 
 const filter = ref("");
@@ -274,9 +274,10 @@ const rows = computed(() => {
       const j = Object.keys(desiredState.value.workloads).indexOf(
         workloadStates.value[i].instanceName.workloadName
       );
-      let tags = "";
-      if (Object.values(desiredState.value.workloads)[j].tags) {
-        tags = Object.values(desiredState.value.workloads)[j].tags[0].value;
+      let tags = ""; //previous code only checked if the 'tags' property existed, and if so, immediately tried to access it as an array. Now, it also checks whether the array is empty before accessing it.
+      let currentWorkload = Object.values(desiredState.value.workloads)[j];
+      if (currentWorkload && currentWorkload.tags && currentWorkload.tags[0]) {
+        tags = currentWorkload.tags[0].value;
       }
       list[i] = {
         Name: workloadStates.value[i].instanceName.workloadName,
@@ -517,7 +518,13 @@ function aggregateAgents(workloads) {
   return counter;
 }
 
-function loadState() {
+
+
+let timerId = null;
+
+onMounted(() => {
+  console.log("component mounted") // report when the component is mounted
+  function loadState() {
   fetch("/completeState")
     .then((response) => {
       if (!response.ok) {
@@ -543,18 +550,22 @@ function loadState() {
         if (completeState.desiredState) {
           desiredState.value = completeState.desiredState;
         }
-
-        donut1.value.updateOptions({
-          labels: Object.keys(aggregateAgents(workloadStates.value)),
-        });
-
-        donut2.value.updateOptions({
-          labels: Object.keys(aggregateStates(workloadStates.value)),
-        });
-
-        donut3.value.updateOptions({
-          labels: Object.keys(aggregateRuntimes(desiredState.value)),
-        });
+          // check whether donut1, donut2, donut3 contain null values and only if not, call updateOptions()
+        if(donut1.value) {
+          donut1.value.updateOptions({
+            labels: Object.keys(aggregateAgents(workloadStates.value)),
+          });
+        }
+        if(donut2.value) {
+          donut2.value.updateOptions({
+            labels: Object.keys(aggregateStates(workloadStates.value)),
+          });
+        }
+        if(donut3.value) {
+          donut3.value.updateOptions({
+            labels: Object.keys(aggregateRuntimes(desiredState.value)),
+          });
+        }
       }
     })
     .catch((error) => {
@@ -564,8 +575,8 @@ function loadState() {
       );
     });
 }
-
-let timerId = setInterval(() => loadState(), 2000);
+  timerId = setInterval(() => loadState(), 2000); // wait for mounting before calling loadState()
+});
 
 onBeforeUnmount(() => {
   clearInterval(timerId);

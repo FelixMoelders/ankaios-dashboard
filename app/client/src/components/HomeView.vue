@@ -66,27 +66,27 @@
     <div class="col-3">
       <apexchart
         class="q-pt-lg"
-        ref="donut1"
+        ref="donutAgents"
         type="donut"
-        :options="chartOptionsDonut1"
+        :options="getChartOptions('Workloads per Agent')"
         :series="Object.values(workloadsPerAgent)"
       ></apexchart>
     </div>
     <div class="col-3">
       <apexchart
         class="q-pt-lg"
-        ref="donut2"
+        ref="donutStatus"
         type="donut"
-        :options="chartOptionsDonut2"
+        :options="getChartOptions('Workload status')"
         :series="Object.values(workloadsPerStatus)"
       ></apexchart>
     </div>
     <div class="col-3">
       <apexchart
         class="q-pt-lg"
-        ref="donut3"
+        ref="donutRuntimes"
         type="donut"
-        :options="chartOptionsDonut3"
+        :options="getChartOptions('Workload runtimes')"
         :series="Object.values(workloadsPerRuntime)"
       ></apexchart>
     </div>
@@ -123,7 +123,8 @@
         </template>
         <template v-slot:body-cell-Tags="props">
           <q-td :props="props">
-            <q-badge v-if="props.value" color="primary" :label="props.value" /> <!-- display empty cell in home view if workload has no tags  -->
+            <q-badge v-if="props.value" color="primary" :label="props.value" />
+            <!-- display empty cell in home view if workload has no tags  -->
           </q-td>
         </template>
       </q-table>
@@ -136,15 +137,15 @@ defineOptions({
   name: "HomeView",
 });
 
-import {ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import apexchart from "vue3-apexcharts";
 
 const filter = ref("");
 var workloadStates = ref([]);
 var desiredState = ref({});
-const donut1 = ref("");
-const donut2 = ref("");
-const donut3 = ref("");
+const donutAgents = ref("");
+const donutStatus = ref("");
+const donutRuntimes = ref("");
 
 const numberOfWorkloads = computed(() => {
   return Object.keys(workloadStates.value).length;
@@ -293,163 +294,60 @@ const rows = computed(() => {
   return list;
 });
 
-const chartOptionsDonut1 = {
-  chart: {
-    type: "donut",
-    animations: {
-      dynamicAnimation: {
-        enabled: false,
-      },
-    },
-  },
-  legend: { show: false },
-  labels: [],
-  responsive: [
-    {
-      breakpoint: 1000,
-      options: {
-        chart: {
-          width: 200,
-        },
-        legend: {
-          show: false,
-        },
-        dataLabels: {
+function getChartOptions(title) {
+  return {
+    chart: {
+      type: "donut",
+      animations: {
+        dynamicAnimation: {
           enabled: false,
         },
       },
     },
-  ],
-  theme: {
-    mode: "light",
-    palette: "palette3",
-    monochrome: {
-      enabled: false,
-      color: "#9C27B0",
-      shadeTo: "light",
-      shadeIntensity: 0.8,
-    },
-  },
-  title: {
-    text: "Workloads per Agent",
-    align: "left",
-    margin: 10,
-    offsetX: 0,
-    offsetY: 0,
-    floating: false,
-    style: {
-      fontSize: "14px",
-      fontWeight: "bold",
-      fontFamily: undefined,
-      color: "#263238",
-    },
-  },
-};
-
-const chartOptionsDonut2 = {
-  chart: {
-    type: "donut",
-    animations: {
-      dynamicAnimation: {
+    legend: { show: false },
+    labels: [],
+    responsive: [
+      {
+        breakpoint: 1000,
+        options: {
+          chart: {
+            width: 200,
+          },
+          legend: {
+            show: false,
+          },
+          dataLabels: {
+            enabled: false,
+          },
+        },
+      },
+    ],
+    theme: {
+      mode: "light",
+      palette: "palette3",
+      monochrome: {
         enabled: false,
+        color: "#9C27B0",
+        shadeTo: "light",
+        shadeIntensity: 0.8,
       },
     },
-  },
-  legend: { show: false },
-  labels: Object.keys(workloadsPerStatus.value),
-  responsive: [
-    {
-      breakpoint: 1000,
-      options: {
-        chart: {
-          width: 200,
-        },
-        legend: {
-          show: false,
-        },
-        dataLabels: {
-          enabled: false,
-        },
+    title: {
+      text: title,
+      align: "left",
+      margin: 10,
+      offsetX: 0,
+      offsetY: 0,
+      floating: false,
+      style: {
+        fontSize: "14px",
+        fontWeight: "bold",
+        fontFamily: undefined,
+        color: "#263238",
       },
     },
-  ],
-  theme: {
-    mode: "light",
-    palette: "palette3",
-    monochrome: {
-      enabled: false,
-      color: "#9C27B0",
-      shadeTo: "light",
-      shadeIntensity: 0.8,
-    },
-  },
-  title: {
-    text: "Workload status",
-    align: "left",
-    margin: 10,
-    offsetX: 0,
-    offsetY: 0,
-    floating: false,
-    style: {
-      fontSize: "14px",
-      fontWeight: "bold",
-      fontFamily: undefined,
-      color: "#263238",
-    },
-  },
-};
-const chartOptionsDonut3 = {
-  chart: {
-    type: "donut",
-    animations: {
-      dynamicAnimation: {
-        enabled: false,
-      },
-    },
-  },
-  legend: { show: false },
-  labels: Object.keys(workloadsPerRuntime.value),
-  responsive: [
-    {
-      breakpoint: 1000,
-      options: {
-        chart: {
-          width: 200,
-        },
-        legend: {
-          show: false,
-        },
-        dataLabels: {
-          enabled: false,
-        },
-      },
-    },
-  ],
-  theme: {
-    mode: "light",
-    palette: "palette3",
-    monochrome: {
-      enabled: false,
-      color: "#9C27B0",
-      shadeTo: "light",
-      shadeIntensity: 0.8,
-    },
-  },
-  title: {
-    text: "Workload runtimes",
-    align: "left",
-    margin: 10,
-    offsetX: 0,
-    offsetY: 0,
-    floating: false,
-    style: {
-      fontSize: "14px",
-      fontWeight: "bold",
-      fontFamily: undefined,
-      color: "#263238",
-    },
-  },
-};
+  };
+}
 
 function aggregateRuntimes(desiredState) {
   const counter = {};
@@ -518,63 +416,61 @@ function aggregateAgents(workloads) {
   return counter;
 }
 
-
-
 let timerId = null;
 
 onMounted(() => {
-  console.log("component mounted") // report when the component is mounted
+  console.log("component mounted"); // report when the component is mounted
   function loadState() {
-  fetch("/completeState")
-    .then((response) => {
-      if (!response.ok) {
-        if (response.status == 405) {
-          console.log("User not logged in.");
+    fetch("/completeState")
+      .then((response) => {
+        if (!response.ok) {
+          if (response.status == 405) {
+            console.log("User not logged in.");
+          }
+          return Promise.reject(response);
+        } else {
+          return response.json();
         }
-        return Promise.reject(response);
-      } else {
-        return response.json();
-      }
-    })
-    .then((json) => {
-      console.log(json);
-      let completeState = null;
-      if (
-        json &&
-        json.response &&
-        json.response.completeState &&
-        json.response.completeState.workloadStates
-      ) {
-        completeState = json.response.completeState;
-        workloadStates.value = completeState.workloadStates;
-        if (completeState.desiredState) {
-          desiredState.value = completeState.desiredState;
+      })
+      .then((json) => {
+        console.log(json);
+        let completeState = null;
+        if (
+          json &&
+          json.response &&
+          json.response.completeState &&
+          json.response.completeState.workloadStates
+        ) {
+          completeState = json.response.completeState;
+          workloadStates.value = completeState.workloadStates;
+          if (completeState.desiredState) {
+            desiredState.value = completeState.desiredState;
+          }
+          // check whether donutAgents, donutStatus, donutRuntimes contain null values and only if not, call updateOptions()
+          if (donutAgents.value) {
+            donutAgents.value.updateOptions({
+              labels: Object.keys(aggregateAgents(workloadStates.value)),
+            });
+          }
+          if (donutStatus.value) {
+            donutStatus.value.updateOptions({
+              labels: Object.keys(aggregateStates(workloadStates.value)),
+            });
+          }
+          if (donutRuntimes.value) {
+            donutRuntimes.value.updateOptions({
+              labels: Object.keys(aggregateRuntimes(desiredState.value)),
+            });
+          }
         }
-          // check whether donut1, donut2, donut3 contain null values and only if not, call updateOptions()
-        if(donut1.value) {
-          donut1.value.updateOptions({
-            labels: Object.keys(aggregateAgents(workloadStates.value)),
-          });
-        }
-        if(donut2.value) {
-          donut2.value.updateOptions({
-            labels: Object.keys(aggregateStates(workloadStates.value)),
-          });
-        }
-        if(donut3.value) {
-          donut3.value.updateOptions({
-            labels: Object.keys(aggregateRuntimes(desiredState.value)),
-          });
-        }
-      }
-    })
-    .catch((error) => {
-      console.log(
-        "There has been a problem with your fetch operation: ",
-        error.message
-      );
-    });
-}
+      })
+      .catch((error) => {
+        console.log(
+          "There has been a problem with your fetch operation: ",
+          error.message
+        );
+      });
+  }
   timerId = setInterval(() => loadState(), 2000); // wait for mounting before calling loadState()
 });
 

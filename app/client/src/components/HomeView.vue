@@ -68,7 +68,7 @@
         class="q-pt-lg"
         ref="donutAgents"
         type="donut"
-        :options="getChartOptions('Workloads per Agent')"
+        :options="chartOptionsAgents"
         :series="Object.values(workloadsPerAgent)"
       ></apexchart>
     </div>
@@ -77,7 +77,7 @@
         class="q-pt-lg"
         ref="donutStatus"
         type="donut"
-        :options="getChartOptions('Workload status')"
+        :options="chartOptionsStatus"
         :series="Object.values(workloadsPerStatus)"
       ></apexchart>
     </div>
@@ -86,7 +86,7 @@
         class="q-pt-lg"
         ref="donutRuntimes"
         type="donut"
-        :options="getChartOptions('Workload runtimes')"
+        :options="chartOptionsRuntimes"
         :series="Object.values(workloadsPerRuntime)"
       ></apexchart>
     </div>
@@ -146,6 +146,14 @@ var desiredState = ref({});
 const donutAgents = ref("");
 const donutStatus = ref("");
 const donutRuntimes = ref("");
+
+const title_donutAgents = "Workloads per Agent";
+const title_donutStatus = "Workload status";
+const title_donutRuntimes = "Workload runtimes";
+
+const chartOptionsAgents = getChartOptions(title_donutAgents);
+const chartOptionsStatus = getChartOptions(title_donutStatus);
+const chartOptionsRuntimes = getChartOptions(title_donutRuntimes);
 
 const numberOfWorkloads = computed(() => {
   return Object.keys(workloadStates.value).length;
@@ -433,7 +441,6 @@ onMounted(() => {
         }
       })
       .then((json) => {
-        console.log(json);
         let completeState = null;
         if (
           json &&

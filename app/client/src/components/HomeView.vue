@@ -1,21 +1,10 @@
 <template>
-  <div class="row justify-evenly">
-    <div v-for="k in kpi" :key="k.name" class="col-2">
-      <q-card square flat bordered class="q-mt-lg">
-        <q-card-section horizontal class="bg-grey-2">
-          <q-card-section class="bg-secondary">
-            <q-icon :name="k.icon" size="md" color="white" />
-          </q-card-section>
-          <q-card-section class="q-pt-xs">
-            <div class="text-h5 q-mt-sm q-mb-xs">
-              <b>{{ k.value }}</b>
-            </div>
-            <div class="text-caption text-grey">{{ k.name }}</div>
-          </q-card-section>
-        </q-card-section>
-      </q-card>
-    </div>
-  </div>
+  <kpi
+    :workloadStates="workloadStates"
+    :workloadsPerAgent="workloadsPerAgent"
+    :dependencies="dependencies"
+    :workloadsPerRuntime="workloadsPerRuntime"
+  />
 
   <div class="row justify-evenly">
     <div class="col-3">
@@ -94,6 +83,7 @@ defineOptions({
 
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import apexchart from "vue3-apexcharts";
+import kpi from "components/HomeViewKPI.vue";
 
 const filter = ref("");
 var workloadStates = ref([]);
@@ -109,37 +99,6 @@ const title_donutRuntimes = "Workload runtimes";
 const chartOptionsAgents = getChartOptions(title_donutAgents);
 const chartOptionsStatus = getChartOptions(title_donutStatus);
 const chartOptionsRuntimes = getChartOptions(title_donutRuntimes);
-
-const numberOfWorkloads = computed(() => {
-  return Object.keys(workloadStates.value).length;
-});
-
-const numberOfAgents = computed(() => {
-  return Object.keys(workloadsPerAgent.value).length;
-});
-
-const numberOfDependencies = computed(() => {
-  const dep = dependencies.value;
-  var nDep = 0;
-  for (let i = 0; i < dep.length; i++) {
-    if (dep[i] != "None") {
-      nDep += (dep[i].match(/,/g) || []).length + 1;
-    }
-  }
-  return nDep;
-});
-
-const numberOfRuntimes = computed(() => {
-  return Object.keys(workloadsPerRuntime.value).length;
-});
-
-const strRuntimes = computed(() => {
-  var str = "Runtimes";
-  if (numberOfRuntimes.value == 1) {
-    str = "Runtime";
-  }
-  return str;
-});
 
 const workloadsPerRuntime = computed(() => {
   const counter = {};
@@ -256,29 +215,6 @@ const rows = computed(() => {
 
   return list;
 });
-
-const kpi = ref([
-  {
-    name: "Workloads",
-    icon: "auto_awesome_motion",
-    value: numberOfWorkloads,
-  },
-  {
-    name: "Agents",
-    icon: "widgets",
-    value: numberOfAgents,
-  },
-  {
-    name: "Dependencies",
-    icon: "mediation",
-    value: numberOfDependencies,
-  },
-  {
-    name: strRuntimes,
-    icon: "code",
-    value: numberOfRuntimes,
-  },
-]);
 
 function getChartOptions(title) {
   return {
@@ -400,6 +336,18 @@ function aggregateAgents(workloads) {
   }
 
   return counter;
+}
+
+function isComputed() {
+  if (
+    workloadStates.value &&
+    workloadsPerAgent.value &&
+    dependencies.value &&
+    workloadsPerRuntime
+  ) {
+    return True;
+  }
+  return False;
 }
 
 let timerId = null;

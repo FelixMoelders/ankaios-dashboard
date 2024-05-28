@@ -7,31 +7,12 @@
   />
 
   <div class="row justify-evenly">
-    <div class="col-3">
+    <div v-for="chart in charts" :key="chart.name" class="col-3">
       <apexchart
         class="q-pt-lg"
-        ref="donutAgents"
-        type="donut"
-        :options="chartOptionsAgents"
-        :series="Object.values(workloadsPerAgent)"
-      ></apexchart>
-    </div>
-    <div class="col-3">
-      <apexchart
-        class="q-pt-lg"
-        ref="donutStatus"
-        type="donut"
-        :options="chartOptionsStatus"
-        :series="Object.values(workloadsPerStatus)"
-      ></apexchart>
-    </div>
-    <div class="col-3">
-      <apexchart
-        class="q-pt-lg"
-        ref="donutRuntimes"
-        type="donut"
-        :options="chartOptionsRuntimes"
-        :series="Object.values(workloadsPerRuntime)"
+        ref="chart.name"
+        :options="chart.options"
+        :series="chart.data"
       ></apexchart>
     </div>
   </div>
@@ -166,6 +147,24 @@ const workloadsPerAgent = computed(() => {
 
   return counter;
 });
+
+var charts = ref([
+  {
+    name: "donutAgents",
+    options: chartOptionsAgents,
+    data: workloadsPerAgent.value ? [] : Object.values(workloadsPerAgent),
+  },
+  {
+    name: "donutStatus",
+    options: chartOptionsStatus,
+    data: workloadsPerStatus.value ? [] : Object.values(workloadsPerStatus),
+  },
+  {
+    name: "donutRuntimes",
+    options: chartOptionsRuntimes,
+    data: workloadsPerRuntime.value ? [] : Object.values(workloadsPerRuntime),
+  },
+]);
 
 const dependencies = computed(() => {
   var list = [];
@@ -338,18 +337,6 @@ function aggregateAgents(workloads) {
   return counter;
 }
 
-function isComputed() {
-  if (
-    workloadStates.value &&
-    workloadsPerAgent.value &&
-    dependencies.value &&
-    workloadsPerRuntime
-  ) {
-    return True;
-  }
-  return False;
-}
-
 let timerId = null;
 
 onMounted(() => {
@@ -381,6 +368,7 @@ onMounted(() => {
           }
           // check whether donutAgents, donutStatus, donutRuntimes contain null values and only if not, call updateOptions()
           if (donutAgents.value) {
+            console.log(donutAgents.value);
             donutAgents.value.updateOptions({
               labels: Object.keys(aggregateAgents(workloadStates.value)),
             });

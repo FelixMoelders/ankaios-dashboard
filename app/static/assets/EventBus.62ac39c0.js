@@ -1,1 +1,18 @@
-function o(i){return{all:i=i||new Map,on:function(e,n){var t=i.get(e);t?t.push(n):i.set(e,[n])},off:function(e,n){var t=i.get(e);t&&(n?t.splice(t.indexOf(n)>>>0,1):i.set(e,[]))},emit:function(e,n){var t=i.get(e);t&&t.slice().map(function(c){c(n)}),(t=i.get("*"))&&t.slice().map(function(c){c(e,n)})}}}const f=o();export{f as E};
+function mitt(n) {
+  return { all: n = n || /* @__PURE__ */ new Map(), on: function(t, e) {
+    var i = n.get(t);
+    i ? i.push(e) : n.set(t, [e]);
+  }, off: function(t, e) {
+    var i = n.get(t);
+    i && (e ? i.splice(i.indexOf(e) >>> 0, 1) : n.set(t, []));
+  }, emit: function(t, e) {
+    var i = n.get(t);
+    i && i.slice().map(function(n2) {
+      n2(e);
+    }), (i = n.get("*")) && i.slice().map(function(n2) {
+      n2(t, e);
+    });
+  } };
+}
+const EventBus = mitt();
+export { EventBus as E };

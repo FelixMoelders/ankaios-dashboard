@@ -22,10 +22,10 @@
 import { ref, toRef, computed } from "vue";
 
 const props = defineProps({
-  workloadStates: Number,
-  workloadsPerAgent: Number,
-  dependencies: Number,
-  workloadsPerRuntime: Number,
+  workloadStates: Object,
+  workloadsPerAgent: Object,
+  dependencies: Array,
+  workloadsPerRuntime: Object,
 });
 
 const workloadStates = toRef(props, "workloadStates");

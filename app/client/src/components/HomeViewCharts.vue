@@ -28,9 +28,9 @@ const chartOptionsStatus = getChartOptions(title_donutStatus);
 const chartOptionsRuntimes = getChartOptions(title_donutRuntimes);
 
 const props = defineProps({
-  workloadsPerAgent: Number,
-  workloadsPerStatus: Number,
-  workloadsPerRuntime: Number,
+  workloadsPerAgent: Object,
+  workloadsPerStatus: Object,
+  workloadsPerRuntime: Object,
 });
 
 const workloadsPerAgent = toRef(props, "workloadsPerAgent");

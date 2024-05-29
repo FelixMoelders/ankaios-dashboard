@@ -28,6 +28,19 @@
             </template>
           </q-input>
         </template>
+        <template v-slot:body-cell-Dependencies="props">
+          <q-td :props="props">
+            <span v-if="props.value">
+              <q-badge
+                v-for="dep in props.value"
+                :key="dep"
+                class="q-mr-xs"
+                color="accent"
+                :label="dep"
+              />
+            </span>
+          </q-td>
+        </template>
         <template v-slot:body-cell-Tags="props">
           <q-td :props="props">
             <span v-if="props.value">
@@ -101,16 +114,25 @@ const rows = computed(() => {
       const j = Object.keys(desiredState.value.workloads).indexOf(
         workloadStates.value[i].instanceName.workloadName
       );
+
       let tags = ""; // checks whether the array is empty before accessing it.
       let currentWorkload = Object.values(desiredState.value.workloads)[j];
       if (currentWorkload && currentWorkload.tags) {
         tags = currentWorkload.tags;
       }
+
+      let deps = "";
+      if (currentWorkload && "dependencies" in currentWorkload) {
+        deps = Object.keys(currentWorkload.dependencies).sort();
+      }
+
+      console.log(deps);
+
       list[i] = {
         Name: workloadStates.value[i].instanceName.workloadName,
         Agent: workloadStates.value[i].instanceName.agentName,
         Runtime: Object.values(desiredState.value.workloads)[j].runtime,
-        Dependencies: dependencies.value[j],
+        Dependencies: deps,
         Tags: tags,
         State: getLastItemOfExecState(workloadStates.value[i]),
       };

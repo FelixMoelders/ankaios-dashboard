@@ -277,22 +277,6 @@ onMounted(() => {
           if (completeState.desiredState) {
             desiredState.value = completeState.desiredState;
           }
-          // check whether donutAgents, donutStatus, donutRuntimes contain null values and only if not, call updateOptions()
-          if (donutAgents.value) {
-            donutAgents.value.updateOptions({
-              labels: Object.keys(aggregateAgents(workloadStates.value)),
-            });
-          }
-          if (donutStatus.value) {
-            donutStatus.value.updateOptions({
-              labels: Object.keys(aggregateStates(workloadStates.value)),
-            });
-          }
-          if (donutRuntimes.value) {
-            donutRuntimes.value.updateOptions({
-              labels: Object.keys(aggregateRuntimes(desiredState.value)),
-            });
-          }
         }
       })
       .catch((error) => {

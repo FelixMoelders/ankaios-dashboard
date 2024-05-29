@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { ref, toRef } from "vue";
+import { ref, toRef, onUpdated } from "vue";
 import apexchart from "vue3-apexcharts";
 
 const donutAgents = ref("");
@@ -41,17 +41,26 @@ var charts = ref([
   {
     name: "donutAgents",
     options: chartOptionsAgents,
-    data: workloadsPerAgent.value ? [] : Object.values(workloadsPerAgent),
+    data:
+      Object.keys(workloadsPerAgent.value).length > 0
+        ? Object.values(workloadsPerAgent)
+        : [],
   },
   {
     name: "donutStatus",
     options: chartOptionsStatus,
-    data: workloadsPerStatus.value ? [] : Object.values(workloadsPerStatus),
+    data:
+      Object.keys(workloadsPerStatus.value).length > 0
+        ? Object.values(workloadsPerStatus)
+        : [],
   },
   {
     name: "donutRuntimes",
     options: chartOptionsRuntimes,
-    data: workloadsPerRuntime.value ? [] : Object.values(workloadsPerRuntime),
+    data:
+      Object.keys(workloadsPerRuntime.value).length > 0
+        ? Object.values(workloadsPerRuntime)
+        : [],
   },
 ]);
 
@@ -109,4 +118,24 @@ function getChartOptions(title) {
     },
   };
 }
+
+onUpdated(() => {
+  if (donutAgents.value) {
+    donutAgents.value.updateOptions({
+      labels: Object.keys(aggregateAgents(workloadStates.value)),
+    });
+  }
+
+  if (donutStatus.value) {
+    donutStatus.value.updateOptions({
+      labels: Object.keys(aggregateStates(workloadStates.value)),
+    });
+  }
+
+  if (donutRuntimes.value) {
+    donutRuntimes.value.updateOptions({
+      labels: Object.keys(aggregateRuntimes(desiredState.value)),
+    });
+  }
+});
 </script>

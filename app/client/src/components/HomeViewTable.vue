@@ -30,8 +30,15 @@
         </template>
         <template v-slot:body-cell-Tags="props">
           <q-td :props="props">
-            <!-- display empty cell in home view if workload has no tags  -->
-            <q-badge v-if="props.value" color="primary" :label="props.value" />
+            <span v-if="props.value">
+              <q-badge
+                v-for="tag in props.value"
+                :key="tag.key"
+                class="q-mr-xs"
+                color="primary"
+                :label="tag.value"
+              />
+            </span>
           </q-td>
         </template>
         <template v-slot:body-cell-State="props">
@@ -69,7 +76,6 @@ function getLastItemOfExecState(workload) {
 }
 
 function chooseExecutionColor(execState) {
-  console.log(execState);
   switch (execState) {
     case "running":
       return "green";
@@ -97,8 +103,8 @@ const rows = computed(() => {
       );
       let tags = ""; // checks whether the array is empty before accessing it.
       let currentWorkload = Object.values(desiredState.value.workloads)[j];
-      if (currentWorkload && currentWorkload.tags && currentWorkload.tags[0]) {
-        tags = currentWorkload.tags[0].value;
+      if (currentWorkload && currentWorkload.tags) {
+        tags = currentWorkload.tags;
       }
       list[i] = {
         Name: workloadStates.value[i].instanceName.workloadName,

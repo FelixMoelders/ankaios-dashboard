@@ -82,3 +82,37 @@ const rows = computed(() => {
   return list;
 });
 </script>
+
+<style lang="scss">
+.q-table__bottom-item {
+  font-size: 10px;
+  color: $grey-7;
+}
+
+.q-field__native {
+  font-size: 10px;
+  color: $grey-7;
+}
+
+.q-field__append {
+  color: $grey-7;
+}
+
+.q-table thead {
+  background-color: $secondary;
+  color: white;
+}
+
+.q-table__bottom {
+  background-color: $grey-3;
+  padding: 0px 15px;
+}
+
+.q-table--dense .q-table__bottom {
+  min-height: 0px;
+}
+
+.q-table__top {
+  border: none;
+}
+</style>

@@ -139,3 +139,12 @@ onUpdated(() => {
   }
 });
 </script>
+
+<style lang="scss">
+.apexcharts-canvas {
+  border-style: solid;
+  border-width: thin;
+  border-color: $grey-4;
+  background: $grey-1;
+}
+</style>

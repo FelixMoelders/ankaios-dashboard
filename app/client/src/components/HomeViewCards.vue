@@ -37,10 +37,11 @@ function getNumberOfDependencies(desiredState) {
   var nDep = 0;
   if (Object.keys(desiredState).length > 0) {
     const workloads = desiredState.workloads;
+    const workloadVals = Object.values(workloads);
     const n = Object.keys(workloads).length;
     for (let i = 0; i < n; i++) {
-      if ("dependencies" in Object.values(workloads)[i]) {
-        nDep += 1;
+      if ("dependencies" in workloadVals[i]) {
+        nDep += Object.keys(workloadVals[i].dependencies).length;
       }
     }
   }

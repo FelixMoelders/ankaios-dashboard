@@ -1,5 +1,5 @@
 <template>
-  <kpi
+  <kpiCard
     :workloadStates="workloadStates"
     :workloadsPerAgent="workloadsPerAgent"
     :dependencies="dependencies"
@@ -58,7 +58,7 @@ defineOptions({
 });
 
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
-import kpi from "components/HomeViewKPI.vue";
+import kpiCard from "src/components/HomeViewCards.vue";
 import donutChart from "components/HomeViewCharts.vue";
 
 const filter = ref("");

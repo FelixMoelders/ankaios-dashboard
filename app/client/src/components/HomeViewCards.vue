@@ -1,16 +1,16 @@
 <template>
   <div class="row justify-evenly">
-    <div v-for="k in kpi" :key="k.name" class="col-2">
+    <div v-for="card in cards" :key="card.name" class="col-2">
       <q-card square flat bordered class="q-mt-lg">
         <q-card-section horizontal class="bg-grey-2">
           <q-card-section class="bg-secondary">
-            <q-icon :name="k.icon" size="md" color="white" />
+            <q-icon :name="card.icon" size="md" color="white" />
           </q-card-section>
           <q-card-section class="q-pt-xs">
             <div class="text-h5 q-mt-sm q-mb-xs">
-              <b>{{ k.value }}</b>
+              <b>{{ card.value }}</b>
             </div>
-            <div class="text-caption text-grey">{{ k.name }}</div>
+            <div class="text-caption text-grey">{{ card.name }}</div>
           </q-card-section>
         </q-card-section>
       </q-card>
@@ -64,7 +64,7 @@ const strRuntimes = computed(() => {
   return str;
 });
 
-const kpi = ref([
+const cards = ref([
   {
     name: "Workloads",
     icon: "auto_awesome_motion",

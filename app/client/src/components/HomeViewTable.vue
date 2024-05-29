@@ -30,8 +30,17 @@
         </template>
         <template v-slot:body-cell-Tags="props">
           <q-td :props="props">
-            <q-badge v-if="props.value" color="primary" :label="props.value" />
             <!-- display empty cell in home view if workload has no tags  -->
+            <q-badge v-if="props.value" color="primary" :label="props.value" />
+          </q-td>
+        </template>
+        <template v-slot:body-cell-State="props">
+          <q-td :props="props">
+            <q-badge
+              rounded
+              :color="chooseExecutionColor(props.value)"
+              class="q-mr-sm"
+            />{{ props.value }}
           </q-td>
         </template>
       </q-table>
@@ -54,6 +63,29 @@ const workloadStates = toRef(props, "workloadStates");
 const desiredState = toRef(props, "desiredState");
 const dependencies = toRef(props, "dependencies");
 
+function getLastItemOfExecState(workload) {
+  const keys = Object.keys(workload.executionState);
+  return keys[keys.length - 1];
+}
+
+function chooseExecutionColor(execState) {
+  console.log(execState);
+  switch (execState) {
+    case "running":
+      return "green";
+    case "failed":
+      return "red";
+    case "pending":
+      return "yellow";
+    case "removed":
+      return "black";
+    case "succeeded":
+    case "unknown":
+    default:
+      return "gray";
+  }
+}
+
 const rows = computed(() => {
   const n = Object.keys(workloadStates.value).length;
   var list = [];
@@ -74,7 +106,7 @@ const rows = computed(() => {
         Runtime: Object.values(desiredState.value.workloads)[j].runtime,
         Dependencies: dependencies.value[j],
         Tags: tags,
-        State: Object.keys(workloadStates.value[i].executionState),
+        State: getLastItemOfExecState(workloadStates.value[i]),
       };
     }
   }

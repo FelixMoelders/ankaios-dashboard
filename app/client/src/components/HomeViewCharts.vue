@@ -122,19 +122,19 @@ function getChartOptions(title) {
 onUpdated(() => {
   if (donutAgents.value) {
     donutAgents.value.updateOptions({
-      labels: Object.keys(aggregateAgents(workloadStates.value)),
+      labels: Object.keys(workloadsPerAgent),
     });
   }
 
   if (donutStatus.value) {
     donutStatus.value.updateOptions({
-      labels: Object.keys(aggregateStates(workloadStates.value)),
+      labels: Object.keys(workloadsPerStatus),
     });
   }
 
   if (donutRuntimes.value) {
     donutRuntimes.value.updateOptions({
-      labels: Object.keys(aggregateRuntimes(desiredState.value)),
+      labels: Object.keys(workloadsPerRuntime),
     });
   }
 });

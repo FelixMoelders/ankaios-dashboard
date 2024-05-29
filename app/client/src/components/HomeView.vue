@@ -33,77 +33,26 @@ var workloadStates = ref([]);
 var desiredState = ref({});
 
 const workloadsPerRuntime = computed(() => {
-  const counter = {};
-
-  if (Object.keys(desiredState.value).length > 0) {
-    const n = Object.keys(desiredState.value.workloads).length;
-    var list = [];
-
-    for (let i = 0; i < n; i++) {
-      list[i] = Object.values(desiredState.value.workloads)[i].runtime;
-    }
-
-    list.sort().forEach((runtime) => {
-      if (counter[runtime]) {
-        counter[runtime] += 1;
-      } else {
-        counter[runtime] = 1;
-      }
-    });
-  }
-
-  return counter;
+  return aggregateRuntimes(desiredState.value);
 });
 
 const workloadsPerStatus = computed(() => {
-  const n = Object.keys(workloadStates.value).length;
-  var list = [];
-  const counter = {};
-
-  if (n > 0) {
-    for (let i = 0; i < n; i++) {
-      list[i] = Object.keys(workloadStates.value[i].executionState);
-    }
-
-    list.sort().forEach((status) => {
-      if (counter[status]) {
-        counter[status] += 1;
-      } else {
-        counter[status] = 1;
-      }
-    });
-  }
-
-  return counter;
+  return aggregateStates(workloadStates.value);
 });
 
 const workloadsPerAgent = computed(() => {
-  const n = Object.keys(workloadStates.value).length;
-  var list = [];
-  const counter = {};
-
-  if (n > 0) {
-    for (let i = 0; i < n; i++) {
-      list[i] = workloadStates.value[i].instanceName.agentName;
-    }
-
-    list.sort().forEach((agent) => {
-      if (counter[agent]) {
-        counter[agent] += 1;
-      } else {
-        counter[agent] = 1;
-      }
-    });
-  }
-
-  return counter;
+  return aggregateAgents(workloadStates.value);
 });
 
 const dependencies = computed(() => {
+  return getDependencies(desiredState.value);
+});
+
+function getDependencies(desiredState) {
   var list = [];
 
-  if (Object.keys(desiredState.value).length > 0) {
-    const workloads = desiredState.value.workloads;
+  if (Object.keys(desiredState).length > 0) {
+    const workloads = desiredState.workloads;
     const n = Object.keys(workloads).length;
 
     for (let i = 0; i < n; i++) {
@@ -118,7 +67,7 @@ const dependencies = computed(() => {
   }
 
   return list;
-});
+}
 
 function aggregateRuntimes(desiredState) {
   const counter = {};
@@ -190,7 +139,6 @@ function aggregateAgents(workloads) {
 let timerId = null;
 
 onMounted(() => {
-  console.log("component mounted"); // report when the component is mounted
   function loadState() {
     fetch("/completeState")
       .then((response) => {

@@ -76,12 +76,10 @@ const filter = ref("");
 const props = defineProps({
   workloadStates: Object,
   desiredState: Object,
-  dependencies: Array,
 });
 
 const workloadStates = toRef(props, "workloadStates");
 const desiredState = toRef(props, "desiredState");
-const dependencies = toRef(props, "dependencies");
 
 function getLastItemOfExecState(workload) {
   const keys = Object.keys(workload.executionState);
@@ -125,8 +123,6 @@ const rows = computed(() => {
       if (currentWorkload && "dependencies" in currentWorkload) {
         deps = Object.keys(currentWorkload.dependencies).sort();
       }
-
-      console.log(deps);
 
       list[i] = {
         Name: workloadStates.value[i].instanceName.workloadName,

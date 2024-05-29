@@ -1,8 +1,8 @@
 <template>
   <kpiCard
     :workloadStates="workloadStates"
+    :desiredState="desiredState"
     :workloadsPerAgent="workloadsPerAgent"
-    :dependencies="dependencies"
     :workloadsPerRuntime="workloadsPerRuntime"
   />
 
@@ -15,7 +15,6 @@
   <workloadTable
     :workloadStates="workloadStates"
     :desiredState="desiredState"
-    :dependencies="dependencies"
   />
 </template>
 
@@ -47,27 +46,6 @@ const workloadsPerAgent = computed(() => {
 const dependencies = computed(() => {
   return getDependencies(desiredState.value);
 });
-
-function getDependencies(desiredState) {
-  var list = [];
-
-  if (Object.keys(desiredState).length > 0) {
-    const workloads = desiredState.workloads;
-    const n = Object.keys(workloads).length;
-
-    for (let i = 0; i < n; i++) {
-      if ("dependencies" in Object.values(workloads)[i]) {
-        list[i] = Object.keys(Object.values(workloads)[i].dependencies)
-          .sort()
-          .join(", ");
-      } else {
-        list[i] = "None";
-      }
-    }
-  }
-
-  return list;
-}
 
 function aggregateRuntimes(desiredState) {
   const counter = {};

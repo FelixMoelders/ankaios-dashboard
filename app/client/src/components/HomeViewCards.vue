@@ -23,15 +23,29 @@ import { ref, toRef, computed } from "vue";
 
 const props = defineProps({
   workloadStates: Object,
+  desiredState: Object,
   workloadsPerAgent: Object,
-  dependencies: Array,
   workloadsPerRuntime: Object,
 });
 
 const workloadStates = toRef(props, "workloadStates");
 const workloadsPerAgent = toRef(props, "workloadsPerAgent");
-const dependencies = toRef(props, "dependencies");
+const desiredState = toRef(props, "desiredState");
 const workloadsPerRuntime = toRef(props, "workloadsPerRuntime");
+
+function getNumberOfDependencies(desiredState) {
+  var nDep = 0;
+  if (Object.keys(desiredState).length > 0) {
+    const workloads = desiredState.workloads;
+    const n = Object.keys(workloads).length;
+    for (let i = 0; i < n; i++) {
+      if ("dependencies" in Object.values(workloads)[i]) {
+        nDep += 1;
+      }
+    }
+  }
+  return nDep;
+}
 
 const numberOfWorkloads = computed(() => {
   return Object.keys(workloadStates.value).length;
@@ -42,14 +56,7 @@ const numberOfAgents = computed(() => {
 });
 
 const numberOfDependencies = computed(() => {
-  const dep = dependencies.value;
-  var nDep = 0;
-  for (let i = 0; i < dep.length; i++) {
-    if (dep[i] != "None") {
-      nDep += (dep[i].match(/,/g) || []).length + 1;
-    }
-  }
-  return nDep;
+  return getNumberOfDependencies(desiredState.value);
 });
 
 const numberOfRuntimes = computed(() => {

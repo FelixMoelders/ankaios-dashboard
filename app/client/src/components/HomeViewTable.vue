@@ -4,6 +4,7 @@
       <q-table
         title="Workloads"
         rows-per-page-label="Workloads per page:"
+        :rows-per-page-options="rowsPerPageOptions"
         no-data-label="Sorry, we didn't find anything for you :("
         no-results-label="Sorry, we didn't find anything for you :("
         flat
@@ -14,6 +15,7 @@
         :columns="columns"
         row-key="name"
         :filter="filter"
+        v-model:pagination="pagination"
       >
         <template v-slot:top-right>
           <q-input
@@ -69,6 +71,7 @@
 </template>
 
 <script setup>
+import { descending } from "d3";
 import { ref, toRef, computed } from "vue";
 
 const filter = ref("");
@@ -136,6 +139,13 @@ const rows = computed(() => {
   }
 
   return list;
+});
+
+const rowsPerPageOptions = [5, 10, 25, 50, 0];
+
+const pagination = ref({
+  sortBy: "Name",
+  descending: false,
 });
 </script>
 

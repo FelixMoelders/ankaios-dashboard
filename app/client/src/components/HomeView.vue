@@ -27,6 +27,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import kpiCard from "src/components/HomeViewCards.vue";
 import donutChart from "components/HomeViewCharts.vue";
 import workloadTable from "components/HomeViewTable.vue";
+import { EventBus } from "src/utils/EventBus";
 
 var workloadStates = ref([]);
 var desiredState = ref({});
@@ -150,11 +151,17 @@ onMounted(() => {
           error.message
         );
       });
+
   }
-  timerId = setInterval(() => loadState(), 2000); // wait for mounting before calling loadState()
+  loadState();
+  EventBus.on('workload-deleted', () => {
+     clearInterval(timerId); // Clear the interval first to stop the periodic fetching
+     loadState(); // Then call loadState
+  });
 });
 
 onBeforeUnmount(() => {
-  clearInterval(timerId);
+  clearInterval(timerId); // Clear the interval when component is unmounted
+  EventBus.off('workload-deleted');
 });
 </script>

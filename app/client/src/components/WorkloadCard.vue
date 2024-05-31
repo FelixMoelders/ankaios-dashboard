@@ -93,7 +93,8 @@ export default {
                 body: JSON.stringify([this.workload.instanceName.workloadName])
             };
             fetch('/deleteWorkloads', requestOptions)
-                .then(response => console.log(response.status));
+                .then(response => { console.log(response.status);
+                      EventBus.emit('workload-deleted')}); // Add emission of status "workload deleted", so that Home View can immediately get an update on the deletion status
         },
         chooseExecutionColor(execState) {
             switch (execState) {

@@ -1,0 +1,1 @@
+import{Q as e}from"./QPage.77cd4678.js";import{v as t,x as a,y as s,A as o}from"./index.94c7a7c2.js";const c=o("h6",null,"This is the content of the About tab",-1),u=Object.assign({name:"AboutView"},{__name:"AboutView",setup(n){return(r,_)=>(t(),a(e,{class:"flex flex-center"},{default:s(()=>[c]),_:1}))}});export{u as default};

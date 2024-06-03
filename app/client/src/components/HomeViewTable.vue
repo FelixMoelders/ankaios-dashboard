@@ -127,10 +127,15 @@ const rows = computed(() => {
         deps = Object.keys(currentWorkload.dependencies).sort();
       }
 
+      let rt = "";
+      if (Object.values(desiredState.value.workloads)[j].runtime) {
+        rt = Object.values(desiredState.value.workloads)[j].runtime;
+      }
+
       list[i] = {
         Name: workloadStates.value[i].instanceName.workloadName,
         Agent: workloadStates.value[i].instanceName.agentName,
-        Runtime: Object.values(desiredState.value.workloads)[j].runtime,
+        Runtime: rt,
         Dependencies: deps,
         Tags: tags,
         State: getLastItemOfExecState(workloadStates.value[i]),

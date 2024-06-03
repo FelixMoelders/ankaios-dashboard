@@ -115,6 +115,7 @@ function aggregateAgents(workloads) {
   return counter;
 }
 
+let timerId = null;
 
 onMounted(() => {
   function loadState() {
@@ -138,10 +139,15 @@ onMounted(() => {
           json.response.completeState.workloadStates
         ) {
           completeState = json.response.completeState;
-          workloadStates.value = completeState.workloadStates.filter(workload => {
-            const executionState = workload.executionState[Object.keys(workload.executionState)[0]];
-            return executionState !== 'stopping';
-          });
+          workloadStates.value = completeState.workloadStates.filter(
+            (workload) => {
+              const executionState =
+                workload.executionState[
+                  Object.keys(workload.executionState)[0]
+                ];
+              return executionState !== "stopping";
+            }
+          );
           if (completeState.desiredState) {
             desiredState.value = completeState.desiredState;
           }
@@ -153,18 +159,17 @@ onMounted(() => {
           error.message
         );
       });
-
   }
   loadState();
   timerId = setInterval(loadState, 2000); // Load state every 2 seconds
-  EventBus.on('workload-deleted', () => {
-     clearInterval(timerId); // Clear the interval first to stop the periodic fetching
-     loadState(); // Then call loadState
+  EventBus.on("workload-deleted", () => {
+    clearInterval(timerId); // Clear the interval first to stop the periodic fetching
+    loadState(); // Then call loadState
   });
 });
 
 onBeforeUnmount(() => {
   clearInterval(timerId); // Clear the interval when component is unmounted
-  EventBus.off('workload-deleted');
+  EventBus.off("workload-deleted");
 });
 </script>

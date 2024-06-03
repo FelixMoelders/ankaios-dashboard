@@ -3,7 +3,7 @@
     <div v-for="chart in charts" :key="chart.name" class="col-3">
       <apexchart
         class="q-pt-lg"
-        ref="chart.name"
+        ref="donutCharts"
         :options="chart.options"
         :series="chart.data"
       ></apexchart>
@@ -12,20 +12,14 @@
 </template>
 
 <script setup>
-import { ref, toRef, onUpdated } from "vue";
+import { ref, toRef, computed, onUpdated } from "vue";
 import apexchart from "vue3-apexcharts";
 
-const donutAgents = ref("");
-const donutStatus = ref("");
-const donutRuntimes = ref("");
+const donutCharts = ref([]);
 
 const title_donutAgents = "Workloads per Agent";
 const title_donutStatus = "Workload status";
 const title_donutRuntimes = "Workload runtimes";
-
-const chartOptionsAgents = getChartOptions(title_donutAgents);
-const chartOptionsStatus = getChartOptions(title_donutStatus);
-const chartOptionsRuntimes = getChartOptions(title_donutRuntimes);
 
 const props = defineProps({
   workloadsPerAgent: Object,
@@ -37,34 +31,69 @@ const workloadsPerAgent = toRef(props, "workloadsPerAgent");
 const workloadsPerStatus = toRef(props, "workloadsPerStatus");
 const workloadsPerRuntime = toRef(props, "workloadsPerRuntime");
 
-var charts = ref([
-  {
-    name: "donutAgents",
-    options: chartOptionsAgents,
-    data:
-      Object.keys(workloadsPerAgent.value).length > 0
-        ? Object.values(workloadsPerAgent)
-        : [],
-  },
-  {
-    name: "donutStatus",
-    options: chartOptionsStatus,
-    data:
-      Object.keys(workloadsPerStatus.value).length > 0
-        ? Object.values(workloadsPerStatus)
-        : [],
-  },
-  {
-    name: "donutRuntimes",
-    options: chartOptionsRuntimes,
-    data:
-      Object.keys(workloadsPerRuntime.value).length > 0
-        ? Object.values(workloadsPerRuntime)
-        : [],
-  },
-]);
+const chartOptionsAgents = computed(() => {
+  return getChartOptions(
+    title_donutAgents,
+    Object.keys(workloadsPerAgent.value)
+  );
+});
 
-function getChartOptions(title) {
+const chartOptionsStatus = computed(() => {
+  return getChartOptions(
+    title_donutStatus,
+    Object.keys(workloadsPerStatus.value)
+  );
+});
+
+const chartOptionsRuntimes = computed(() => {
+  return getChartOptions(
+    title_donutRuntimes,
+    Object.keys(workloadsPerRuntime.value)
+  );
+});
+
+const charts = computed(() => {
+  return [
+    {
+      name: "donutAgents",
+      options: chartOptionsAgents.value,
+      data:
+        Object.keys(workloadsPerAgent.value).length > 0
+          ? Object.values(workloadsPerAgent.value)
+          : [],
+      labels:
+        Object.keys(workloadsPerAgent.value).length > 0
+          ? Object.keys(workloadsPerAgent.value)
+          : [],
+    },
+    {
+      name: "donutStatus",
+      options: chartOptionsStatus.value,
+      data:
+        Object.keys(workloadsPerStatus.value).length > 0
+          ? Object.values(workloadsPerStatus.value)
+          : [],
+      labels:
+        Object.keys(workloadsPerStatus.value).length > 0
+          ? Object.keys(workloadsPerStatus.value)
+          : [],
+    },
+    {
+      name: "donutRuntimes",
+      options: chartOptionsRuntimes.value,
+      data:
+        Object.keys(workloadsPerRuntime.value).length > 0
+          ? Object.values(workloadsPerRuntime.value)
+          : [],
+      labels:
+        Object.keys(workloadsPerRuntime.value).length > 0
+          ? Object.keys(workloadsPerRuntime.value)
+          : [],
+    },
+  ];
+});
+
+function getChartOptions(title, labels) {
   return {
     chart: {
       type: "donut",
@@ -75,7 +104,7 @@ function getChartOptions(title) {
       },
     },
     legend: { show: false },
-    labels: [],
+    labels: labels,
     responsive: [
       {
         breakpoint: 1000,
@@ -120,22 +149,13 @@ function getChartOptions(title) {
 }
 
 onUpdated(() => {
-  if (donutAgents.value) {
-    donutAgents.value.updateOptions({
-      labels: Object.keys(workloadsPerAgent),
-    });
-  }
-
-  if (donutStatus.value) {
-    donutStatus.value.updateOptions({
-      labels: Object.keys(workloadsPerStatus),
-    });
-  }
-
-  if (donutRuntimes.value) {
-    donutRuntimes.value.updateOptions({
-      labels: Object.keys(workloadsPerRuntime),
-    });
+  const n = charts.value.length;
+  for (let i = 0; i < n; i++) {
+    if (donutCharts.value[i]) {
+      donutCharts.value[i].updateOptions({
+        labels: charts.value[i].labels,
+      });
+    }
   }
 });
 </script>

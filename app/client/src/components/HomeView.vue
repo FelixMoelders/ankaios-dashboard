@@ -78,7 +78,8 @@ function aggregateStates(workloads) {
 
   if (n > 0) {
     for (let i = 0; i < n; i++) {
-      list[i] = Object.keys(workloads[i].executionState);
+      const keys = Object.keys(workloads[i].executionState);
+      list[i] = keys[keys.length - 1];
     }
 
     list.sort().forEach((status) => {

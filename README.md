@@ -1,6 +1,6 @@
-# Ankaios dashboard under construction
+# Ankaios Dashboard
 
-Future web interface to control the ankaios system.
+![Architecture](/doc/Architecture.PNG)
 
 ## How to use the dashboard out of the box?
 
@@ -28,10 +28,12 @@ Add the following entry to your startupState.yaml for ankaios and you are ready 
 
 Call the dashboard via localhost:5001. The login credentials are by default
 
-   User: admin
-   Password: admin
+> - User: **admin**
+> - Password: **admin**
+   
+   
 
-## How to build the dashboard?
+## How to build and run the dashboard during development?
 
 1. Open the project in VS Code Dev Container, with the provided configuration.
 2. Build and run the dashboard:

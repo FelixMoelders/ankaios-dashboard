@@ -35,7 +35,7 @@
               <div v-for="workloadState in workloadStates.filter(ws => ws.instanceName.workloadName === currentWorkloadName)"
                 :key="workloadState.instanceName.workloadName">
                 <div>
-                  <q-badge rounded :color="workloadState.executionState[Object.keys(workloadState.executionState)[0]] === 'RUNNING_OK' ? 'positive' : 'negative'" class="q-mr-sm" />
+                  <q-badge rounded :color="getExecutionStateColor(workloadState.executionState[Object.keys(workloadState.executionState)[0]])" class="q-mr-sm" />
                   {{ workloadState.executionState[Object.keys(workloadState.executionState)[0]] }}
                 </div>
                 <div v-for="dependency in getDependencyText(workloadState)" :key="dependency.text" >
@@ -86,6 +86,17 @@ export default {
 
     },
     methods: {
+      getExecutionStateColor(state) { // Display icons in workload card dependency view in corresponding colors
+        if (state === 'RUNNING_OK') { // includes more detailed substate descriptions than method "chooseExecutionColor(execState)" below. Could be simplified to remove redundant code.
+            return 'positive';
+        }
+
+        if (state === 'PENDING_WAITING_TO_START') { // In case of a state 'PENDING_WAITING_TO_START' the icon is yellow, more states can be added.
+            return 'yellow';
+        }
+
+        return 'negative';
+       },
         deleteWorkload() {
             const requestOptions = {
                 method: 'POST',
@@ -93,7 +104,8 @@ export default {
                 body: JSON.stringify([this.workload.instanceName.workloadName])
             };
             fetch('/deleteWorkloads', requestOptions)
-                .then(response => console.log(response.status));
+                .then(response => { console.log(response.status);
+                      EventBus.emit('workload-deleted')}); // Add emission of status "workload deleted", so that Home View can immediately get an update on the deletion status
         },
         chooseExecutionColor(execState) {
             switch (execState) {

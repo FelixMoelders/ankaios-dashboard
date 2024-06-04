@@ -1,25 +1,20 @@
 apiVersion: v0.1
 workloads:
-  important:
+  Ankaios_Dashboard:
     runtime: podman
-    agent: agent_B
+    agent: agent_A
     restart: true
     updateStrategy: AT_LEAST_ONCE
     accessRights:
       allow: []
       deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Passenger 
-      - key: Running in
-        value: Infotainment
+    restartPolicy: NEVER 
     dependencies:
     runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5001:5001", "-e", "PASSWORD=admin"]
+       image: dashboard:0.0 
+       commandOptions: ["-p", "5001:5001", "-e", "PASSWORD=admin"]
 
-  throughout:
+  Automatic_Climate_Control:
     runtime: podman
     agent: agent_A
     restart: true
@@ -30,18 +25,16 @@ workloads:
     restartPolicy: NEVER
     tags:
       - key: Started by
-        value: Passenger 
+        value: Front Passenger
       - key: Running in
-        value: Infotainment
-    dependencies:
-        important: ADD_COND_RUNNING
+        value: AC Unit
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5002:5001", "-e", "PASSWORD=admin"]
-
-  if:
+  
+  Navigation:
     runtime: podman
-    agent: agent_C
+    agent: agent_B
     restart: true
     updateStrategy: AT_LEAST_ONCE
     accessRights:
@@ -50,56 +43,57 @@ workloads:
     restartPolicy: NEVER
     tags:
       - key: Started by
-        value: Passenger 
+        value: Front Passenger
       - key: Running in
         value: Infotainment
     dependencies:
-        important: ADD_COND_FAILED
+      Infotainment_Screen_On: ADD_COND_RUNNING
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5003:5001", "-e", "PASSWORD=admin"]
 
-  hair:
+  Smartphone_Music_Streaming:
     runtime: podman
-    agent: agent_A
+    agent: agent_C
     restart: true
     updateStrategy: AT_LEAST_ONCE
     accessRights:
       allow: []
       deny: []
     restartPolicy: NEVER
+    dependencies:
+      Smartphone_Bluetooth_Connection: ADD_COND_RUNNING
     tags:
       - key: Started by
-        value: Passenger 
+        value: Rear Passenger
       - key: Running in
         value: Infotainment
-    dependencies:
-        important: ADD_COND_FAILED
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5004:5001", "-e", "PASSWORD=admin"]
 
-  matter:
+  EV_Charging_Error:
     runtime: podman
-    agent: agent_A
+    agent: agent_B
     restart: true
     updateStrategy: AT_LEAST_ONCE
     accessRights:
       allow: []
       deny: []
     restartPolicy: NEVER
+    dependencies:
+      EV_Charging_Start: ADD_COND_FAILED
+      Infotainment_Screen_On: ADD_COND_RUNNING
     tags:
       - key: Started by
-        value: Passenger 
+        value: Charging Circuit
       - key: Running in
-        value: Infotainment
-    dependencies:
-        important: ADD_COND_FAILED
+        value: Instrument Cluster
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5005:5001", "-e", "PASSWORD=admin"]
 
-  impact:
+  EV_Charging_Start:
     runtime: podman
     agent: agent_C
     restart: true
@@ -108,18 +102,18 @@ workloads:
       allow: []
       deny: []
     restartPolicy: NEVER
+    dependencies:
+    commandArgs: [ "-c", "sleep 10; exit 1" ]
     tags:
       - key: Started by
-        value: Passenger 
+        value: Charging Circuit
       - key: Running in
-        value: Infotainment
-    dependencies:
-        throughout: ADD_COND_FAILED
+        value: Instrument Cluster
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5006:5001", "-e", "PASSWORD=admin"]
 
-  lawyer:
+  Infotainment_Screen_On:
     runtime: podman
     agent: agent_C
     restart: true
@@ -128,193 +122,12 @@ workloads:
       allow: []
       deny: []
     restartPolicy: NEVER
+    dependencies:
     tags:
       - key: Started by
-        value: Passenger 
+        value: Driver
       - key: Running in
-        value: Infotainment
-    dependencies:
-        important: ADD_COND_RUNNING
+        value: Instrument Cluster
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5007:5001", "-e", "PASSWORD=admin"]
-
-  product:
-    runtime: podman
-    agent: agent_A
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Passenger 
-      - key: Running in
-        value: Infotainment
-    dependencies:
-        matter: ADD_COND_FAILED
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5008:5001", "-e", "PASSWORD=admin"]
-
-  room:
-    runtime: podman
-    agent: agent_A
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Passenger 
-      - key: Running in
-        value: Infotainment
-    dependencies:
-        matter: ADD_COND_RUNNING
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5009:5001", "-e", "PASSWORD=admin"]
-
-  build:
-    runtime: podman
-    agent: agent_B
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Passenger 
-      - key: Running in
-        value: Infotainment
-    dependencies:
-        lawyer: ADD_COND_FAILED
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5010:5001", "-e", "PASSWORD=admin"]
-
-  choice:
-    runtime: podman
-    agent: agent_A
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Passenger 
-      - key: Running in
-        value: Infotainment
-    dependencies:
-        impact: ADD_COND_RUNNING
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5011:5001", "-e", "PASSWORD=admin"]
-
-  ten:
-    runtime: podman
-    agent: agent_A
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Passenger 
-      - key: Running in
-        value: Infotainment
-    dependencies:
-        hair: ADD_COND_FAILED
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5012:5001", "-e", "PASSWORD=admin"]
-
-  life:
-    runtime: podman
-    agent: agent_B
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Passenger 
-      - key: Running in
-        value: Infotainment
-    dependencies:
-        if: ADD_COND_RUNNING
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5013:5001", "-e", "PASSWORD=admin"]
-
-  eat:
-    runtime: podman
-    agent: agent_C
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Passenger 
-      - key: Running in
-        value: Infotainment
-    dependencies:
-        matter: ADD_COND_FAILED
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5014:5001", "-e", "PASSWORD=admin"]
-
-  herself:
-    runtime: podman
-    agent: agent_C
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Passenger 
-      - key: Running in
-        value: Infotainment
-    dependencies:
-        eat: ADD_COND_FAILED
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5015:5001", "-e", "PASSWORD=admin"]
-
-  ball:
-    runtime: podman
-    agent: agent_B
-    restart: true
-    updateStrategy: AT_LEAST_ONCE
-    accessRights:
-      allow: []
-      deny: []
-    restartPolicy: NEVER
-    tags:
-      - key: Started by
-        value: Passenger 
-      - key: Running in
-        value: Infotainment
-    dependencies:
-        room: ADD_COND_RUNNING
-    runtimeConfig: |
-      image: dashboard:0.0
-      commandOptions: ["-p", "5016:5001", "-e", "PASSWORD=admin"]

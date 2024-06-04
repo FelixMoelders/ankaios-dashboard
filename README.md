@@ -1,5 +1,7 @@
 # Ankaios Dashboard
 
+![Architecture](/doc/Architecture.PNG)
+
 ## How to use the dashboard out of the box?
 
 Add the following entry to your startupState.yaml for ankaios and you are ready to go.

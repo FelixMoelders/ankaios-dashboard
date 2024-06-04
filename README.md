@@ -1,6 +1,4 @@
-# Ankaios dashboard under construction
-
-Future web interface to control the ankaios system.
+# Ankaios Dashboard
 
 ## How to use the dashboard out of the box?
 
@@ -28,8 +26,10 @@ Add the following entry to your startupState.yaml for ankaios and you are ready 
 
 Call the dashboard via localhost:5001. The login credentials are by default
 
-   User: admin
-   Password: admin
+> - User: **admin**
+> - Password: **admin**
+   
+   
 
 ## How to build the dashboard?
 

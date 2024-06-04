@@ -33,7 +33,7 @@ Call the dashboard via localhost:5001. The login credentials are by default
    
    
 
-## How to build the dashboard?
+## How to build and run the dashboard during development?
 
 1. Open the project in VS Code Dev Container, with the provided configuration.
 2. Build and run the dashboard:

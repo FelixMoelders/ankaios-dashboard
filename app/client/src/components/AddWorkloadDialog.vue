@@ -9,7 +9,9 @@
             <q-card-section class="q-pa-md">
                 <div class="q-gutter-md" style="max-width: 420px">
 
-                    <q-input filled v-model="workloadName" label="Workload Name" />
+                    <q-input filled v-model.trim="workloadName" label="Workload Name" />
+                    <!-- If warning is true, this will be displayed -->
+                    <p v-if="warning" class="text-negative warning">Workload Name cannot be empty.</p>
 
                     <!-- Drop-down selection menu for pre-existing agents list-->
                     <q-select
@@ -29,9 +31,8 @@
                     <q-input v-model="runtimeConfig" label="Runtime Config" filled autogrow />
 
                 </div>
-
                 <q-card-actions class="row justify-end">
-                    <q-btn icon="add" color="secondary" label="Add" @click="submit" v-close-popup />
+                    <q-btn :disable ="warning" icon="add" color="secondary" label="Add" @click="submit" v-close-popup /> <!-- disable the "Add" button in case of an empty field for workloadName -->
                 </q-card-actions>
             </q-card-section>
         </q-card>
@@ -53,8 +54,16 @@ export default {
             restartPolicy: "NEVER",
             runtime: "podman",
             options: ["NEVER", "ALWAYS", "ON_FAILURE"],
-        }
+            warning: true,
+        };
     },
+
+    watch: { // implement watching for the workloadName to enable/disable Add-button
+      workloadName(value) {
+        this.warning = value.trim() === '';
+      }
+    },
+
     methods: {
         submit() {
             var tags_list = [];

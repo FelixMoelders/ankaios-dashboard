@@ -10,8 +10,9 @@
                 <div class="q-gutter-md" style="max-width: 420px">
 
                     <q-input filled v-model.trim="workloadName" label="Workload Name" />
-                    <!-- If warning is true, this will be displayed -->
-                    <p v-if="warning" class="text-negative warning">Workload Name cannot be empty.</p>
+                    <!-- If warning (no workloadName) is true, this will be displayed -->
+                    <p v-if="workloadName.trim() === '' && warning" style="color: var(--q-color-negative);" class="warning">Workload Name cannot be empty.</p>
+
 
                     <!-- Drop-down selection menu for pre-existing agents list-->
                     <q-select
@@ -21,6 +22,8 @@
                       label="Agent"
                       style="width: 300px"
                     />
+                    <!-- If warning (no agent selected) is true, this will be displayed -->
+                    <p v-if="agent == null && warning" style="color: var(--q-color-negative);" class="warning">Agent must be selected.</p>
 
                     <q-input filled v-model="runtime" label="Runtime" />
 
@@ -58,9 +61,12 @@ export default {
         };
     },
 
-    watch: { // implement watching for the workloadName to enable/disable Add-button
+    watch: { // implement watching for the workloadName and agent to enable/disable Add-button
       workloadName(value) {
-        this.warning = value.trim() === '';
+        this.checkWarningState();
+      },
+      agent(value) {
+        this.checkWarningState();
       }
     },
 
@@ -93,7 +99,10 @@ export default {
         },
         close() {
             this.showDialog = false;
-        }
+        },
+        checkWarningState() { // method to set warning variable if workloadName is empty or agent is null
+          this.warning = this.workloadName.trim() === '' || this.agent == null;
+        },
     },
     computed: {
         showDialog: {

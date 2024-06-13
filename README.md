@@ -1,5 +1,9 @@
 # Ankaios Dashboard
 
+The Ankaios Dashboard ist the ui interface for [Eclipse Ankaios](https://github.com/eclipse-ankaios/ankaios) project. It offers insights into a running ankaios cluster, allows for modification/deletion/creation of workloads and offers a dependency graph for easier understanding of the interdependencies between workloads. If you didn't use the Ankaios CLI commands so far, the dashboard is a powerful tool to understand the functionality of ankaios. Furthermore, if you are running into any issues during the execution of your ankaios workloads, it is a good starting point to start debugging, especially for finding workloads that are missing but other workloads are depending on.
+
+The ankaios dashboard is started as a workload within the ankaios cluster. More Info on how to get started may be found in the next chapter.
+
 ![Architecture](/doc/Architecture.PNG)
 
 ## How to use the dashboard out of the box?

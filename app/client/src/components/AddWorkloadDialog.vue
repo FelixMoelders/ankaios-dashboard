@@ -45,13 +45,16 @@
 <script>
 export default {
     props: {
-        value: Boolean
+        value: Boolean,
+        agentsList: {
+            type: Array,
+            required: true
+        }
     },
     data() {
         return {
             workloadName: "",
             agent: null,
-            agentsList: ['agent_A', 'agent_B', 'agent_C'], // TO DO: Implement dynamic fetching of existing agents?
             runtimeConfig: "image: IMAGE_NAME \ncommandOptions: [\"flag\", \"value\"]",
             tags: "{\"key1\": \"value1\", \"key2\": \"value2\"}",
             restartPolicy: "NEVER",

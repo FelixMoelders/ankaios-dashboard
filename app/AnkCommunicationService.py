@@ -41,9 +41,10 @@ class AnkCommunicationService:
                 restart_policy = ank.NEVER
 
         tag_list = []
-        for kv_pair in json["tags"]:
-            tag = ank.Tag(key=kv_pair["key"], value=kv_pair["value"])
-            tag_list.append(tag)
+        if "tags" in json:
+            for kv_pair in json["tags"]:
+                tag = ank.Tag(key=kv_pair["key"], value=kv_pair["value"])
+                tag_list.append(tag)
 
         return ank.ToServer(
                 request=ank.Request(

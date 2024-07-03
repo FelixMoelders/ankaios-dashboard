@@ -1,10 +1,10 @@
 <template>
     <div>
         <div class="row full-width">
-            <q-input v-model="runtimeConfig" class="full-width-item" filled autogrow label="Runtime Config" :readonly="!readonly" />
-            <q-toggle v-model="readonly" class="full-width-item" label="Edit"/>
+            <q-input v-model="runtimeConfig" class="full-width-item" :input-style="{ fontSize: '14px' }" filled autogrow label="Runtime Config" :readonly="!readonly" />
         </div>
-        <div class="row justify-end">
+        <div class="row justify-end" style="margin-top: 5px;">
+            <q-toggle v-model="readonly" style="margin-right: 10px;" label="Edit"/>
             <q-btn icon="save" color="secondary" @click="applyConfig" />
         </div>
     </div>
@@ -37,7 +37,7 @@ export default {
             };
             fetch('/updateConfig', requestOptions)
                 .then(response => console.log(response.status));
-            this.editConfig = false;
+            this.readonly = false;
         },
     },
     mounted() {

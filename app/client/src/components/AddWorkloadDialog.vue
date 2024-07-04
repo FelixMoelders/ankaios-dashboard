@@ -9,7 +9,7 @@
             <q-card-section class="q-pa-md">
                 <div class="q-gutter-md" style="max-width: 420px">
 
-                    <q-input filled v-model.trim="workloadName" label="Workload Name" />
+                    <q-input filled v-model.trim="workloadName" :input-style="{ fontSize: '14px' }" label="Workload Name" />
                     <!-- If warning (no workloadName) is true, this will be displayed -->
                     <p v-if="workloadName.trim() === '' && warning" style="color: var(--q-color-negative);" class="warning">Workload Name cannot be empty.</p>
 
@@ -25,13 +25,13 @@
                     <!-- If warning (no agent selected) is true, this will be displayed -->
                     <p v-if="agent == null && warning" style="color: var(--q-color-negative);" class="warning">Agent must be selected.</p>
 
-                    <q-input filled v-model="runtime" label="Runtime" />
+                    <q-input filled v-model="runtime" :input-style="{ fontSize: '14px' }" label="Runtime" />
 
                     <q-select filled v-model="restartPolicy" :options="options" label="restartPolicy" />
 
-                    <q-input filled v-model="tags" label="tags" />
+                    <q-input filled v-model="tags" :input-style="{ fontSize: '14px' }" label="tags" />
 
-                    <q-input v-model="runtimeConfig" label="Runtime Config" filled autogrow />
+                    <q-input v-model="runtimeConfig" :input-style="{ fontSize: '14px' }" label="Runtime Config" filled autogrow />
 
                 </div>
                 <q-card-actions class="row justify-end">

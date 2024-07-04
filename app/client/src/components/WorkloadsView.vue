@@ -10,7 +10,7 @@
       </div>
     </div>
 
-    <AddWorkloadDialog v-model="addworkload" />
+    <AddWorkloadDialog :agentsList="agentsList" v-model="addworkload" />
 
     <div class="q-pa-md row q-gutter-md">
       <div class="col-md-3" v-for="workload in paginatedWorkloads" :key="workload.instanceName.id">
@@ -38,6 +38,7 @@ export default {
       search: '',
       workloads: [],
       dependencies: [],
+      agentsList: [],
       addworkload: false,
       filterState: "all",
       options: ["all", "running", "pending", "failed", "succeeded", "stopping"],
@@ -76,6 +77,7 @@ export default {
               }
               if (workloads) {
                   const dependencies = [];
+                  let agents = new Set();
                   for (let [workloadName, workloadDefinition] of Object.entries(workloads)) {
                       if ("dependencies" in workloadDefinition) {
                           for (let [dependency, condition] of Object.entries(workloadDefinition.dependencies)) {
@@ -86,7 +88,12 @@ export default {
                               });
                           }
                       }
+                      if ("agent" in workloadDefinition) {
+                          agents.add(workloadDefinition.agent);
+                      }
                   }
+                  this.agentsList = [...agents];
+                  this.agentsList = this.agentsList.sort((a, b) => a.localeCompare(b))
                   EventBus.emit('update-dependencies', dependencies);
               }
 

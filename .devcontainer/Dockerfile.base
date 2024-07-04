@@ -43,6 +43,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     protobuf-compiler \
     protobuf-compiler-grpc \
     gcc-aarch64-linux-gnu \
+    qemu-system \
+    qemu-user-static \
     tmux \
     vim \
     uidmap \

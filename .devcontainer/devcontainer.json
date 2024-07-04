@@ -43,7 +43,7 @@
             "DavidAnson.vscode-markdownlint",
             "EditorConfig.EditorConfig",
             "Vue.volar",
-            "ms-azuretools.vscode-docker"
+            "ms-azuretools.vscode-docker",
 			"esbenp.prettier-vscode"
            ]
        }

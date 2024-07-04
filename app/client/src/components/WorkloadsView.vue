@@ -5,7 +5,7 @@
         <div class="text-h5">Workloads <q-btn small round color="secondary" icon="add" @click="addworkload = true" style="margin-left: 20px" /></div>
       </div>
       <div class="row justify-between">
-        <q-input v-model="search" placeholder="Search..." filled dense debounce="300"/>
+        <q-input v-model="search" :input-style="{ fontSize: '14px' }" placeholder="Search..." filled dense debounce="300"/>
         <q-select style="width: 125px; margin-left: 10px" filled v-model="filterState" :options="options" label="State Filter" />
       </div>
     </div>

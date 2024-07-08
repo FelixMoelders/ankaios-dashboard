@@ -4,6 +4,14 @@ The Ankaios Dashboard ist the ui interface for [Eclipse Ankaios](https://github.
 
 The ankaios dashboard is started as a workload within the ankaios cluster. More Info on how to get started may be found in the next chapter.
 
+<center>
+
+| Dashboard version | Tested with Ank API |
+|:-----------------:|:-------------------:|
+| v0.1, v0.1.1      | v0.1                |
+
+</center>
+
 ![Architecture](/doc/Architecture.PNG)
 
 ## How to use the dashboard out of the box?

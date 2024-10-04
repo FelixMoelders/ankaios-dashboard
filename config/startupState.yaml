@@ -13,6 +13,18 @@ workloads:
     runtimeConfig: |
        image: dashboard:0.0 
        commandOptions: ["-p", "5001:5001", "-e", "PASSWORD=admin"]
+    controlInterfaceAccess:
+        allowRules:
+          - type: StateRule
+            operation: ReadWrite
+            filterMask:
+              - "desiredState"
+              - "workloadStates"
+    tags:
+      - key: Started by
+        value: Front Passenger
+      - key: Running in
+        value: AC Unit
 
   Automatic_Climate_Control:
     runtime: podman
@@ -28,6 +40,8 @@ workloads:
         value: Front Passenger
       - key: Running in
         value: AC Unit
+    dependencies:
+      Ankaios_Dashboard: ADD_COND_FAILED
     runtimeConfig: |
       image: dashboard:0.0
       commandOptions: ["-p", "5002:5001", "-e", "PASSWORD=admin"]

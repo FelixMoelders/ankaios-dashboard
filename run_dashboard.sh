@@ -20,20 +20,20 @@ run_ankaios() {
 
   # Start the Ankaios server
   echo "Starting Ankaios server located in '${ANK_BIN_DIR}'."
-  ${ANK_BIN_DIR}/ank-server --startup-config ${SCRIPT_DIR}/config/startupState.yaml --address ${ANKAIOS_SERVER_SOCKET} > ${ANKAIOS_LOG_DIR}/ankaios-server.log 2>&1 &
+  ${ANK_BIN_DIR}/ank-server --insecure --startup-config ${SCRIPT_DIR}/config/startupState.yaml --address ${ANKAIOS_SERVER_SOCKET} > ${ANKAIOS_LOG_DIR}/ankaios-server.log 2>&1 &
 
   sleep 2
   # Start an Ankaios agent_A
   echo "Starting Ankaios agent agent_A located in '${ANK_BIN_DIR}'."
-  ${ANK_BIN_DIR}/ank-agent --name agent_A --server-url ${ANKAIOS_SERVER_URL} > ${ANKAIOS_LOG_DIR}/ankaios-agent_A.log 2>&1 &
+  ${ANK_BIN_DIR}/ank-agent --insecure --name agent_A --server-url ${ANKAIOS_SERVER_URL} > ${ANKAIOS_LOG_DIR}/ankaios-agent_A.log 2>&1 &
 
-# Adding additional agent_B
- echo "Starting Ankaios agent agent_B located in '${ANK_BIN_DIR}'."
-  ${ANK_BIN_DIR}/ank-agent --name agent_B --server-url ${ANKAIOS_SERVER_URL} > ${ANKAIOS_LOG_DIR}/ankaios-agent_B.log 2>&1 &
+  # Adding additional agent_B
+  echo "Starting Ankaios agent agent_B located in '${ANK_BIN_DIR}'."
+  ${ANK_BIN_DIR}/ank-agent --insecure --name agent_B --server-url ${ANKAIOS_SERVER_URL} > ${ANKAIOS_LOG_DIR}/ankaios-agent_B.log 2>&1 &
 
-# Adding additional agent_C
- echo "Starting Ankaios agent agent_C located in '${ANK_BIN_DIR}'."
-  ${ANK_BIN_DIR}/ank-agent --name agent_C --server-url ${ANKAIOS_SERVER_URL} > ${ANKAIOS_LOG_DIR}/ankaios-agent_C.log 2>&1 &
+  # Adding additional agent_C
+  echo "Starting Ankaios agent agent_C located in '${ANK_BIN_DIR}'."
+  ${ANK_BIN_DIR}/ank-agent --insecure --name agent_C --server-url ${ANKAIOS_SERVER_URL} > ${ANKAIOS_LOG_DIR}/ankaios-agent_C.log 2>&1 &
 
 
   # Wait for any process to exit

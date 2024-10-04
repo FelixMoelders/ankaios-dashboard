@@ -5,19 +5,19 @@
 
         <div class="row justify-between items-center">
             <div>
-                <q-badge rounded :color="chooseExecutionColor(lastItemOfExecState)" class="q-mr-sm" />{{lastItemOfExecState}}
+                <q-badge rounded :color="chooseExecutionColor(execStateKey)" class="q-mr-sm" />{{execStateKey}}
             </div>
             <q-btn flat round icon="close" size="xs" color="negative" @click="confirm = true" />
         </div>
 
         <div class="row justify-between items-center">
-            <div class="text-h6">{{workload.instanceName.workloadName}}</div>
-            <div>{{workload.instanceName.agentName}}</div>
+            <div class="text-h6">{{workload.workloadName}}</div>
+            <div>{{workload.agent}}</div>
         </div>
 
         <q-separator />
 
-        <div v-for="tag in desiredState.workloads[workload.instanceName.workloadName].tags" :key="tag.key">
+        <div v-for="tag in workload.tags.tags" :key="tag.key">
             <q-badge color="secondary" :label="tag.key + ': ' + tag.value" />
         </div>
 
@@ -32,11 +32,11 @@
 
         <q-slide-transition>
             <q-card-section v-if="currentSection === 'dependencies'">
-              <div v-for="workloadState in workloadStates.filter(ws => ws.instanceName.workloadName === currentWorkloadName)"
-                :key="workloadState.instanceName.workloadName">
+              <div v-for="workloadState in allWorkloads.filter(ws => ws.workloadName === currentWorkloadName)"
+                :key="workloadState.workloadName">
                 <div>
-                  <q-badge rounded :color="getExecutionStateColor(workloadState.executionState[Object.keys(workloadState.executionState)[0]])" class="q-mr-sm" />
-                  {{ workloadState.executionState[Object.keys(workloadState.executionState)[0]] }}
+                  <q-badge rounded :color="getExecutionStateColor(workloadState.executionState)" class="q-mr-sm" />
+                  {{ workloadState.executionState }}
                 </div>
                 <div v-for="dependency in getDependencyText(workloadState)" :key="dependency.text" >
                   <q-badge rounded :color="dependency.status === 'match' ? 'positive' : 'negative'" class="q-mr-sm" /> {{ dependency.text }}
@@ -46,7 +46,7 @@
 
             <q-card-section v-if="currentSection === 'config'">
 
-                <ConfigSection :state="state" />
+                <ConfigSection :workload="workload" />
 
             </q-card-section>
 
@@ -58,7 +58,7 @@
         <q-card>
             <q-card-section class="row items-center">
                 <q-avatar icon="warning" size="xs" color="primary" text-color="white" />
-                <span class="q-ml-sm">You are about to delete "{{ workload.instanceName.workloadName }}"</span>
+                <span class="q-ml-sm">You are about to delete "{{ workload.workloadName }}"</span>
             </q-card-section>
 
             <q-card-actions align="right">
@@ -74,7 +74,7 @@
 import ConfigSection from './ConfigSection.vue'
 
 export default {
-    props: ['workload', 'desiredState', 'dependencies', 'workloadStates'],
+    props: ['workload', 'dependencies', 'allWorkloads'],
     data() {
         return {
             confirm: false,
@@ -101,7 +101,7 @@ export default {
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify([this.workload.instanceName.workloadName])
+                body: JSON.stringify([this.workload.workloadName])
             };
             fetch('/deleteWorkloads', requestOptions)
                 .then(response => { console.log(response.status);
@@ -131,14 +131,16 @@ export default {
 
             let dependenciesList = [];
 
-            if (workloadState && this.desiredState && this.desiredState.workloads && workloadState.instanceName && workloadState.instanceName.workloadName in this.desiredState.workloads) {
-                let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
+            if (workloadState) {
+                let dependencies = workloadState.dependencies["dependencies"];
+                console.log("dependencies");
+                console.log(dependencies);
                 if (dependencies && Object.keys(dependencies).length > 0) {
-                    for (let dependency in dependencies) {
-                        let workload = this.workloadStates.find(workload => workload.instanceName.workloadName === dependency);
+                    for (let dependency of Object.keys(dependencies)) {
+                        let workload = this.allWorkloads.find(workload => workload.workloadName === dependency);
                         if (workload && workload.executionState) {
                             let desiredValue = dependencies[dependency];
-                            let actualValue = workload.executionState[Object.keys(workload.executionState)[0]];
+                            let actualValue = workload.executionState;
                             let actualMappedValue = equivalentStates[actualValue] || actualValue;
                             if (actualMappedValue === desiredValue) {
                                 dependenciesList.push({text: `${dependency} -> ${desiredValue} is a match`, status: 'match'});
@@ -166,16 +168,15 @@ export default {
                     // more equivalencies can be added
                 };
 
-                if (workloadState && this.desiredState && this.desiredState.workloads && workloadState.instanceName && 'workloadName' in workloadState.instanceName && workloadState.instanceName.workloadName in this.desiredState.workloads) {
-                    let dependencies = this.desiredState.workloads[workloadState.instanceName.workloadName].dependencies;
+                if (workloadState) {
+                    let dependencies = workloadState.dependencies;
                     if (dependencies && Object.keys(dependencies).length > 0) {
                         let allFound = true;
                         for (let dependency in dependencies) {
-                            let workload = this.workloadStates.find(workload => workload.instanceName && 'workloadName' in workload.instanceName &&
-                            workload.instanceName.workloadName === dependency);
-                            if (workload && workload.executionState && Object.keys(workload.executionState).length > 0) {
+                            let workload = this.allWorkloads.find(workload => workload.workloadName === dependency);
+                            if (workload && workload.executionState) {
                                 let desiredValue = dependencies[dependency];
-                                let actualValue = workload.executionState[Object.keys(workload.executionState)[0]];
+                                let actualValue = workload.executionState;
 
                                 if (equivalentStates[actualValue]) {
                                     actualValue = equivalentStates[actualValue];
@@ -199,16 +200,14 @@ export default {
         }
     },
     computed: {
-        lastItemOfExecState() {
-            const keys = Object.keys(this.workload.executionState);
-            const lastKey = keys[keys.length - 1];
-            return lastKey;
+        execStateKey() {
+            return this.workload.execStateKey;
         }
   },
   mounted() {
-    this.currentWorkloadName = this.workload.instanceName.workloadName;
+    this.currentWorkloadName = this.workload.workloadName;
 
-    for (let [name, definition] of Object.entries(this.desiredState.workloads)) {
+    for (let [name, definition] of Object.entries(this.desiredState.workloads.workloads)) {
         definition = {...definition};
         if (name === this.currentWorkloadName) {
             this.state = JSON.parse(JSON.stringify(definition));

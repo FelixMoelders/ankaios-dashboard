@@ -1,9 +1,9 @@
 <template>
   <kpiCard
-    :workloadStates="workloadStates"
-    :desiredState="desiredState"
-    :workloadsPerAgent="workloadsPerAgent"
-    :workloadsPerRuntime="workloadsPerRuntime"
+    :numberOfWorkloads="numberOfWorkloads"
+    :numberOfAgents="numberOfAgents"
+    :numberOfDependencies="numberOfDependencies"
+    :numberOfRuntimes="numberOfRuntimes"
   />
 
   <donutChart
@@ -13,8 +13,7 @@
   />
 
   <workloadTable
-    :workloadStates="workloadStates"
-    :desiredState="desiredState"
+    :workloads="workloads"
   />
 </template>
 
@@ -29,92 +28,77 @@ import donutChart from "components/HomeViewCharts.vue";
 import workloadTable from "components/HomeViewTable.vue";
 import { EventBus } from "src/utils/EventBus";
 
-var workloadStates = ref([]);
-var desiredState = ref({});
+var workloads = ref([]);
+var agentsList = ref([]);
+var dependencies = ref([]);
+
+const numberOfWorkloads = computed(() => {
+  return workloads.value.length;
+});
+
+const numberOfAgents = computed(() => {
+  return agentsList.value.length;
+});
 
 const workloadsPerRuntime = computed(() => {
-  return aggregateRuntimes(desiredState.value);
+  var counter = {};
+  for (let workload of workloads.value) {
+    if (counter[workload.runtime]) {
+      counter[workload.runtime] += 1;
+    } else {
+      counter[workload.runtime] = 1;
+    }
+  }
+  counter = Object.keys(counter).sort().reduce((acc, key) => {
+    acc[key] = counter[key];
+    return acc;
+  }, {});
+  return counter;
 });
 
 const workloadsPerStatus = computed(() => {
-  return aggregateStates(workloadStates.value);
+  var counter = {};
+  for (let workload of workloads.value) {
+    if (counter[workload.execStateKey]) {
+      counter[workload.execStateKey] += 1;
+    } else {
+      counter[workload.execStateKey] = 1;
+    }
+  }
+  counter = Object.keys(counter).sort().reduce((acc, key) => {
+    acc[key] = counter[key];
+    return acc;
+  }, {});
+  return counter;
 });
 
 const workloadsPerAgent = computed(() => {
-  return aggregateAgents(workloadStates.value);
+  var counter = {};
+  for (let workload of workloads.value) {
+    if (counter[workload.agent]) {
+      counter[workload.agent] += 1;
+    } else {
+      counter[workload.agent] = 1;
+    }
+  }
+  counter = Object.keys(counter).sort().reduce((acc, key) => {
+    acc[key] = counter[key];
+    return acc;
+  }, {});
+  return counter;
 });
 
-const dependencies = computed(() => {
-  return getDependencies(desiredState.value);
+const numberOfDependencies = computed(() => {
+  return dependencies.value.length;
 });
 
-function aggregateRuntimes(desiredState) {
-  const counter = {};
-
-  if (Object.keys(desiredState).length > 0) {
-    const n = Object.keys(desiredState.workloads).length;
-    var list = [];
-
-    for (let i = 0; i < n; i++) {
-      list[i] = Object.values(desiredState.workloads)[i].runtime;
-    }
-
-    list.sort().forEach((runtime) => {
-      if (counter[runtime]) {
-        counter[runtime] += 1;
-      } else {
-        counter[runtime] = 1;
-      }
-    });
+const numberOfRuntimes = computed(() => {
+  const mySet = new Set();
+  for (let workload of workloads.value) {
+    mySet.add(workload.runtime);
   }
-
-  return counter;
-}
-
-function aggregateStates(workloads) {
-  const n = Object.keys(workloads).length;
-  var list = [];
-  const counter = {};
-
-  if (n > 0) {
-    for (let i = 0; i < n; i++) {
-      const keys = Object.keys(workloads[i].executionState);
-      list[i] = keys[keys.length - 1];
-    }
-
-    list.sort().forEach((status) => {
-      if (counter[status]) {
-        counter[status] += 1;
-      } else {
-        counter[status] = 1;
-      }
-    });
-  }
-
-  return counter;
-}
-
-function aggregateAgents(workloads) {
-  const n = Object.keys(workloads).length;
-  var list = [];
-  const counter = {};
-
-  if (n > 0) {
-    for (let i = 0; i < n; i++) {
-      list[i] = workloads[i].instanceName.agentName;
-    }
-
-    list.sort().forEach((agent) => {
-      if (counter[agent]) {
-        counter[agent] += 1;
-      } else {
-        counter[agent] = 1;
-      }
-    });
-  }
-
-  return counter;
-}
+  return mySet.size;
+});
 
 let timerId = null;
 
@@ -132,27 +116,58 @@ onMounted(() => {
         }
       })
       .then((json) => {
-        let completeState = null;
-        if (
-          json &&
-          json.response &&
-          json.response.completeState &&
-          json.response.completeState.workloadStates
-        ) {
-          completeState = json.response.completeState;
-          workloadStates.value = completeState.workloadStates.filter(
-            (workload) => {
-              const executionState =
-                workload.executionState[
-                  Object.keys(workload.executionState)[0]
-                ];
-              return executionState !== "stopping";
+        console.log("loadState");
+        console.log(json);
+        console.log(numberOfWorkloads.value);
+        if (json && json.response && json.response.completeState && json.response.completeState.workloadStates
+        && json.response.completeState.desiredState && json.response.completeState.desiredState.workloads.workloads) {
+            var completeState = json.response.completeState;
+
+            // reset workloads array
+            workloads.value = [];
+
+            // combine desired state and workload states into one data structure
+            var agentStateMap = completeState.workloadStates.agentStateMap;
+            for (const agentName in agentStateMap) {
+              var workloadStateMap = agentStateMap[agentName].wlNameStateMap;
+              for (const workloadName in workloadStateMap) {
+                // retrieve the execution state
+                var idStateMap = workloadStateMap[workloadName].idStateMap;
+                var workloadId = Object.keys(idStateMap)[0];
+
+                var state = idStateMap[workloadId];
+                var keys = Object.keys(state);
+                var execStateKey = keys[keys.length - 1];
+                var executionState = state[execStateKey];
+
+                var workload = completeState.desiredState.workloads.workloads[workloadName];
+                workload["workloadName"] = workloadName;
+                workload["workloadId"] = workloadId;
+                workload["executionState"] = executionState;
+                workload["execStateKey"] = execStateKey;
+                workloads.value.push(workload);
+              }
             }
-          );
-          if (completeState.desiredState) {
-            desiredState.value = completeState.desiredState;
-          }
         }
+        let agents = new Set();
+        dependencies.value = [];
+        for (const workloadDefinition of workloads.value) {
+            if (workloadDefinition.dependencies) {
+                for (let [dependency, condition] of Object.entries(workloadDefinition.dependencies)) {
+                    dependencies.value.push({
+                      source: workloadDefinition.workloadName,
+                      target: dependency,
+                      type: condition
+                    });
+                }
+            }
+            if (workloadDefinition.agent) {
+                agents.add(workloadDefinition.agent);
+            }
+        }
+        agentsList.value = [...agents];
+        agentsList.value = agentsList.value.sort((a, b) => a.localeCompare(b))
+        EventBus.emit('update-dependencies', dependencies);
       })
       .catch((error) => {
         console.log(

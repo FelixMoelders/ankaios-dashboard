@@ -14,7 +14,7 @@
 import { ref } from 'vue'
 
 export default {
-    props: ['state'],
+    props: ['workload'],
     data() {
         return {
             readonly: ref(false),
@@ -23,16 +23,22 @@ export default {
     },
     methods: {
         applyConfig() {
+            const controlInterfaceAccess = {};
+            if (this.workload.controlInterfaceAccess) {
+              controlInterfaceAccess = this.workload.controlInterfaceAccess;
+            }
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    workloadName: this.state.name,
-                    agent: this.state.agent,
+                    workloadName: this.workload.workloadName,
+                    agent: this.workload.agent,
                     runtimeConfig: this.runtimeConfig,
-                    restartPolicy: this.state.restartPolicy,
-                    runtime: this.state.runtime,
-                    tags: this.state.tags
+                    restartPolicy: this.workload.restartPolicy,
+                    runtime: this.workload.runtime,
+                    tags: this.workload.tags.tags,
+                    controlInterfaceAccess: controlInterfaceAccess,
+                    dependencies: this.workload.dependencies,
                 })
             };
             fetch('/updateConfig', requestOptions)
@@ -41,8 +47,8 @@ export default {
         },
     },
     mounted() {
-      if (this.state.runtimeConfig) {
-        this.runtimeConfig = this.state.runtimeConfig;
+      if (this.workload.runtimeConfig) {
+        this.runtimeConfig = this.workload.runtimeConfig;
       } else {
         this.runtimeConfig = "";
       }

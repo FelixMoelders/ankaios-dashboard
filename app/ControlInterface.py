@@ -1,4 +1,4 @@
-import ankaios_pb2 as ank
+import control_api_pb2 as control_api
 from Logger import Logger
 from google.protobuf.internal.encoder import _VarintBytes
 from google.protobuf.internal.decoder import _DecodeVarint
@@ -53,16 +53,16 @@ class ControlInterface:
                         break
                     msg_buf += next_byte
 
-                from_server = ank.FromServer()
+                from_ankaios = control_api.FromAnkaios()
                 try:
-                    from_server.ParseFromString(msg_buf) # Deserialize the received proto msg
+                    from_ankaios.ParseFromString(msg_buf) # Deserialize the received proto msg
                 except Exception as e:
                     self.logger.error(f"Invalid response, parsing error: '{e}'")
                     continue
 
-                response_request_id = from_server.response.requestId
+                response_request_id = from_ankaios.response.requestId
                 if response_request_id == request_id:
-                    msg_json = MessageToJson(from_server)
+                    msg_json = MessageToJson(from_ankaios)
                     self.logger.debug(f"JSON-Response: {msg_json}")
                     return msg_json
                 else:

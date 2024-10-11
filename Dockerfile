@@ -16,8 +16,10 @@ RUN apk update && apk add --update-cache \
     protoc \
     && rm -rf /var/cache/apk/*
 
-COPY /tmp/ankaios/api/proto/ankaios.proto /usr/local/lib/ankaios/ankaios.proto
-RUN protoc --python_out=/usr/local/lib/ankaios/ --proto_path=/usr/local/lib/ankaios/ ankaios.proto && touch /usr/local/lib/ankaios/__init__.py
+COPY /tmp/ankaios/api/proto/ank_base.proto /usr/local/lib/ankaios/ank_base.proto
+COPY /tmp/ankaios/api/proto/control_api.proto /usr/local/lib/ankaios/control_api.proto
+RUN protoc --python_out=/usr/local/lib/ankaios/ --proto_path=/usr/local/lib/ankaios/ ank_base.proto
+RUN protoc --python_out=/usr/local/lib/ankaios/ --proto_path=/usr/local/lib/ankaios/ control_api.proto && touch /usr/local/lib/ankaios/__init__.py
 
 # prod stage
 FROM base

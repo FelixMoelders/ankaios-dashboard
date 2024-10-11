@@ -93,7 +93,8 @@ export default {
                     runtime: this.runtime,
                     tags: tags_list,
                     restartPolicy: this.restartPolicy,
-                    runtimeConfig: this.runtimeConfig
+                    runtimeConfig: this.runtimeConfig,
+                    controlInterfaceAccess: {}
                 })
             };
             fetch('/addNewWorkload', requestOptions) //Added 'Workload Added' Message upon adding a new workload

@@ -71,23 +71,15 @@
 </template>
 
 <script setup>
-import { descending } from "d3";
 import { ref, toRef, computed } from "vue";
 
 const filter = ref("");
 
 const props = defineProps({
-  workloadStates: Object,
-  desiredState: Object,
+  workloads: Object,
 });
 
-const workloadStates = toRef(props, "workloadStates");
-const desiredState = toRef(props, "desiredState");
-
-function getLastItemOfExecState(workload) {
-  const keys = Object.keys(workload.executionState);
-  return keys[keys.length - 1];
-}
+const workloads = toRef(props, "workloads");
 
 function chooseExecutionColor(execState) {
   switch (execState) {
@@ -107,42 +99,31 @@ function chooseExecutionColor(execState) {
 }
 
 const rows = computed(() => {
-  const n = Object.keys(workloadStates.value).length;
-  var list = [];
+  const list = [];
 
-  if (n > 0) {
-    for (let i = 0; i < n; i++) {
-      const j = Object.keys(desiredState.value.workloads).indexOf(
-        workloadStates.value[i].instanceName.workloadName
-      );
+  if (!workloads.value) return [];
 
-      let tags = ""; // checks whether the array is empty before accessing it.
-      let currentWorkload = Object.values(desiredState.value.workloads)[j];
-      if (currentWorkload && currentWorkload.tags) {
-        tags = currentWorkload.tags;
-      }
-
-      let deps = "";
-      if (currentWorkload && "dependencies" in currentWorkload) {
-        deps = Object.keys(currentWorkload.dependencies).sort();
-      }
-
-      let rt = "";
-      if (Object.values(desiredState.value.workloads)[j].runtime) {
-        rt = Object.values(desiredState.value.workloads)[j].runtime;
-      }
-
-      list[i] = {
-        Name: workloadStates.value[i].instanceName.workloadName,
-        Agent: workloadStates.value[i].instanceName.agentName,
-        Runtime: rt,
-        Dependencies: deps,
-        Tags: tags,
-        State: getLastItemOfExecState(workloadStates.value[i]),
-      };
+  for (let workload of workloads.value) {
+    let tags = [];
+    if (workload.tags && workload.tags.tags) {
+      tags = workload.tags.tags;
     }
-  }
 
+    let deps = [];
+    if (workload.dependencies && workload.dependencies.dependencies) {
+      deps = Object.keys(workload.dependencies.dependencies).sort();
+    }
+
+    list.push({
+      Name: workload.workloadName,
+      Agent: workload.agent,
+      Runtime: workload.runtime,
+      Dependencies: deps,
+      Tags: tags,
+      State: workload.execStateKey,
+    });
+  }
+  console.log("list", list);
   return list;
 });
 

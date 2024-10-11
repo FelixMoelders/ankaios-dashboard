@@ -13,8 +13,13 @@
     <AddWorkloadDialog :agentsList="agentsList" v-model="addworkload" />
 
     <div class="q-pa-md row q-gutter-md">
-      <div class="col-md-3" v-for="workload in paginatedWorkloads" :key="workload.instanceName.id">
-        <WorkloadCard :workload="workload" :workloadStates="workloads" :desiredState="desiredState" :dependencies="dependencies" />
+      <div class="col-md-3" v-for="workload in paginatedWorkloads" :key="workload.workloadId">
+        <WorkloadCard
+          :workload="workload"
+          :allWorkloads="workloads"
+          :dependencies="dependencies"
+          :sections-toggle-state="sectionsToggleState"
+          @update:section-toggle-state="updateSectionToggleState" />
       </div>
     </div>
     <div class="q-pa-lg flex flex-center">
@@ -36,13 +41,13 @@ export default {
   data() {
     return {
       search: '',
+      sectionsToggleState: {},
       workloads: [],
       dependencies: [],
       agentsList: [],
       addworkload: false,
       filterState: "all",
       options: ["all", "running", "pending", "failed", "succeeded", "stopping"],
-      desiredState: {},
       currentPage: 1,
       pageSize: 9,
     }
@@ -63,46 +68,77 @@ export default {
           }).then(json => {
             console.log("loadState");
             console.log(json);
-              let completeState = null, workloads = null;
+            if (json && json.response && json.response.completeState && json.response.completeState.workloadStates
+            && json.response.completeState.desiredState && json.response.completeState.desiredState.workloads.workloads) {
+                var completeState = json.response.completeState;
 
-              if (json && json.response && json.response.completeState && json.response.completeState.workloadStates) {
-                  completeState = json.response.completeState;
-                  this.workloads = completeState.workloadStates;
-                  if (completeState.desiredState) {
-                      this.desiredState = completeState.desiredState;
-                      if (completeState.desiredState.workloads) {
-                          workloads = completeState.desiredState.workloads;
-                      }
-                  }
-              }
-              if (workloads) {
-                  const dependencies = [];
-                  let agents = new Set();
-                  for (let [workloadName, workloadDefinition] of Object.entries(workloads)) {
-                      if ("dependencies" in workloadDefinition) {
-                          for (let [dependency, condition] of Object.entries(workloadDefinition.dependencies)) {
-                              dependencies.push({
-                                source: workloadName,
-                                target: dependency,
-                                type: condition
-                              });
-                          }
-                      }
-                      if ("agent" in workloadDefinition) {
-                          agents.add(workloadDefinition.agent);
-                      }
-                  }
-                  this.agentsList = [...agents];
-                  this.agentsList = this.agentsList.sort((a, b) => a.localeCompare(b))
-                  EventBus.emit('update-dependencies', dependencies);
-              }
+                // combine desired state and workload states into one data structure
+                var agentStateMap = completeState.workloadStates.agentStateMap;
+                var workloads_buffer = [];
+                for (const agentName in agentStateMap) {
+                  var workloadStateMap = agentStateMap[agentName].wlNameStateMap;
+                  for (const workloadName in workloadStateMap) {
+                    if (!(workloadName in this.sectionsToggleState)) {
+                      this.sectionsToggleState[workloadName] = "";
+                    }
+                    // retrieve the execution state
+                    var idStateMap = workloadStateMap[workloadName].idStateMap;
+                    var workloadId = Object.keys(idStateMap)[0];
 
+                    var state = idStateMap[workloadId];
+                    var keys = Object.keys(state);
+                    var execStateKey = keys[keys.length - 1];
+                    var executionState = state[execStateKey];
+
+                    var workload = completeState.desiredState.workloads.workloads[workloadName];
+                    workload["workloadName"] = workloadName;
+                    workload["workloadId"] = workloadId;
+                    workload["executionState"] = executionState;
+                    workload["execStateKey"] = execStateKey;
+                    workloads_buffer.push(workload);
+                  }
+                }
+                if (this.workloads.length !== workloads_buffer.length) {
+                  this.workloads = workloads_buffer;
+                } else {
+                  for (let i = 0; i < workloads_buffer.length; i++) {
+                    if (this.workloads[i] !== workloads_buffer[i]) {
+                      this.workloads = workloads_buffer;
+                      break;
+                    }
+                  }
+                }
+            }
+            if (this.workloads) {
+                var dependencies = [];
+                let agents = new Set();
+                for (const workloadDefinition of this.workloads) {
+                    if (workloadDefinition.dependencies) {
+                        for (let [dependency, condition] of Object.entries(workloadDefinition.dependencies)) {
+                            dependencies.push({
+                              source: workloadDefinition.workloadName,
+                              target: dependency,
+                              type: condition
+                            });
+                        }
+                    }
+                    if (workloadDefinition.agent) {
+                        agents.add(workloadDefinition.agent);
+                    }
+                }
+                this.agentsList = [...agents];
+                this.agentsList = this.agentsList.sort((a, b) => a.localeCompare(b))
+                EventBus.emit('update-dependencies', dependencies);
+            }
           }).catch((error) => {
-              console.log('There has been a problem with your fetch operation: ', error.message);
+              console.log('There has been a problem with the fetch operation: ', error.message);
           });
     },
     toggle(id) {
       this.showConfig[id] = !this.showConfig[id];
+    },
+    updateSectionToggleState(newState) {
+      this.sectionsToggleState = { ...newState };
     },
     updatePage(page) {
       this.currentPage = page;
@@ -115,48 +151,41 @@ export default {
   },
   computed: {
     sortedWorkloads() {
-      return this.workloads.sort((a, b) => a.instanceName.workloadName.localeCompare(b.instanceName.workloadName));
+      return this.workloads.sort((a, b) => a.workloadName.localeCompare(b.workloadName));
     },
     filteredWorkloads() {
       if (!this.search && !this.filterState) {
         return this.sortedWorkloads
       }
       return this.sortedWorkloads.filter(workload => {
-        console.log(workload);
         let search = this.search.toLowerCase();
 
-        let workloadName = workload.instanceName.workloadName.toLowerCase();
-        let agentName = workload.instanceName.agentName.toLowerCase();
+        let workloadName = workload.workloadName.toLowerCase();
+        let agentName = workload.agent.toLowerCase();
 
-        let desiredState = this.desiredState.workloads[workload.instanceName.workloadName];
-
-        if (!desiredState) {
+        if (!workload.runtimeConfig) {
           return false;
         }
 
-        let runtimeConfig = desiredState.runtimeConfig.toLowerCase();
+        let runtimeConfig = workload.runtimeConfig.toLowerCase();
 
-        let tagKeyExists = false;
-        let tagValueExists = false;
+        let tagExists = false;
 
-        if ('tags' in desiredState) {
-          let tags = desiredState.tags;
-          tagKeyExists = tags.some(item => item.key.toLowerCase().includes(search));
-          tagValueExists = tags.some(item => item.value.toLowerCase().includes(search));
+        if (workload.tags && workload.tags.tags) {
+          tagExists = workload.tags.tags.some(item => item["key"].toLowerCase().includes(search) || item["value"].toLowerCase().includes(search));
         }
 
         let execStateFits = false;
         if (this.filterState == "all") {
           execStateFits = true;
-        } else if (this.filterState == this.getLastItemOfExecState(workload.executionState)) {
+        } else if (this.filterState == workload.execStateKey) {
           execStateFits = true;
         }
 
         return (workloadName.includes(search)
                 || agentName.includes(search)
                 || runtimeConfig.includes(search)
-                || tagKeyExists
-                || tagValueExists)
+                || tagExists)
                 && execStateFits
       })
     },

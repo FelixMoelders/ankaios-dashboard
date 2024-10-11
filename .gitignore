@@ -1,3 +1,6 @@
 __pycache__/
-app/ankaios_pb2.py
-app/__init__.py
+ank_base_pb2.py
+ank_base.proto
+control_api_pb2.py
+control_api.proto
+.vs/

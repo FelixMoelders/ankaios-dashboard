@@ -6,9 +6,10 @@ The ankaios dashboard is started as a workload within the ankaios cluster. More 
 
 <center>
 
-| Dashboard version | Tested with Ank API |
+| Dashboard version | Tested with Ankaios |
 |:-----------------:|:-------------------:|
-| v0.1, v0.1.1      | v0.1                |
+| v0.1, v0.1.1      | v0.3                |
+| v0.2              | v0.4                |
 
 </center>
 

@@ -23,6 +23,10 @@ export default {
     },
     methods: {
         applyConfig() {
+            const controlInterfaceAccess = {};
+            if (this.workload.controlInterfaceAccess) {
+              controlInterfaceAccess = this.workload.controlInterfaceAccess;
+            }
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -33,7 +37,8 @@ export default {
                     restartPolicy: this.workload.restartPolicy,
                     runtime: this.workload.runtime,
                     tags: this.workload.tags.tags,
-                    controlInterfaceAccess: this.workload.controlInterfaceAccess
+                    controlInterfaceAccess: controlInterfaceAccess,
+                    dependencies: this.workload.dependencies,
                 })
             };
             fetch('/updateConfig', requestOptions)

@@ -22,35 +22,32 @@
         </div>
 
         <q-card-actions class="row justify-end">
-            <q-btn rounded icon="mediation" color="primary small" @click="currentSection = currentSection === 'dependencies' ? '' : 'dependencies'" />
-            <q-btn rounded icon="settings" color="secondary small" @click="currentSection = currentSection === 'config' ? '' : 'config'" />
+            <q-btn rounded icon="mediation" color="primary small" @click="toggleSection('dependencies')" />
+            <q-btn rounded icon="settings" color="secondary small" @click="toggleSection('config')" />
         </q-card-actions>
 
         </q-card-section>
 
         <q-separator />
 
-        <q-slide-transition>
-            <q-card-section v-if="currentSection === 'dependencies'">
-              <div v-for="workloadState in allWorkloads.filter(ws => ws.workloadName === currentWorkloadName)"
-                :key="workloadState.workloadName">
-                <div>
-                  <q-badge rounded :color="getExecutionStateColor(workloadState.executionState)" class="q-mr-sm" />
-                  {{ workloadState.executionState }}
-                </div>
-                <div v-for="dependency in getDependencyText(workloadState)" :key="dependency.text" >
-                  <q-badge rounded :color="dependency.status === 'match' ? 'positive' : 'negative'" class="q-mr-sm" /> {{ dependency.text }}
-                </div>
+          <q-card-section v-if="currentSection === 'dependencies'">
+            <div v-for="workloadState in allWorkloads.filter(ws => ws.workloadName === currentWorkloadName)"
+              :key="workloadState.workloadName">
+              <div>
+                <q-badge rounded :color="getExecutionStateColor(workloadState.executionState)" class="q-mr-sm" />
+                {{ workloadState.executionState }}
               </div>
-            </q-card-section>
+              <div v-for="dependency in getDependencyText(workloadState)" :key="dependency.text" >
+                <q-badge rounded :color="dependency.status === 'match' ? 'positive' : 'negative'" class="q-mr-sm" /> {{ dependency.text }}
+              </div>
+            </div>
+          </q-card-section>
 
-            <q-card-section v-if="currentSection === 'config'">
+          <q-card-section v-if="currentSection === 'config'">
 
-                <ConfigSection :workload="workload" />
+              <ConfigSection :workload="workload" />
 
-            </q-card-section>
-
-        </q-slide-transition>
+          </q-card-section>
 
     </q-card>
 
@@ -74,14 +71,11 @@
 import ConfigSection from './ConfigSection.vue'
 
 export default {
-    props: ['workload', 'dependencies', 'allWorkloads'],
+    props: ['workload', 'dependencies', 'allWorkloads', 'sectionsToggleState'],
     data() {
         return {
             confirm: false,
-            currentSection: "",
             currentWorkloadName: "",
-            workloadState: [],
-            state: {runtimeConfig: "test"},
         }
 
     },
@@ -123,6 +117,15 @@ export default {
                     return "gray";
             }
         },
+        toggleSection(section) {
+            const newState = { ...this.sectionsToggleState };
+            if (newState[this.currentWorkloadName] === section) {
+                delete newState[this.currentWorkloadName];
+            } else {
+                newState[this.currentWorkloadName] = section;
+            }
+            this.$emit('update:section-toggle-state', newState);
+        },
         getDependencyText(workloadState) {
             const equivalentStates = {
                 "ADD_COND_RUNNING": "RUNNING_OK",
@@ -133,8 +136,6 @@ export default {
 
             if (workloadState) {
                 let dependencies = workloadState.dependencies["dependencies"];
-                console.log("dependencies");
-                console.log(dependencies);
                 if (dependencies && Object.keys(dependencies).length > 0) {
                     for (let dependency of Object.keys(dependencies)) {
                         let workload = this.allWorkloads.find(workload => workload.workloadName === dependency);
@@ -202,19 +203,14 @@ export default {
     computed: {
         execStateKey() {
             return this.workload.execStateKey;
+        },
+        currentSection() {
+            return this.sectionsToggleState[this.currentWorkloadName];
         }
   },
   mounted() {
     this.currentWorkloadName = this.workload.workloadName;
-
-    for (let [name, definition] of Object.entries(this.desiredState.workloads.workloads)) {
-        definition = {...definition};
-        if (name === this.currentWorkloadName) {
-            this.state = JSON.parse(JSON.stringify(definition));
-            this.state["name"] = name;
-            break;
-        }
-    }
+    console.log("workload: ", this.workload);
   }
 };
 </script>

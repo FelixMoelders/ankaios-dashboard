@@ -14,7 +14,12 @@
 
     <div class="q-pa-md row q-gutter-md">
       <div class="col-md-3" v-for="workload in paginatedWorkloads" :key="workload.workloadId">
-        <WorkloadCard :workload="workload" :allWorkloads="workloads" :dependencies="dependencies" />
+        <WorkloadCard
+          :workload="workload"
+          :allWorkloads="workloads"
+          :dependencies="dependencies"
+          :sections-toggle-state="sectionsToggleState"
+          @update:section-toggle-state="updateSectionToggleState" />
       </div>
     </div>
     <div class="q-pa-lg flex flex-center">
@@ -36,6 +41,7 @@ export default {
   data() {
     return {
       search: '',
+      sectionsToggleState: {},
       workloads: [],
       dependencies: [],
       agentsList: [],
@@ -66,14 +72,15 @@ export default {
             && json.response.completeState.desiredState && json.response.completeState.desiredState.workloads.workloads) {
                 var completeState = json.response.completeState;
 
-                // reset workloads array
-                this.workloads = [];
-
                 // combine desired state and workload states into one data structure
                 var agentStateMap = completeState.workloadStates.agentStateMap;
+                var workloads_buffer = [];
                 for (const agentName in agentStateMap) {
                   var workloadStateMap = agentStateMap[agentName].wlNameStateMap;
                   for (const workloadName in workloadStateMap) {
+                    if (!(workloadName in this.sectionsToggleState)) {
+                      this.sectionsToggleState[workloadName] = "";
+                    }
                     // retrieve the execution state
                     var idStateMap = workloadStateMap[workloadName].idStateMap;
                     var workloadId = Object.keys(idStateMap)[0];
@@ -88,7 +95,17 @@ export default {
                     workload["workloadId"] = workloadId;
                     workload["executionState"] = executionState;
                     workload["execStateKey"] = execStateKey;
-                    this.workloads.push(workload);
+                    workloads_buffer.push(workload);
+                  }
+                }
+                if (this.workloads.length !== workloads_buffer.length) {
+                  this.workloads = workloads_buffer;
+                } else {
+                  for (let i = 0; i < workloads_buffer.length; i++) {
+                    if (this.workloads[i] !== workloads_buffer[i]) {
+                      this.workloads = workloads_buffer;
+                      break;
+                    }
                   }
                 }
             }
@@ -120,6 +137,9 @@ export default {
     toggle(id) {
       this.showConfig[id] = !this.showConfig[id];
     },
+    updateSectionToggleState(newState) {
+      this.sectionsToggleState = { ...newState };
+    },
     updatePage(page) {
       this.currentPage = page;
     },
@@ -138,7 +158,6 @@ export default {
         return this.sortedWorkloads
       }
       return this.sortedWorkloads.filter(workload => {
-        console.log(workload);
         let search = this.search.toLowerCase();
 
         let workloadName = workload.workloadName.toLowerCase();

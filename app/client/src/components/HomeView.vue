@@ -49,6 +49,10 @@ const workloadsPerRuntime = computed(() => {
       counter[workload.runtime] = 1;
     }
   }
+  counter = Object.keys(counter).sort().reduce((acc, key) => {
+    acc[key] = counter[key];
+    return acc;
+  }, {});
   return counter;
 });
 
@@ -61,6 +65,10 @@ const workloadsPerStatus = computed(() => {
       counter[workload.execStateKey] = 1;
     }
   }
+  counter = Object.keys(counter).sort().reduce((acc, key) => {
+    acc[key] = counter[key];
+    return acc;
+  }, {});
   return counter;
 });
 
@@ -73,6 +81,10 @@ const workloadsPerAgent = computed(() => {
       counter[workload.agent] = 1;
     }
   }
+  counter = Object.keys(counter).sort().reduce((acc, key) => {
+    acc[key] = counter[key];
+    return acc;
+  }, {});
   return counter;
 });
 
@@ -138,6 +150,7 @@ onMounted(() => {
             }
         }
         let agents = new Set();
+        dependencies.value = [];
         for (const workloadDefinition of workloads.value) {
             if (workloadDefinition.dependencies) {
                 for (let [dependency, condition] of Object.entries(workloadDefinition.dependencies)) {

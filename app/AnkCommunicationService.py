@@ -40,14 +40,30 @@ class AnkCommunicationService:
             case _:
                 restart_policy = ank_base.NEVER
 
-        print("tags") # TODO
         tag_list = []
         if "tags" in json:
             for kv_pair in json["tags"]:
                 tag = ank_base.Tag(key=kv_pair["key"], value=kv_pair["value"])
-                print(tag) # TODO
                 tag_list.append(tag)
 
+        controlInterfaceAccess = {}
+        if "controlInterfaceAccess" in json:
+            controlInterfaceAccess = json["controlInterfaceAccess"]
+
+        # map strings to enum type of ank_base.proto
+        dependencies = {}
+        if "dependencies" in json and "dependencies" in json["dependencies"]:
+            dependencies = json["dependencies"]
+            for key, value in dependencies["dependencies"].items():
+                match value:
+                    case "ADD_COND_RUNNING":
+                        dependencies["dependencies"][key] = ank_base.ADD_COND_RUNNING
+                    case "ADD_COND_SUCCEEDED":
+                        dependencies["dependencies"][key] = ank_base.ADD_COND_SUCCEEDED
+                    case "ADD_COND_FAILED":
+                        dependencies["dependencies"][key] = ank_base.ADD_COND_FAILED
+
+        print(dependencies) # todo
         return control_api.ToAnkaios(
                 request=ank_base.Request(
                         requestId=request_id,
@@ -60,12 +76,13 @@ class AnkCommunicationService:
                                                 workload_name: ank_base.Workload(
                                                     agent=json["agent"],
                                                     runtime=json["runtime"],
+                                                    dependencies=dependencies,
                                                     restartPolicy=restart_policy,
                                                     tags=ank_base.Tags(
                                                         tags=tag_list
                                                     ),
                                                     runtimeConfig=json["runtimeConfig"],
-                                                    controlInterfaceAccess=json["controlInterfaceAccess"]
+                                                    controlInterfaceAccess=controlInterfaceAccess
                                                 )
                                             }
                                         )

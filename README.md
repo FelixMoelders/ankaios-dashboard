@@ -70,7 +70,7 @@ Call the dashboard via localhost:5001. The login credentials are by default
 3. Open an additional terminal in the dev container and run the following shell command to see the logs of the example workload:
 
    ```shell
-   podman logs -f $(podman ps -a | grep ank_dashboard | awk '{print $1}')
+   podman logs -f $(podman ps -a | grep Ankaios_Dashboard | awk '{print $1}')
    ```
 
 ## Use the protobuf definition in python

@@ -20,23 +20,28 @@ The ankaios dashboard is started as a workload within the ankaios cluster. More 
 Add the following entry to your startupState.yaml for ankaios and you are ready to go.
 
    ```yaml
-   apiVersion: v0.1
-   workloads:
-      Ankaios_Dashboard:
-         runtime: podman
-         agent: agent_A
-         restart: true
-         updateStrategy: AT_LEAST_ONCE
-         accessRights:
-            allow: []
-            deny: []
-         restartPolicy: NEVER
-         tags:
-            - key: ankaios
-              value: dashboard
-         runtimeConfig: |
-            image: ghcr.io/felixmoelders/ankaios-dashboard:latest
-            commandOptions: ["-p", "5001:5001", "-e", "PASSWORD=admin"]
+apiVersion: v0.1
+workloads:
+  Ankaios_Dashboard:
+    runtime: podman
+    agent: agent_A
+    restart: true
+    updateStrategy: AT_LEAST_ONCE
+    accessRights:
+      allow: []
+      deny: []
+    restartPolicy: NEVER 
+    dependencies:
+    runtimeConfig: |
+       image: ghcr.io/felixmoelders/ankaios-dashboard:latest
+       commandOptions: ["-p", "5001:5001", "-e", "PASSWORD=admin"]
+    controlInterfaceAccess:
+        allowRules:
+          - type: StateRule
+            operation: ReadWrite
+            filterMask:
+              - "desiredState"
+              - "workloadStates"
    ```
 
 Call the dashboard via localhost:5001. The login credentials are by default

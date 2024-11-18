@@ -23,7 +23,8 @@ export default {
     },
     methods: {
         applyConfig() {
-            const controlInterfaceAccess = {};
+            console.log("Aufgerufen.");
+            let controlInterfaceAccess = {};
             if (this.workload.controlInterfaceAccess) {
               controlInterfaceAccess = this.workload.controlInterfaceAccess;
             }
@@ -36,7 +37,7 @@ export default {
                     runtimeConfig: this.runtimeConfig,
                     restartPolicy: this.workload.restartPolicy,
                     runtime: this.workload.runtime,
-                    tags: this.workload.tags.tags,
+                    tags: this.workload.tags,
                     controlInterfaceAccess: controlInterfaceAccess,
                     dependencies: this.workload.dependencies,
                 })

@@ -20,6 +20,7 @@ run_ankaios() {
 
   # Start the Ankaios server
   echo "Starting Ankaios server located in '${ANK_BIN_DIR}'."
+  
   ${ANK_BIN_DIR}/ank-server --insecure --startup-config ${SCRIPT_DIR}/config/startupState.yaml --address ${ANKAIOS_SERVER_SOCKET} > ${ANKAIOS_LOG_DIR}/ankaios-server.log 2>&1 &
 
   sleep 2

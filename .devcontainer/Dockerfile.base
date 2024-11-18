@@ -109,7 +109,7 @@ RUN rustup target add x86_64-unknown-linux-musl \
 
 # Retrieve latest verion of ankaios from github and build it
 WORKDIR "/tmp"
-RUN sudo git clone --depth 1 --branch v0.4.1 https://github.com/eclipse-ankaios/ankaios.git
+RUN sudo git clone --depth 1 --branch v0.5.0 https://github.com/eclipse-ankaios/ankaios.git
 WORKDIR "/tmp/ankaios"
 RUN sudo chmod a+w /tmp/ankaios
 RUN cargo build

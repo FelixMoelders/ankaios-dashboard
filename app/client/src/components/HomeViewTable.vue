@@ -105,13 +105,13 @@ const rows = computed(() => {
 
   for (let workload of workloads.value) {
     let tags = [];
-    if (workload.tags && workload.tags.tags) {
-      tags = workload.tags.tags;
+    if (workload.tags && workload.tags) {
+      tags = workload.tags;
     }
 
     let deps = [];
-    if (workload.dependencies && workload.dependencies.dependencies) {
-      deps = Object.keys(workload.dependencies.dependencies).sort();
+    if (workload.dependencies && workload.dependencies) {
+      deps = Object.keys(workload.dependencies).sort();
     }
 
     list.push({
@@ -120,7 +120,7 @@ const rows = computed(() => {
       Runtime: workload.runtime,
       Dependencies: deps,
       Tags: tags,
-      State: workload.execStateKey,
+      State: workload.state,
     });
   }
   console.log("list", list);

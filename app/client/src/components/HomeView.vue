@@ -118,33 +118,26 @@ onMounted(() => {
       .then((json) => {
         console.log("loadState");
         console.log(json);
-        console.log(numberOfWorkloads.value);
-        if (json && json.response && json.response.completeState && json.response.completeState.workloadStates
-        && json.response.completeState.desiredState && json.response.completeState.desiredState.workloads.workloads) {
-            var completeState = json.response.completeState;
-
+        if (json && json.workload_states && json.desired_state && json.desired_state.workloads) {
             // reset workloads array
             workloads.value = [];
 
             // combine desired state and workload states into one data structure
-            var agentStateMap = completeState.workloadStates.agentStateMap;
-            for (const agentName in agentStateMap) {
-              var workloadStateMap = agentStateMap[agentName].wlNameStateMap;
+            var workloadStates = json.workload_states;
+            for (const agentName in workloadStates) {
+              var workloadStateMap = workloadStates[agentName];
               for (const workloadName in workloadStateMap) {
                 // retrieve the execution state
-                var idStateMap = workloadStateMap[workloadName].idStateMap;
+                var idStateMap = workloadStateMap[workloadName];
                 var workloadId = Object.keys(idStateMap)[0];
 
                 var state = idStateMap[workloadId];
-                var keys = Object.keys(state);
-                var execStateKey = keys[keys.length - 1];
-                var executionState = state[execStateKey];
 
-                var workload = completeState.desiredState.workloads.workloads[workloadName];
+                var workload = json.desired_state.workloads[workloadName];
                 workload["workloadName"] = workloadName;
                 workload["workloadId"] = workloadId;
-                workload["executionState"] = executionState;
-                workload["execStateKey"] = execStateKey;
+                workload["state"] = state.state.toLowerCase();
+                workload["substate"] = state.substate;
                 workloads.value.push(workload);
               }
             }
@@ -168,8 +161,7 @@ onMounted(() => {
         agentsList.value = [...agents];
         agentsList.value = agentsList.value.sort((a, b) => a.localeCompare(b))
         EventBus.emit('update-dependencies', dependencies);
-      })
-      .catch((error) => {
+      }).catch((error) => {
         console.log(
           "There has been a problem with your fetch operation: ",
           error.message

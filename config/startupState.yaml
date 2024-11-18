@@ -11,7 +11,7 @@ workloads:
     restartPolicy: NEVER 
     dependencies:
     runtimeConfig: |
-       image: dashboard:0.0 
+       image: dashboard:0.0
        commandOptions: ["-p", "5001:5001", "-e", "PASSWORD=admin"]
     controlInterfaceAccess:
         allowRules:
@@ -20,11 +20,6 @@ workloads:
             filterMask:
               - "desiredState"
               - "workloadStates"
-    tags:
-      - key: Started by
-        value: Front Passenger
-      - key: Running in
-        value: AC Unit
 
   Automatic_Climate_Control:
     runtime: podman

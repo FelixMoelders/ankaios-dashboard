@@ -68,33 +68,28 @@ export default {
           }).then(json => {
             console.log("loadState");
             console.log(json);
-            if (json && json.response && json.response.completeState && json.response.completeState.workloadStates
-            && json.response.completeState.desiredState && json.response.completeState.desiredState.workloads.workloads) {
-                var completeState = json.response.completeState;
-
+            if (json && json.workload_states && json.desired_state && json.desired_state.workloads) {
+                console.log("if statement klappt");
                 // combine desired state and workload states into one data structure
-                var agentStateMap = completeState.workloadStates.agentStateMap;
+                var agentStateMap = json.workload_states;
                 var workloads_buffer = [];
                 for (const agentName in agentStateMap) {
-                  var workloadStateMap = agentStateMap[agentName].wlNameStateMap;
+                  var workloadStateMap = agentStateMap[agentName];
                   for (const workloadName in workloadStateMap) {
                     if (!(workloadName in this.sectionsToggleState)) {
                       this.sectionsToggleState[workloadName] = "";
                     }
                     // retrieve the execution state
-                    var idStateMap = workloadStateMap[workloadName].idStateMap;
+                    var idStateMap = workloadStateMap[workloadName];
                     var workloadId = Object.keys(idStateMap)[0];
 
                     var state = idStateMap[workloadId];
-                    var keys = Object.keys(state);
-                    var execStateKey = keys[keys.length - 1];
-                    var executionState = state[execStateKey];
 
-                    var workload = completeState.desiredState.workloads.workloads[workloadName];
+                    var workload = json.desired_state.workloads[workloadName];
                     workload["workloadName"] = workloadName;
                     workload["workloadId"] = workloadId;
-                    workload["executionState"] = executionState;
-                    workload["execStateKey"] = execStateKey;
+                    workload["state"] = state.state.toLowerCase();
+                    workload["substate"] = state.substate;
                     workloads_buffer.push(workload);
                   }
                 }
@@ -108,6 +103,7 @@ export default {
                     }
                   }
                 }
+                console.log("Workloads buffer wurde gesetzt");
             }
             if (this.workloads) {
                 var dependencies = [];

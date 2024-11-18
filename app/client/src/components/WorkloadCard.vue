@@ -5,7 +5,7 @@
 
         <div class="row justify-between items-center">
             <div>
-                <q-badge rounded :color="chooseExecutionColor(execStateKey)" class="q-mr-sm" />{{execStateKey}}
+                <q-badge rounded :color="chooseExecutionColor(state)" class="q-mr-sm" />{{state}}
             </div>
             <q-btn flat round icon="close" size="xs" color="negative" @click="confirm = true" />
         </div>
@@ -34,8 +34,8 @@
             <div v-for="workloadState in allWorkloads.filter(ws => ws.workloadName === currentWorkloadName)"
               :key="workloadState.workloadName">
               <div>
-                <q-badge rounded :color="getExecutionStateColor(workloadState.executionState)" class="q-mr-sm" />
-                {{ workloadState.executionState }}
+                <q-badge rounded :color="getExecutionStateColor(workloadState.substate)" class="q-mr-sm" />
+                {{ workloadState.substate }}
               </div>
               <div v-for="dependency in getDependencyText(workloadState)" :key="dependency.text" >
                 <q-badge rounded :color="dependency.status === 'match' ? 'positive' : 'negative'" class="q-mr-sm" /> {{ dependency.text }}
@@ -81,7 +81,7 @@ export default {
     },
     methods: {
       getExecutionStateColor(state) { // Display icons in workload card dependency view in corresponding colors
-        if (state === 'RUNNING_OK') { // includes more detailed substate descriptions than method "chooseExecutionColor(execState)" below. Could be simplified to remove redundant code.
+        if (state === 'RUNNING_OK') {
             return 'positive';
         }
 
@@ -135,18 +135,18 @@ export default {
             let dependenciesList = [];
 
             if (workloadState) {
-                let dependencies = workloadState.dependencies["dependencies"];
+                let dependencies = workloadState.dependencies;
                 if (dependencies && Object.keys(dependencies).length > 0) {
                     for (let dependency of Object.keys(dependencies)) {
                         let workload = this.allWorkloads.find(workload => workload.workloadName === dependency);
-                        if (workload && workload.executionState) {
+                        if (workload && workload.substate) {
                             let desiredValue = dependencies[dependency];
-                            let actualValue = workload.executionState;
+                            let actualValue = workload.substate;
                             let actualMappedValue = equivalentStates[actualValue] || actualValue;
                             if (actualMappedValue === desiredValue) {
                                 dependenciesList.push({text: `${dependency} -> ${desiredValue} is a match`, status: 'match'});
                             } else {
-                                dependenciesList.push({text: `${dependency} -> ${desiredValue} does not match current state ${actualMappedValue}`, status: 'no-match'});
+                                dependenciesList.push({text: `${dependency} -> ${desiredValue} does not match current state ${actualValue}`, status: 'no-match'});
                             }
                         } else {
                             let value = dependencies[dependency];
@@ -201,8 +201,8 @@ export default {
         }
     },
     computed: {
-        execStateKey() {
-            return this.workload.execStateKey;
+        state() {
+            return this.workload.state;
         },
         currentSection() {
             return this.sectionsToggleState[this.currentWorkloadName];

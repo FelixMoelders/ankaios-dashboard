@@ -39,52 +39,43 @@ export default {
                   // reset workloads array
                   var workloads = [];
 
-                  if (json && json.response && json.response.completeState && json.response.completeState.workloadStates
-                  && json.response.completeState.desiredState && json.response.completeState.desiredState.workloads.workloads) {
-                      var completeState = json.response.completeState;
+                  if (json && json.workload_states && json.desired_state && json.desired_state.workloads) {
+                    // combine desired state and workload states into one data structure
+                    var workloadStates = json.workload_states;
+                    for (const agentName in workloadStates) {
+                      var workloadStateMap = workloadStates[agentName];
+                      for (const workloadName in workloadStateMap) {
+                        // retrieve the execution state
+                        var idStateMap = workloadStateMap[workloadName];
+                        var workloadId = Object.keys(idStateMap)[0];
 
-                      // combine desired state and workload states into one data structure
-                      var agentStateMap = completeState.workloadStates.agentStateMap;
-                      for (const agentName in agentStateMap) {
-                        var workloadStateMap = agentStateMap[agentName].wlNameStateMap;
-                        for (const workloadName in workloadStateMap) {
-                          // retrieve the execution state
-                          var idStateMap = workloadStateMap[workloadName].idStateMap;
-                          var workloadId = Object.keys(idStateMap)[0];
+                        var state = idStateMap[workloadId];
 
-                          var state = idStateMap[workloadId];
-                          var keys = Object.keys(state);
-                          var execStateKey = keys[keys.length - 1];
-                          var executionState = state[execStateKey];
-
-                          var workload = completeState.desiredState.workloads.workloads[workloadName];
-                          workload["workloadName"] = workloadName;
-                          workload["workloadId"] = workloadId;
-                          workload["executionState"] = executionState;
-                          workload["execStateKey"] = execStateKey;
-                          workloads.push(workload);
-                        }
+                        var workload = json.desired_state.workloads[workloadName];
+                        workload["workloadName"] = workloadName;
+                        workload["workloadId"] = workloadId;
+                        workload["state"] = state.state.toLowerCase();
+                        workload["substate"] = state.substate;
+                        workloads.push(workload);
                       }
-                  }
-                  if (workloads) {
-                      var dependencies = [];
-                      for (const workloadDefinition of workloads) {
-                        if (Object.keys(workloadDefinition.dependencies).length > 0) {
-                            for (let [dependency, condition] of Object.entries(workloadDefinition.dependencies["dependencies"])) {
-                                dependencies.push({
-                                  source: workloadDefinition.workloadName,
-                                  target: dependency,
-                                  type: condition
-                                });
-                            }
+                    }
+                }
+                this.dependencies = [];
+                for (const workloadDefinition of workloads) {
+                    if (workloadDefinition.dependencies) {
+                        for (let [dependency, condition] of Object.entries(workloadDefinition.dependencies)) {
+                            this.dependencies.push({
+                              source: workloadDefinition.workloadName,
+                              target: dependency,
+                              type: condition
+                            });
                         }
-                      }
-                      console.log(dependencies); // todo - debug output
-                      EventBus.emit('update-dependencies', dependencies);
-                  }
-                }).catch((error) => {
-                    console.log('There has been a problem with your fetch operation: ', error.message);
-                });
+                    }
+                }
+                EventBus.emit('update-dependencies', this.dependencies);
+              }).catch((error) => {
+                  console.log('There has been a problem with your fetch operation: ', error.message);
+              });
         },
   },
   mounted() {

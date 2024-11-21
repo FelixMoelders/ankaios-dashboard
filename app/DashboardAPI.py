@@ -40,11 +40,10 @@ def home():
 @dashboard.route('/login', methods=['POST'])
 def login():
     pwd = request.json['pwd']['_value']
-    if pwd == os.environ.get('PASSWORD', DEFAULT_PASSWORD):
-        user = User(str(uuid.uuid4))
+    if pwd == os.environ.get('PASSWORD', DEFAULT_PASSWORD) or not os.environ.get('PASSWORD', DEFAULT_PASSWORD):
+        user = User(str(uuid.uuid4()))
         login_user(user)
         return Response("Logged in.", status=200)
-
     else:
         return Response("Wrong password.", status=401)
 
@@ -58,7 +57,12 @@ def logout():
 def checkAuthentication():
     if current_user.is_authenticated:
         return Response("Authenticated.", status=200)
+    elif not os.environ.get('PASSWORD', DEFAULT_PASSWORD):
+        user = User(str(uuid.uuid4()))
+        login_user(user)
+        return Response("Authenticated.", status=200)
     else:
+        print("user not authenticated.", current_user)
         return Response("Not authenticated.", status=401)
 
 @dashboard.route('/setNewPwd', methods=['POST'])

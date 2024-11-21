@@ -35,7 +35,7 @@ Add the following entry to your startupState.yaml for ankaios and you are ready 
        dependencies:
        runtimeConfig: |
           image: ghcr.io/felixmoelders/ankaios-dashboard:latest
-          commandOptions: ["-p", "5001:5001", "-e", "PASSWORD=admin"]
+          commandOptions: ["-p", "5001:5001"]
        controlInterfaceAccess:
            allowRules:
              - type: StateRule

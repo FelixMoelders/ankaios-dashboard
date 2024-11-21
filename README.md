@@ -45,7 +45,7 @@ Add the following entry to your startupState.yaml for ankaios and you are ready 
                  - "workloadStates"
    ```
 
-Call the dashboard via localhost:5001. The login credentials are by default
+Call the dashboard via localhost:5001. If you want to use the dashboard with a password, then add the PASSWORD environment variable for the dashboard e.g. commandOptions: ["-p", "5001:5001", "-e", "PASSWORD=admin"]
 
 > - User: **admin**
 > - Password: **admin**

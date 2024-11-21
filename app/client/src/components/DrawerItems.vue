@@ -9,7 +9,7 @@
         clickable
         v-ripple
         @click="flagActiveItem(item.name)"
-        :to="loggedIn ? '/' + item.name.toLowerCase() : '/nologin'"
+        :to="'/' + item.name.toLowerCase()"
       >
         <q-item-section avatar>
           <q-icon

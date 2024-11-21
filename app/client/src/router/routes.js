@@ -11,7 +11,7 @@ function guardRoutes(to, from, next) {
 const routes = [
   {
     path: "/",
-    redirect: { path: "/nologin" },
+    redirect: { path: "/home" },
     component: () => import("layouts/MainLayout.vue"),
     children: [
       {
